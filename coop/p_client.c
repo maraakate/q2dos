@@ -2719,7 +2719,7 @@ ClientUserinfoChanged(edict_t *ent, char *userinfo)
 
 	/* set name */
 	s = Info_ValueForKey(userinfo, "name");
-	if(!s[0] || s[0] == ' ') /* FS: Catch trouble makers */
+	if (!s[0] || s[0] == ' ') /* FS: Catch trouble makers */
 	{
 		Info_SetValueForKey(userinfo, "name", "unnamed");
 		strncpy(ent->client->pers.netname, "unnamed", sizeof(ent->client->pers.netname)-1);
@@ -2727,9 +2727,9 @@ ClientUserinfoChanged(edict_t *ent, char *userinfo)
 	}
 	else
 	{
-		if(sv_coop_announce_name_change->intValue && ent->client->pers.netname[0] && s[0] && Q_stricmp(ent->client->pers.netname, s)) /* FS: Catch trouble makers */
+		if (sv_coop_announce_name_change->intValue && ent->client->pers.netname[0] && s[0] && Q_stricmp(ent->client->pers.netname, s)) /* FS: Catch trouble makers */
 		{
-			if(ent->client->pers.name_timeout > level.time)
+			if (ent->client->pers.name_timeout > level.time)
 			{
 				gi.cprintf(ent, PRINT_HIGH, "You are changing names too quickly!  Please wait another %d second(s).\n", (int)ent->client->pers.name_timeout-(int)level.time);
 				Info_SetValueForKey(userinfo, "name", ent->client->pers.netname);
@@ -2741,9 +2741,9 @@ ClientUserinfoChanged(edict_t *ent, char *userinfo)
 			}
 		}
 
-		if(bAllowNameChange)
+		if (bAllowNameChange)
 		{
-			if(ent->client->pers.netname[0] && Q_stricmp(ent->client->pers.netname, s)) /* FS: If the netname has been set, and it doesn't match what we got then set the timeout.  On initial connect sequence the username is blank so we can't count that one. */
+			if (ent->client->pers.netname[0] && Q_stricmp(ent->client->pers.netname, s)) /* FS: If the netname has been set, and it doesn't match what we got then set the timeout.  On initial connect sequence the username is blank so we can't count that one. */
 			{
 				ent->client->pers.name_timeout = level.time + sv_coop_name_timeout->value;
 			}
@@ -2751,14 +2751,31 @@ ClientUserinfoChanged(edict_t *ent, char *userinfo)
 		}
 	}
 
+	/* FS: Detect tastyspleen's WallFly bot. */
 	if (!Q_stricmp(ent->client->pers.netname, "WallFly[BZZZ]"))
 	{
 		s = Info_ValueForKey(userinfo, "ip");
-		if (s[0] && !Q_stricmp(s, sv_filter_wallfly_ip->string))
+
+		if (s[0] && sv_filter_wallfly_ip->string[0])
 		{
-			gi.dprintf(DEVELOPER_MSG_VERBOSE, "isWallFly flag set for user %s [%d]\n", ent->client->pers.netname, ent->s.number);
-			ent->client->pers.isWallFly = true;
+			if (!strncmp(s, sv_filter_wallfly_ip->string, strlen(sv_filter_wallfly_ip->string)))
+			{
+				gi.dprintf(DEVELOPER_MSG_VERBOSE, "isWallFly flag set for user %s [%d]\n", ent->client->pers.netname, ent->s.number);
+				ent->client->pers.isWallFly = true;
+			}
+			else
+			{
+				ent->client->pers.isWallFly = false;
+			}
 		}
+		else
+		{
+			ent->client->pers.isWallFly = false;
+		}
+	}
+	else
+	{
+		ent->client->pers.isWallFly = false;
 	}
 
 	/* set spectator */
@@ -2819,7 +2836,7 @@ ClientUserinfoChanged(edict_t *ent, char *userinfo)
 
 	if ((maxclients->intValue > 1) && (strlen(s)))
 	{
-		if(adminpass->string[0] && !Q_stricmp(s, adminpass->string))
+		if (adminpass->string[0] && !Q_stricmp(s, adminpass->string))
 		{
 			gi.dprintf(DEVELOPER_MSG_VERBOSE, "isAdmin flag set for user %s [%d]\n", ent->client->pers.netname, ent->s.number);
 			ent->client->pers.isAdmin = ent->client->resp.isAdmin = true;
@@ -2839,7 +2856,7 @@ ClientUserinfoChanged(edict_t *ent, char *userinfo)
 
 	if ((maxclients->intValue > 1) && (strlen(s)))
 	{
-		if(vippass->string[0] && !Q_stricmp(s, vippass->string))
+		if (vippass->string[0] && !Q_stricmp(s, vippass->string))
 		{
 			gi.dprintf(DEVELOPER_MSG_VERBOSE, "isVIP flag set for user %s [%d]\n", ent->client->pers.netname, ent->s.number);
 			ent->client->pers.isVIP = ent->client->resp.isVIP = true;
@@ -2858,7 +2875,7 @@ ClientUserinfoChanged(edict_t *ent, char *userinfo)
 	s = Info_ValueForKey(userinfo, "nosummon");
 	if (strlen(s))
 	{
-		if(atoi(s))
+		if (atoi(s))
 		{
 			ent->client->pers.noSummon = ent->client->resp.noSummon = ent->client->resp.coop_respawn.noSummon = true;
 		}
