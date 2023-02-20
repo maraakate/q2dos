@@ -643,6 +643,9 @@ void SV_ExecuteUserCommand (char *s)
 	if (sv_client->state < cs_spawned)
 		return;
 
+	/* FS: From R1Q2.  Reset idle time. */
+	sv_client->idletime = 0;
+
 	if (!u->name && sv.state == ss_game)
 		ge->ClientCommand (sv_player);
 
@@ -799,6 +802,14 @@ void SV_ExecuteClientMessage (client_t *cl)
 
 				}
 				SV_ClientThink (cl, &newcmd);
+			}
+
+			/* FS: From R1Q2.  Reset idle time */
+			if (newcmd.buttons != oldcmd.buttons ||
+				newcmd.forwardmove != oldcmd.forwardmove ||
+				newcmd.upmove != oldcmd.upmove)
+			{
+				cl->idletime = 0;
 			}
 
 			cl->lastcmd = newcmd;

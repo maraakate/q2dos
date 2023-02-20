@@ -129,6 +129,7 @@ typedef struct client_s
 	int				lastmessage;		// sv.framenum when packet was last received
 	int				lastconnect;
 
+	int				idletime;			/* FS: From R1Q2.  Kick excessive idlers. */
 	int				challenge;			// challenge of this user, randomly generated
 
 	netchan_t		netchan;

@@ -59,6 +59,7 @@ cvar_t	*sv_entfile;	// Knightmare 6/25/12- cvar to control use of .ent files
 cvar_t	*sv_skipcinematics; /* FS: Skip cinematics if we want to. */
 cvar_t	*sv_allow_download_maps_in_paks; /* FS: Allow bsp downloads from a pak file if we want to. */
 cvar_t	*sv_downloadserver; /* FS: From R1Q2: HTTP Downloading */
+cvar_t	*sv_idlekick; /* FS: Kick excessive idlers.  From R1Q2 */
 
 /* FS: Added these to filter out wallfly's spammy rcon status request every 30 seconds */
 cvar_t		*sv_filter_wallfly_rcon_request;
@@ -911,6 +912,22 @@ void SV_CheckTimeouts (void)
 			cl->state = cs_free;	// can now be reused
 			continue;
 		}
+
+		/* FS: From R1Q2.  Kick excessive idlers */
+		if (cl->state == cs_spawned && dedicated->intValue)
+		{
+			cl->idletime++;
+			if (sv_idlekick->intValue && cl->idletime >= sv_idlekick->intValue * 100)
+			{
+				SV_ClientPrintf (cl, PRINT_HIGH, "DROPPED: You have been disconnected due to inactivity.\n");
+				SV_BroadcastPrintf (PRINT_HIGH, "%s has been disconnected due to inactivity.\n", cl->name);
+				SV_DropClient (cl);
+				cl->lastmessage = svs.realtime;
+				cl->state = cs_free;
+				continue;
+			}
+		}
+
 		if ( (cl->state == cs_connected || cl->state == cs_spawned) 
 			&& cl->lastmessage < droppoint)
 		{
@@ -1223,6 +1240,10 @@ void SV_Init (void)
 	/* FS: From R1Q2: HTTP Downloading */
 	sv_downloadserver = Cvar_Get ("sv_downloadserver", "", 0);
 	Cvar_SetDescription("sv_downloadserver", "URL to a location where clients can download game content over HTTP. Default empty.  Path leads to game dir name.  i.e. quake2.com/baseq2/maps\n");
+
+	/* FS: Kick excessive idlers.  From R1Q2 */
+	sv_idlekick = Cvar_Get("sv_idlekick", "300", 0);
+	Cvar_SetDescription("sv_idlekick", "Kick excessive idlers after X seconds.  Set to 0 to disable.");
 
 	/* FS: Added these to filter out wallfly's spammy rcon status request every 30 seconds */
 	sv_filter_wallfly_rcon_request = Cvar_Get ("sv_filter_wallfly_rcon_request", "0", 0);
