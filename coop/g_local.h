@@ -1138,6 +1138,7 @@ void player_die(edict_t *self, edict_t *inflictor, edict_t *attacker,
 //
 void	ServerCommand (void);
 qboolean SV_FilterPacket (char *from);
+qboolean SV_FilterName (char *from); /* FS: Added */
 
 //
 // p_view.c

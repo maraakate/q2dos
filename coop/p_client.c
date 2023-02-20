@@ -2886,6 +2886,14 @@ ClientConnect(edict_t *ent, char *userinfo)
 		return false;
 	}
 
+	/* check to see if they are on the banned name list */
+	value = Info_ValueForKey(userinfo, "name");
+	if (SV_FilterName(value))
+	{
+		Info_SetValueForKey(userinfo, "rejmsg", "Banned.");
+		return false;
+	}
+
 	/* check for a spectator */
 	value = Info_ValueForKey(userinfo, "spectator");
 
