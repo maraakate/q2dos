@@ -281,6 +281,7 @@ InitGame(void)
 	needpass = gi.cvar ("needpass", "0", CVAR_SERVERINFO);
 	filterban = gi.cvar ("filterban", "1", 0);
 	flashlightmode = gi.cvar("flashlightmode", "0", 0);
+	sv_filter_wallfly_ip = gi.cvar("sv_filter_wallfly_ip", "", 0); /* FS */
 
 	g_select_empty = gi.cvar ("g_select_empty", "0", CVAR_ARCHIVE);
 

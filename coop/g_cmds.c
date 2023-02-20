@@ -1790,7 +1790,8 @@ Cmd_Say_f(edict_t *ent, qboolean team, qboolean arg0)
 
 	strcat(text, "\n");
 
-	if (flood_msgs->value)
+	/* FS: Admins, VIPs, and WallFly are exempt from this. */
+	if (!ent->client->pers.isAdmin && !ent->client->pers.isVIP && !ent->client->pers.isWallFly && flood_msgs->value)
 	{
 		cl = ent->client;
 
@@ -2240,7 +2241,8 @@ Cmd_SayPerson_f(edict_t *ent) /* FS: Tastyspleen/Q2Admin stuff.  By request. */
 	}
 	strcat(entHeader, "\n");
 
-	if (flood_msgs->value)
+	/* FS: Admins, VIPs, and WallFly are exempt from this. */
+	if (!ent->client->pers.isAdmin && !ent->client->pers.isVIP && !ent->client->pers.isWallFly && flood_msgs->value)
 	{
 		cl = ent->client;
 

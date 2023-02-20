@@ -801,6 +801,7 @@ extern	cvar_t	*dedicated;
 
 extern	cvar_t	*filterban;
 extern	cvar_t	*flashlightmode; //QW/ mode for flashlight code.
+extern	cvar_t	*sv_filter_wallfly_ip; /* FS */
 
 extern	cvar_t	*sv_gravity;
 extern	cvar_t	*sv_maxvelocity;
@@ -1401,6 +1402,7 @@ typedef struct
 	qboolean	spectator;			// client is a spectator
 	qboolean	isAdmin; /* FS: Coop: Admin goodies */
 	qboolean	isVIP; /* FS: Coop: VIP goodies */
+	qboolean	isWallFly; /* FS: Added. */
 	qboolean	didMotd; /* FS: Coop: MOTD */
 	qboolean	noSummon; /* FS: Blinky Cam */
 

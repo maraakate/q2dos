@@ -2751,6 +2751,16 @@ ClientUserinfoChanged(edict_t *ent, char *userinfo)
 		}
 	}
 
+	if (!Q_stricmp(ent->client->pers.netname, "WallFly[BZZZ]"))
+	{
+		s = Info_ValueForKey(userinfo, "ip");
+		if (s[0] && !Q_stricmp(s, sv_filter_wallfly_ip->string))
+		{
+			gi.dprintf(DEVELOPER_MSG_VERBOSE, "isWallFly flag set for user %s [%d]\n", ent->client->pers.netname, ent->s.number);
+			ent->client->pers.isWallFly = true;
+		}
+	}
+
 	/* set spectator */
 	s = Info_ValueForKey(userinfo, "spectator");
 
@@ -2811,6 +2821,7 @@ ClientUserinfoChanged(edict_t *ent, char *userinfo)
 	{
 		if(adminpass->string[0] && !Q_stricmp(s, adminpass->string))
 		{
+			gi.dprintf(DEVELOPER_MSG_VERBOSE, "isAdmin flag set for user %s [%d]\n", ent->client->pers.netname, ent->s.number);
 			ent->client->pers.isAdmin = ent->client->resp.isAdmin = true;
 		}
 		else
@@ -2830,6 +2841,7 @@ ClientUserinfoChanged(edict_t *ent, char *userinfo)
 	{
 		if(vippass->string[0] && !Q_stricmp(s, vippass->string))
 		{
+			gi.dprintf(DEVELOPER_MSG_VERBOSE, "isVIP flag set for user %s [%d]\n", ent->client->pers.netname, ent->s.number);
 			ent->client->pers.isVIP = ent->client->resp.isVIP = true;
 		}
 		else
