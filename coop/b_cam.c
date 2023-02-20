@@ -193,18 +193,18 @@ static void ShowStats(edict_t *ent, edict_t *player)
 	xd = -dp[0]/SCANNER_UNIT;
 	yd = dp[1]/SCANNER_UNIT;
 
-	if (player->client)
+	//if (player->client)
 	{
 		strncpy(pname, player->client->pers.netname, sizeof(pname)-1);
 	}
-	else if (player->classname)
-	{
-		strncpy(pname, player->classname, sizeof(pname)-1);
-	}
-	else
-	{
-		Com_sprintf(pname, sizeof(pname), "unnamed");
-	}
+	//else if (player->classname)
+	//{
+	//	strncpy(pname, player->classname, sizeof(pname)-1);
+	//}
+	//else
+	//{
+	//	Com_sprintf(pname, sizeof(pname), "unnamed");
+	//}
 
 	pname[sizeof(pname)-1] = 0;
 	health = player->health;
@@ -270,7 +270,7 @@ void stopBlinkyCam(edict_t * ent)
 	}
 
 	bdata = &ent->client->blinky_client;
-	if(!bdata || !bdata->cam_decoy)
+	if(!bdata->cam_decoy)
 	{
 		return;
 	}
@@ -289,11 +289,8 @@ void stopBlinkyCam(edict_t * ent)
 	gi.linkentity(ent);
 
 	/* FS: Get rid of the decoy, free up some edicts */
-	if(bdata->cam_decoy)
-	{
-		G_FreeEdict(bdata->cam_decoy);
-		bdata->cam_decoy = NULL;
-	}
+	G_FreeEdict(bdata->cam_decoy);
+	bdata->cam_decoy = NULL;
 //	gi.linkentity(bdata->cam_decoy);
 }
 
@@ -414,13 +411,13 @@ void Cmd_Cam_f(edict_t *ent)
 			}
 
 			target = &g_edicts[playernum+1];
-			if(!target || !target->inuse || !target->client)
+			if (!target || !target->inuse || !target->client)
 			{
 				gi.cprintf(ent, PRINT_HIGH, "Couldn't find player #%d to chase!\n", playernum);
 				return;
 			}
 
-			if ((target) && (ent->client->blinky_client.cam_target) && (ent->client->blinky_client.cam_target == target)) /* FS: If we ask for it twice and we're already viewing them then bust out */
+			if (ent->client->blinky_client.cam_target == target) /* FS: If we ask for it twice and we're already viewing them then bust out */
 			{
 				stopBlinkyCam(ent);
 				return;
@@ -459,7 +456,7 @@ void Cmd_Cam_f(edict_t *ent)
 			return;
 		}
 
-		if ((target) && (ent->client->blinky_client.cam_target) && (ent->client->blinky_client.cam_target == target)) /* FS: If we ask for it twice and we're already viewing them then bust out */
+		if (ent->client->blinky_client.cam_target == target) /* FS: If we ask for it twice and we're already viewing them then bust out */
 		{
 			stopBlinkyCam(ent);
 			return;
@@ -483,12 +480,6 @@ void Cmd_Cam_f(edict_t *ent)
 	}
 	else
 	{
-		if (obj1 && obj1->client && name[0] && !Q_stricmp(name, obj1->client->pers.netname)) /* FS: If we ask for it twice and we're already viewing them then bust out */
-		{
-			stopBlinkyCam(ent);
-			return;
-		}
-
 		if (!obj1)
 		{
 			gi.cprintf(ent, PRINT_HIGH, "Blinky cam setup\n");
@@ -533,14 +524,7 @@ void Cmd_Cam_f(edict_t *ent)
 
 		if(bFindFailed)
 		{
-			if(name[0])
-			{
-				gi.cprintf(ent, PRINT_HIGH, "Can't find player \"%s\" to chase!\n", name);
-			}
-			else
-			{
-				gi.cprintf(ent, PRINT_HIGH, "Can't find a player to chase!\n");
-			}
+			gi.cprintf(ent, PRINT_HIGH, "Can't find a player to chase!\n");
 		}
 	}
 }
