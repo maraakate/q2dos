@@ -2234,9 +2234,10 @@ int G_SpawnCheckpoints (edict_t *ent)
 	return inhibit;
 }
 
-void G_CheckCoopVictory (void) /* FS: Coop: Check if victory.pcx is the current map, workaround the "gamemap" crap in sv_init.c */
+//QW// Generalized to detect .pcx used as a map.
+void G_CheckCoopVictory (void) /* FS: Coop: Check if a pcx is the current map, workaround the "gamemap" crap in sv_init.c */
 {
-	if(!Q_stricmp("victory.pcx", level.mapname))
+	if (strstr(level.mapname, ".pcx"))
 	{
 		switch (game.gametype)
 		{
