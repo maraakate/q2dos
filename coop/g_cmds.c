@@ -1744,7 +1744,7 @@ Cmd_Say_f(edict_t *ent, qboolean team, qboolean arg0)
 	char text[2048];
 	gclient_t *cl;
 
-	if (!ent)
+	if (!ent || !ent->client)
 	{
 		return;
 	}
@@ -1754,7 +1754,7 @@ Cmd_Say_f(edict_t *ent, qboolean team, qboolean arg0)
 		return;
 	}
 
-	if (ent->client && ent->client->pers.isSilenced) /* FS */
+	if (ent->client->pers.isSilenced) /* FS */
 	{
 		return;
 	}
@@ -2150,7 +2150,7 @@ Cmd_SayPerson_f(edict_t *ent) /* FS: Tastyspleen/Q2Admin stuff.  By request. */
 	qboolean bIsPlayerNum = false;
 	qboolean bIsSearch = false;
 
-	if (!ent)
+	if (!ent || !ent->client)
 	{
 		return;
 	}
@@ -2161,7 +2161,7 @@ Cmd_SayPerson_f(edict_t *ent) /* FS: Tastyspleen/Q2Admin stuff.  By request. */
 		return;
 	}
 
-	if (ent->client && ent->client->pers.isSilenced) /* FS */
+	if (ent->client->pers.isSilenced) /* FS */
 	{
 		return;
 	}

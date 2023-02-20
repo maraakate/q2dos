@@ -1380,6 +1380,11 @@ void Info_RemoveKey (char *s, char *key)
 	char	value[512];
 	char	*o;
 
+	if (!key)
+	{
+		return;
+	}
+
 	if (strchr(key, '\\'))
 	{
 //		Com_Printf ("Can't use a key with a \\\n");

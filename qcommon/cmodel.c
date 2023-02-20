@@ -650,7 +650,10 @@ cmodel_t *CM_LoadMap (char *name, qboolean clientload, unsigned *checksum)
 	//
 	length = FS_LoadFile (name, (void **)&buf);
 	if (!buf)
+	{
 		Com_Error (ERR_DROP, "Couldn't load %s", name);
+		return NULL;
+	}
 
 	last_checksum = LittleLong (Com_BlockChecksum (buf, length));
 	*checksum = last_checksum;
@@ -701,10 +704,17 @@ cmodel_t	*CM_InlineModel (char *name)
 	int		num;
 
 	if (!name || name[0] != '*')
+	{
 		Com_Error (ERR_DROP, "CM_InlineModel: bad name");
+		return 0;
+	}
+
 	num = atoi (name+1);
 	if (num < 1 || num >= numcmodels)
+	{
 		Com_Error (ERR_DROP, "CM_InlineModel: bad number");
+		return 0;
+	}
 
 	return &map_cmodels[num];
 }

@@ -426,12 +426,12 @@ SP_info_coop_checkpoint_touch ( edict_t * self , edict_t * other , cplane_t * pl
 void
 SP_info_coop_checkpoint (edict_t * self )
 {
-	if(!self)
+	if (!self)
 	{
 		return;
 	}
 
-	if((!coop->intValue) || (coop->intValue && !coop_checkpoints->intValue))
+	if (!coop->intValue || !coop_checkpoints->intValue)
 	{
 		G_FreeEdict(self);
 		return;
@@ -2581,20 +2581,19 @@ void ClientShowMOTD(edict_t* ent)
 	// Generate the path to the MOTD file.
 	Com_sprintf(motdPath, sizeof motdPath, "%s/%s", gamedir->string, "motd.txt");
 
-	if ((motd_file = fopen(motdPath, "r")) != NULL)
+	motd_file = fopen(motdPath, "r");
+	if (motd_file)
 	{
-		if (motd_file)
+		if (fgets(motd, 8192, motd_file))
 		{
-			if (fgets(motd, 8192, motd_file))
+			while (fgets(line, 80, motd_file))
 			{
-				while (fgets(line, 80, motd_file))
-				{
-					strcat(motd, line);
-				}
-				gi.centerprintf(ent, "%s", motd);
+				strcat(motd, line);
 			}
-			fclose(motd_file);
+			gi.centerprintf(ent, "%s", motd);
 		}
+
+		fclose(motd_file);
 	}
 }
 
@@ -2728,7 +2727,7 @@ ClientUserinfoChanged(edict_t *ent, char *userinfo)
 	}
 	else
 	{
-		if (sv_coop_announce_name_change->intValue && ent->client->pers.netname[0] && s[0] && Q_stricmp(ent->client->pers.netname, s)) /* FS: Catch trouble makers */
+		if (sv_coop_announce_name_change->intValue && ent->client->pers.netname[0] && Q_stricmp(ent->client->pers.netname, s)) /* FS: Catch trouble makers */
 		{
 			if (ent->client->pers.name_timeout > level.time)
 			{

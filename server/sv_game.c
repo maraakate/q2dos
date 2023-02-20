@@ -204,6 +204,7 @@ void PF_setmodel (edict_t *ent, char *name)
 	if (!name)
 	{
 		Com_Error (ERR_DROP, "PF_setmodel: NULL");
+		return;
 	}
 
 	i = SV_ModelIndex (name);
@@ -239,6 +240,7 @@ void PF_Configstring (int index, char *val)
 	if ((index < 0) || (index >= MAX_CONFIGSTRINGS))
 	{
 		Com_Error (ERR_DROP, "PF_Configstring: bad index %i\n", index);
+		return;
 	}
 
 	if (!val)

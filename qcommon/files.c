@@ -358,7 +358,10 @@ int FS_FOpenFile (char *filename, FILE **file)
 			// open a new file on the pakfile
 				*file = fopen (pak->filename, "rb");
 				if (!*file)
+				{
 					Com_Error (ERR_FATAL, "Couldn't reopen %s", pak->filename);
+					return -1;
+				}
 				fseek (*file, pak->files[i].filepos, SEEK_SET);
 				return pak->files[i].filelen;
 			}

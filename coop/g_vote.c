@@ -362,10 +362,7 @@ qboolean vote_mapcheck (edict_t *ent, const char *mapName)
 	if (toEOF <= 0)
 	{
 		gi.cprintf(NULL, PRINT_CHAT, "vote_mapcheck: cannot read file '%s' into memory!\n", sv_coop_maplist->string);
-		if (fileBuffer)
-		{
-			free(fileBuffer);
-		}
+		free(fileBuffer);
 		return false;
 	}
 
@@ -414,8 +411,7 @@ qboolean vote_mapcheck (edict_t *ent, const char *mapName)
 		mapToken = strtok_r(NULL, separators, &listPtr);
 	}
 cleanup:
-	if (fileBuffer)
-		free(fileBuffer);
+	free(fileBuffer);
 	if (fileBuffer2)
 		free(fileBuffer2);
 
