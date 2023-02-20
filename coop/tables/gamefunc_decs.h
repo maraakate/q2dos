@@ -1290,6 +1290,8 @@ extern void fire_lead ( edict_t * self , vec3_t start , vec3_t aimdir , int dama
 extern qboolean fire_hit ( edict_t * self , vec3_t aim , int damage , int kick ) ;
 extern void check_dodge ( edict_t * self , vec3_t start , vec3_t dir , int speed ) ;
 extern void vote_hook ( edict_t * ent ) ;
+extern void vote_silence_menu ( edict_t * ent , int entNum ) ;
+extern void vote_silence ( edict_t * ent , char * playerName ) ;
 extern void vote_kickban_menu ( edict_t * ent , int entNum , qboolean banPlayer ) ;
 extern void vote_kickban ( edict_t * ent , char * playerName , qboolean banPlayer ) ;
 extern void vote_playerexit ( edict_t * ent ) ;
@@ -1442,6 +1444,11 @@ extern void Use_Target_Speaker ( edict_t * ent , edict_t * other , edict_t * act
 extern void SP_target_temp_entity ( edict_t * ent ) ;
 extern void Use_Target_Tent ( edict_t * ent , edict_t * other , edict_t * activator ) ;
 extern void ServerCommand ( void ) ;
+extern void SVCmd_WriteName_f ( void ) ;
+extern void SVCmd_ListName_f ( void ) ;
+extern qboolean SV_FilterName ( char * from ) ;
+extern void SVCmd_RemoveName_f ( void ) ;
+extern void SVCmd_AddName_f ( void ) ;
 extern void SVCmd_Coop_Gamemode_f ( void ) ;
 extern void SVCmd_StuffCmd_f ( void ) ;
 extern void SVCmd_SayPerson_f ( void ) ;
@@ -1977,6 +1984,7 @@ extern void Move_Done ( edict_t * ent ) ;
 extern void CoopVoteToggleHook ( edict_t * ent , pmenuhnd_t * p ) ;
 extern void CoopUpdateVoteHookMenu ( edict_t * ent ) ;
 extern void CoopVoteHookMenu ( edict_t * ent , pmenuhnd_t * p ) ;
+extern void CoopVotePlayerSilence ( edict_t * ent , pmenuhnd_t * p ) ;
 extern void CoopVotePlayerBan ( edict_t * ent , pmenuhnd_t * p ) ;
 extern void CoopVotePlayerKick ( edict_t * ent , pmenuhnd_t * p ) ;
 extern void CoopVoteGamemodeDynamic ( edict_t * ent , pmenuhnd_t * p ) ;

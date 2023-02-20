@@ -15,6 +15,7 @@
 #define VOTE_NOPLAYERKICK		0x00000800 /* 2048 */
 #define VOTE_NOPLAYERBAN		0x00001000 /* 4096 */
 #define VOTE_NOHOOK				0x00002000 /* 8192 */
+#define VOTE_NOSILENCE			0x00004000 /* 16384 */
 
 /* Globals */
 qboolean bVoteInProgress;
@@ -67,6 +68,8 @@ void VoteMenuOpen (edict_t *ent);
 void vote_playerexit (edict_t *ent);
 void vote_kickban (edict_t *ent, char *playerName, qboolean banPlayer);
 void vote_kickban_menu (edict_t *ent, int entNum, qboolean banPlayer);
+void vote_silence (edict_t *ent, char *playerName);
+void vote_silence_menu (edict_t *ent,  int entNum);
 void vote_hook(edict_t *ent);
 
 #define VOTEMENU_TYPE 6
@@ -246,6 +249,30 @@ void vote_command (edict_t *ent)
 			return;
 		}
 	}
+	else if (!Q_stricmp(gi.argv(1), "silence"))
+	{
+		if (argc <= 2)
+		{
+			gi.cprintf(ent, PRINT_HIGH, "error: you must supply a player name! i.e. vote silence quakekiller\n");
+			return;
+		}
+		else
+		{
+			vote_silence(ent, gi.argv(2));
+			return;
+		}
+	}
+	else if (!Q_stricmp(gi.argv(1), "silence_menu")) /* FS: Internal menu commands */
+	{
+		if (argc <= 2)
+		{
+			return;
+		}
+		else
+		{
+			vote_silence_menu(ent, atoi(gi.argv(2)));
+		}
+	}
 	else if (!Q_stricmp(gi.argv(1), "kick_menu")) /* FS: Internal menu commands */
 	{
 		if (argc <= 2)
@@ -275,7 +302,7 @@ void vote_command (edict_t *ent)
 	else
 	{
 		gi.cprintf(ent, PRINT_HIGH, "Unknown vote command: %s.  ", gi.argv(1));
-		gi.cprintf(ent, PRINT_HIGH, "valid options are: vote map <mapname>, vote gamemode <gamemode>, vote skill <coopskill>, vote kick <playername>, vote ban <playername>, vote restartmap, vote playerexit, vote hook, vote yes, vote no, vote stop, and vote progress.\n");
+		gi.cprintf(ent, PRINT_HIGH, "valid options are: vote map <mapname>, vote gamemode <gamemode>, vote skill <coopskill>, vote kick <playername>, vote ban <playername>, vote silence <playername>, vote restartmap, vote playerexit, vote hook, vote yes, vote no, vote stop, and vote progress.\n");
 		return;
 	}
 }
@@ -900,7 +927,6 @@ void vote_Reset (void)
 			}
 		}
 	}
-
 }
 
 static void vote_SetGamemodeCVAR (char *gamemode)
@@ -966,6 +992,17 @@ void vote_Passed (void)
 	{
 		Com_sprintf(voteCbufCmdExecute, sizeof(voteCbufCmdExecute), "sv addip %s;sv writeip;kick %d\n", votePlayerBanIP, votePlayerBanEntNum);
 	}
+	else if (!Q_stricmp(voteType, "silence player"))
+	{
+		edict_t *ent = &g_edicts[votePlayerBanEntNum];
+		if (ent && ent->inuse && ent->client)
+		{
+			ent->client->pers.isSilenced = true;
+			ent->client->resp.isSilenced = true;
+
+			gi.cprintf(ent, PRINT_CHAT, "You have been silenced.\n");
+		}
+	}
 	else
 	{
 		vote_SetGamemodeCVAR(voteGamemode);
@@ -975,7 +1012,7 @@ void vote_Passed (void)
 	vote_Reset();
 
 	gi.AddCommandString(voteCbufCmdExecute);
-	return;
+	voteCbufCmdExecute[0] = '\0';
 }
 
 void vote_Failed (qboolean bTied)
@@ -990,7 +1027,6 @@ void vote_Failed (qboolean bTied)
 	}
 
 	vote_Reset();
-	return;
 }
 
 void vote_Broadcast (const char *fmt, ...)
@@ -1560,6 +1596,110 @@ void vote_kickban_menu (edict_t *ent, int entNum, qboolean banPlayer)
 		Com_sprintf(voteType, sizeof(voteType), "kick player");
 	else
 		Com_sprintf(voteType, sizeof(voteType), "ban player");
+
+	ent->voteInitiator = true;
+
+	if (sv_vote_assume_yes->intValue)
+	{
+		vote_yes(ent, true); /* FS: I assume you would want to vote yes if you initiated the vote. */
+	}
+
+	vote_menu_broadcast();
+}
+
+void vote_silence (edict_t *ent, char *playerName)
+{
+	edict_t *badPlayer = NULL;
+
+	if (!ent || !ent->client)
+	{
+		gi.dprintf(DEVELOPER_MSG_GAME, "Error: vote_silence from a non-player!\n");
+		return;
+	}
+
+	if (bVoteInProgress)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "A vote is already in progress for %s: %s!\n", voteType, whatAreWeVotingFor);
+		return;
+	}
+
+	vote_Reset();
+
+	if (sv_vote_disallow_flags->intValue & VOTE_NOSILENCE)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Voting for silencing players are not allowed on this server.  Vote cancelled.\n");
+		return;
+	}
+
+	if (!playerName)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Error: You must provide a player name!\n");
+		return;
+	}
+
+	badPlayer = Find_LikePlayer(ent, playerName, true);
+	if (!badPlayer)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Vote cancelled.\n");
+		return;
+	}
+
+	votePlayerBanEntNum = badPlayer - g_edicts;
+
+	Com_sprintf(whatAreWeVotingFor, sizeof(whatAreWeVotingFor), "%s", playerName);
+
+	voteClients = P_Clients_Connected(false);
+	bVoteInProgress = true;
+	Com_sprintf(voteType, sizeof(voteType), "silence player");
+
+	ent->voteInitiator = true;
+
+	if (sv_vote_assume_yes->intValue)
+	{
+		vote_yes(ent, true); /* FS: I assume you would want to vote yes if you initiated the vote. */
+	}
+
+	vote_menu_broadcast();
+}
+
+void vote_silence_menu (edict_t *ent, int entNum)
+{
+	edict_t *badPlayer = NULL;
+
+	if (!ent || !ent->client)
+	{
+		gi.dprintf(DEVELOPER_MSG_GAME, "Error: vote_silence from a non-player!\n");
+		return;
+	}
+
+	if (bVoteInProgress)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "A vote is already in progress for %s: %s!\n", voteType, whatAreWeVotingFor);
+		return;
+	}
+
+	vote_Reset();
+
+	if (sv_vote_disallow_flags->intValue & VOTE_NOSILENCE)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Voting for silencing players are not allowed on this server.  Vote cancelled.\n");
+		return;
+	}
+
+	badPlayer = g_edicts + entNum + 1;
+	if (!badPlayer)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Vote cancelled.\n");
+		return;
+	}
+
+	votePlayerBanEntNum = badPlayer - g_edicts;
+
+	Com_sprintf(whatAreWeVotingFor, sizeof(whatAreWeVotingFor), "%s", badPlayer->client->pers.netname);
+
+	voteClients = P_Clients_Connected(false);
+	bVoteInProgress = true;
+	Com_sprintf(voteType, sizeof(voteType), "silence player");
 
 	ent->voteInitiator = true;
 

@@ -1697,6 +1697,12 @@ void sayCmd_CheckVote(edict_t *ent, char *voteChat)
 		gi.WriteString(va("%s\n", voteChat));
 		gi.unicast(ent, true);
 	}
+	else if (!strncmp(voteChat, "vote silence ", 13))
+	{
+		gi.WriteByte(svc_stufftext);
+		gi.WriteString(va("%s\n", voteChat));
+		gi.unicast(ent, true);
+	}
 	else if (!Q_stricmp(voteChat, "vote help") || !Q_stricmp(voteChat, "vote list") || !Q_stricmp(voteChat, "vote cmds") || !Q_stricmp(voteChat, "vote commands"))
 	{
 		gi.WriteByte(svc_stufftext);
@@ -1744,6 +1750,11 @@ Cmd_Say_f(edict_t *ent, qboolean team, qboolean arg0)
 	}
 
 	if ((gi.argc() < 2) && !arg0)
+	{
+		return;
+	}
+
+	if (ent->client && ent->client->pers.isSilenced) /* FS */
 	{
 		return;
 	}
@@ -2147,6 +2158,11 @@ Cmd_SayPerson_f(edict_t *ent) /* FS: Tastyspleen/Q2Admin stuff.  By request. */
 	if ((gi.argc() < 2))
 	{
 		gi.cprintf(ent, PRINT_HIGH, "Usage: say_person [LIKE/CL] <player_name> <message>\n");
+		return;
+	}
+
+	if (ent->client && ent->client->pers.isSilenced) /* FS */
+	{
 		return;
 	}
 

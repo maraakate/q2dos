@@ -1405,6 +1405,7 @@ typedef struct
 	qboolean	isWallFly; /* FS: Added. */
 	qboolean	didMotd; /* FS: Coop: MOTD */
 	qboolean	noSummon; /* FS: Blinky Cam */
+	qboolean	isSilenced; /* FS: Added for troublemakers. */
 
 //=========
 //ROGUE
@@ -1431,6 +1432,7 @@ typedef struct
 	qboolean	spectator;			// client is a spectator
 	qboolean	isAdmin; /* FS: Coop: Admin goodies */
 	qboolean	isVIP; /* FS: Coop: VIP goodies */
+	qboolean	isSilenced; /* FS: For troublemakers. */
 	qboolean	didMotd; /* FS: Coop: MOTD */
 	qboolean	noSummon; /* FS: Blinky Cam */
 } client_respawn_t;

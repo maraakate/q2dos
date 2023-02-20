@@ -2324,6 +2324,7 @@ PutClientInServer(edict_t *ent)
 		resp.coop_respawn.didMotd = client->pers.didMotd; /* FS */
 		resp.coop_respawn.noSummon = client->pers.noSummon; /* FS */
 		resp.coop_respawn.name_timeout = client->pers.name_timeout; /* FS */
+		resp.coop_respawn.isSilenced = client->pers.isSilenced; /* FS */
 		strcpy(resp.coop_respawn.netname, client->pers.netname); /* FS */
 
 		if (game.gametype == zaero_coop)

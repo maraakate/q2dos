@@ -48,6 +48,7 @@ void CoopVoteRestartMap(edict_t *ent, pmenuhnd_t *p);
 void CoopVotePlayerReq(edict_t *ent, pmenuhnd_t *p);
 void CoopVotePlayerKick(edict_t *ent, pmenuhnd_t *p);
 void CoopVotePlayerBan(edict_t *ent, pmenuhnd_t *p);
+void CoopVotePlayerSilence(edict_t *silence, pmenuhnd_t *p);
 void CoopVoteHookMenu(edict_t *ent, pmenuhnd_t *p);
 void CoopUpdateVoteHookMenu(edict_t *ent);
 void CoopVoteToggleHook(edict_t *ent, pmenuhnd_t *p);
@@ -143,6 +144,7 @@ pmenu_t votemenu[] = {
 	{"Exit Requirements", PMENU_ALIGN_LEFT, CoopVotePlayerReq},
 	{"Kick Player", PMENU_ALIGN_LEFT, CoopVotePlayerKick},
 	{"Ban Player", PMENU_ALIGN_LEFT, CoopVotePlayerBan},
+	{"Silence Player", PMENU_ALIGN_LEFT, CoopVotePlayerSilence},
 	{"Grappling Hook", PMENU_ALIGN_LEFT, CoopVoteHookMenu},
 	{NULL, PMENU_ALIGN_CENTER, NULL},
 	{"Return to Main Menu", PMENU_ALIGN_LEFT, CoopReturnToMain}
@@ -337,6 +339,29 @@ pmenu_t playerbanmenu[] = {
 	{"*Custom Coop", PMENU_ALIGN_CENTER, NULL},
 	{NULL, PMENU_ALIGN_CENTER, NULL},
 	{"*Ban Player", PMENU_ALIGN_CENTER, NULL}, /* 4 */
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL}, /* 6 */
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL}, /* 16 */
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{"Return to Main Menu", PMENU_ALIGN_LEFT, CoopReturnToMain}
+};
+
+#define PLAYERSILENCEMENU_START 6
+pmenu_t playersilencemenu[] = {
+	{"*Quake II", PMENU_ALIGN_CENTER, NULL},
+	{"*Mara'akate and Freewill", PMENU_ALIGN_CENTER, NULL},
+	{"*Custom Coop", PMENU_ALIGN_CENTER, NULL},
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{"*Silence Player", PMENU_ALIGN_CENTER, NULL}, /* 4 */
 	{NULL, PMENU_ALIGN_CENTER, NULL},
 	{NULL, PMENU_ALIGN_LEFT, NULL}, /* 6 */
 	{NULL, PMENU_ALIGN_LEFT, NULL},
@@ -1767,6 +1792,33 @@ static void CoopVotePlayerBanExec(edict_t *ent, pmenuhnd_t *p)
 	PMenu_Close(ent);
 }
 
+static void CoopVotePlayerSilenceExec(edict_t *ent, pmenuhnd_t *p)
+{
+	static char cmd[32];
+	int playernum;
+	edict_t *other = NULL;
+
+	if(!ent || !ent->client)
+	{
+		return;
+	}
+
+	playernum = p->cur - PLAYERKICKMENU_START;
+	other = &g_edicts[playernum+1];
+	if(!other || !other->client)
+	{
+		return;
+	}
+
+	Com_sprintf(cmd, sizeof(cmd), "vote silence_menu %d\n", playernum);
+
+	gi.WriteByte(svc_stufftext);
+	gi.WriteString(cmd);
+	gi.unicast(ent, true);
+
+	PMenu_Close(ent);
+}
+
 static void CoopInitVotePlayerKickMenu(edict_t *ent)
 {
 	int i;
@@ -1814,6 +1866,31 @@ static void CoopInitVotePlayerBanMenu(edict_t *ent)
 
 		playerbanmenu[i + PLAYERBANMENU_START].text = other->client->pers.netname;
 		playerbanmenu[i + PLAYERBANMENU_START].SelectFunc = CoopVotePlayerBanExec;
+	}
+}
+
+static void CoopInitVotePlayerSilenceMenu(edict_t *ent)
+{
+	int i;
+	edict_t *other = NULL;
+
+	if(!ent || !ent->client)
+	{
+		return;
+	}
+
+	for (i = 0; i < game.maxclients; i++)
+	{
+		other = &g_edicts[i + 1];
+		if(!other || !other->inuse || !other->client || other->client->pers.spectator)
+		{
+			playersilencemenu[i + PLAYERSILENCEMENU_START].text = NULL;
+			playersilencemenu[i + PLAYERSILENCEMENU_START].SelectFunc = NULL;
+			continue;
+		}
+
+		playersilencemenu[i + PLAYERSILENCEMENU_START].text = other->client->pers.netname;
+		playersilencemenu[i + PLAYERSILENCEMENU_START].SelectFunc = CoopVotePlayerSilenceExec;
 	}
 }
 
@@ -1877,6 +1954,36 @@ static void CoopUpdateVotePlayerBanMenu(edict_t *ent)
 	}
 }
 
+static void CoopUpdateVotePlayerSilenceMenu(edict_t *ent)
+{
+	int i;
+	edict_t *other = NULL;
+	pmenuhnd_t *p;
+
+	if(!ent || !ent->client)
+	{
+		return;
+	}
+
+	p = ent->client->menu;
+	if(!p)
+	{
+		return;
+	}
+
+	for (i = 0; i < game.maxclients; i++)
+	{
+		other = &g_edicts[i + 1];
+		if(!other || !other->inuse || !other->client || other->client->pers.spectator)
+		{
+			PMenu_UpdateEntry(p->entries + i + PLAYERSILENCEMENU_START, NULL, PMENU_ALIGN_LEFT, NULL);
+			continue;
+		}
+
+		PMenu_UpdateEntry(p->entries + i + PLAYERSILENCEMENU_START, other->client->pers.netname, PMENU_ALIGN_LEFT, CoopVotePlayerSilenceExec);
+	}
+}
+
 void CoopVotePlayerKick(edict_t *ent, pmenuhnd_t *p /* unused */)
 {
 	if(!ent || !ent->client)
@@ -1903,6 +2010,20 @@ void CoopVotePlayerBan(edict_t *ent, pmenuhnd_t *p /* unused */)
 	CoopInitVotePlayerBanMenu(ent);
 	PMenu_Open(ent, playerbanmenu, NULL, 0, sizeof(playerbanmenu) / sizeof(pmenu_t), 0, NULL, PMENU_NORMAL);
 	ent->client->menu_update = CoopUpdateVotePlayerBanMenu;
+}
+
+void CoopVotePlayerSilence(edict_t *ent, pmenuhnd_t *p /* unused */)
+{
+	if(!ent || !ent->client)
+	{
+		return;
+	}
+
+	PMenu_Close(ent);
+
+	CoopInitVotePlayerSilenceMenu(ent);
+	PMenu_Open(ent, playersilencemenu, NULL, 0, sizeof(playersilencemenu) / sizeof(pmenu_t), 0, NULL, PMENU_NORMAL);
+	ent->client->menu_update = CoopUpdateVotePlayerSilenceMenu;
 }
 
 static void CoopInitVoteHookMenu(edict_t *ent)
