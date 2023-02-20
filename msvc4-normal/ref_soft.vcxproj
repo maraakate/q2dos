@@ -97,7 +97,6 @@
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>../win32/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;id386=1;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <MinimalRebuild>true</MinimalRebuild>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <FloatingPointModel>Fast</FloatingPointModel>
       <BrowseInformation>true</BrowseInformation>
@@ -136,7 +135,6 @@
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>../win32/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;id386=0;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <MinimalRebuild>true</MinimalRebuild>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <FloatingPointModel>Fast</FloatingPointModel>
       <BrowseInformation>true</BrowseInformation>

@@ -97,7 +97,6 @@
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>../win32/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;DEDICATED_ONLY;id386=1;WIN32;_WINDOWS;CLIENT_SPLIT_NETFRAME;GAMESPY;USE_CURL;OGG_SUPPORT;USE_JOYSTICK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <MinimalRebuild>true</MinimalRebuild>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <FloatingPointModel>Fast</FloatingPointModel>
       <BrowseInformation>true</BrowseInformation>
@@ -176,7 +175,6 @@
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>../win32/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;DEDICATED_ONLY;id386=0;WIN32;_WINDOWS;CLIENT_SPLIT_NETFRAME;GAMESPY;USE_CURL;OGG_SUPPORT;USE_JOYSTICK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <MinimalRebuild>true</MinimalRebuild>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <FloatingPointModel>Fast</FloatingPointModel>
       <BrowseInformation>true</BrowseInformation>

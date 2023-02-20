@@ -69,7 +69,7 @@ void vote_playerexit (edict_t *ent);
 void vote_kickban (edict_t *ent, char *playerName, qboolean banPlayer);
 void vote_kickban_menu (edict_t *ent, int entNum, qboolean banPlayer);
 void vote_silence (edict_t *ent, char *playerName);
-void vote_silence_menu (edict_t *ent,  int entNum);
+void vote_silence_menu (edict_t *ent, int entNum);
 void vote_hook(edict_t *ent);
 
 #define VOTEMENU_TYPE 6
@@ -194,12 +194,12 @@ void vote_command (edict_t *ent)
 		vote_stop(ent);
 		return;
 	}
-/* FS: Not ready yet... */
-//	else if (!Q_stricmp(gi.argv(1), "random"))
-//	{
-//		vote_random(ent);
-//		return;
-//	}
+	/* FS: Not ready yet... */
+	//	else if (!Q_stricmp(gi.argv(1), "random"))
+	//	{
+	//		vote_random(ent);
+	//		return;
+	//	}
 	else if (!Q_stricmp(gi.argv(1), "warp"))
 	{
 		if (argc <= 2)
@@ -350,7 +350,7 @@ qboolean vote_mapcheck (edict_t *ent, const char *mapName)
 	fseek(f, 0, SEEK_END);
 	fileSize = ftell(f);
 	fseek(f, 0, SEEK_SET);
-	fileBuffer = (char *)malloc(sizeof(char)*(fileSize + 2)); /* FS: In case we have to add a newline terminator */
+	fileBuffer = (char *)malloc(sizeof(char) * (fileSize + 2)); /* FS: In case we have to add a newline terminator */
 	if (!fileBuffer)
 	{
 		gi.cprintf(NULL, PRINT_CHAT, "vote_mapcheck: can't allocate memory for fileBuffer!\n");
@@ -676,25 +676,25 @@ void vote_coopskill (edict_t *ent, int skillVote)
 
 	switch (skillVote)
 	{
-	case 0:
-		voteCoopSkill = 0;
-		Com_sprintf(whatAreWeVotingFor, sizeof(whatAreWeVotingFor), "easy");
-		break;
-	case 1:
-		voteCoopSkill = 1;
-		Com_sprintf(whatAreWeVotingFor, sizeof(whatAreWeVotingFor), "medium");
-		break;
-	case 2:
-		voteCoopSkill = 2;
-		Com_sprintf(whatAreWeVotingFor, sizeof(whatAreWeVotingFor), "hard");
-		break;
-	case 3:
-		voteCoopSkill = 3;
-		Com_sprintf(whatAreWeVotingFor, sizeof(whatAreWeVotingFor), "nightmare");
-		break;
-	default:
-		gi.cprintf(ent, PRINT_HIGH, "error: invalid coop difficulty level!  valid options are: 0 (easy), 1 (medium), 2 (hard), and 3 (nightmare).\n");
-		return;
+		case 0:
+			voteCoopSkill = 0;
+			Com_sprintf(whatAreWeVotingFor, sizeof(whatAreWeVotingFor), "easy");
+			break;
+		case 1:
+			voteCoopSkill = 1;
+			Com_sprintf(whatAreWeVotingFor, sizeof(whatAreWeVotingFor), "medium");
+			break;
+		case 2:
+			voteCoopSkill = 2;
+			Com_sprintf(whatAreWeVotingFor, sizeof(whatAreWeVotingFor), "hard");
+			break;
+		case 3:
+			voteCoopSkill = 3;
+			Com_sprintf(whatAreWeVotingFor, sizeof(whatAreWeVotingFor), "nightmare");
+			break;
+		default:
+			gi.cprintf(ent, PRINT_HIGH, "error: invalid coop difficulty level!  valid options are: 0 (easy), 1 (medium), 2 (hard), and 3 (nightmare).\n");
+			return;
 	}
 
 	if (skill->intValue == skillVote)
@@ -1383,14 +1383,14 @@ void VoteMenuChoice (edict_t *ent, pmenuhnd_t *p)
 
 	switch (p->cur)
 	{
-	case VOTEMENU_YES:
-		vote_yes(ent, false);
-		break;
-	case VOTEMENU_NO:
-		vote_no(ent);
-		break;
-	default:
-		break;
+		case VOTEMENU_YES:
+			vote_yes(ent, false);
+			break;
+		case VOTEMENU_NO:
+			vote_no(ent);
+			break;
+		default:
+			break;
 	}
 
 	PMenu_Close(ent);
