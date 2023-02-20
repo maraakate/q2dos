@@ -916,15 +916,18 @@ void SV_CheckTimeouts (void)
 		/* FS: From R1Q2.  Kick excessive idlers */
 		if (cl->state == cs_spawned && dedicated->intValue)
 		{
-			cl->idletime++;
-			if (sv_idlekick->intValue && cl->idletime >= sv_idlekick->intValue * 100)
+			if ((Q_stricmp(cl->name, "WallFly[BZZZ]") != 0) && (Q_stricmp(sv_filter_wallfly_ip->string, NET_AdrToString(cl->netchan.remote_address)) != 0))
 			{
-				SV_ClientPrintf (cl, PRINT_HIGH, "DROPPED: You have been disconnected due to inactivity.\n");
-				SV_BroadcastPrintf (PRINT_HIGH, "%s has been disconnected due to inactivity.\n", cl->name);
-				SV_DropClient (cl);
-				cl->lastmessage = svs.realtime;
-				cl->state = cs_free;
-				continue;
+				cl->idletime++;
+				if (sv_idlekick->intValue && cl->idletime >= sv_idlekick->intValue * 100)
+				{
+					SV_ClientPrintf (cl, PRINT_HIGH, "DROPPED: You have been disconnected due to inactivity.\n");
+					SV_BroadcastPrintf (PRINT_HIGH, "%s has been disconnected due to inactivity.\n", cl->name);
+					SV_DropClient (cl);
+					cl->lastmessage = svs.realtime;
+					cl->state = cs_free;
+					continue;
+				}
 			}
 		}
 
