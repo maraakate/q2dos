@@ -320,7 +320,6 @@ qboolean vote_mapcheck (edict_t *ent, const char *mapName)
 	char separators[] = ",\n";
 	//	char separators2[] = ",";
 	long fileSize;
-	int mapCount = 0;
 	FILE *f = NULL;
 	size_t toEOF = 0;
 	qboolean retval = false;

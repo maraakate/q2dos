@@ -436,7 +436,7 @@ void
 PMenu_Do_Scrolling_Update(edict_t *ent) /* FS */
 {
 	char string[LAYOUT_MAX_LENGTH];
-	int i, z, pos, scroll_lines, fixed_lines = 0;
+	int i, z, pos, scroll_lines;
 	pmenu_t *p;
 	int x;
 	pmenuhnd_t *hnd;

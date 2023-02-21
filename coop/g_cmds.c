@@ -2147,8 +2147,6 @@ Cmd_SayPerson_f(edict_t *ent) /* FS: Tastyspleen/Q2Admin stuff.  By request. */
 	char *p;
 	char text[2048], entHeader[2048];
 	gclient_t *cl;
-	qboolean bIsPlayerNum = false;
-	qboolean bIsSearch = false;
 
 	if (!ent || !ent->client)
 	{
