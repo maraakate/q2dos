@@ -2067,6 +2067,7 @@ extern void Cmd_Score_f ( edict_t * ent ) ;
 extern void Cmd_Drop_f ( edict_t * ent ) ;
 extern void Cmd_Use_f ( edict_t * ent ) ;
 extern void altSelect ( edict_t * ent , int num ) ;
+struct altsel_s; /* avoid compiler warning */
 extern void findNext ( edict_t * ent , struct altsel_s * ptr , int offset ) ;
 extern qboolean tryUse ( edict_t * ent , char * s ) ;
 extern void Cmd_Noclip_f ( edict_t * ent ) ;
