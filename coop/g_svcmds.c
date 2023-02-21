@@ -349,7 +349,7 @@ void SVCmd_StuffCmd_f (void)
 	char cmd[2000]; /* FS: Q2Admin magic limit */
 	char *p = NULL;
 	edict_t	*client = NULL;
-	int playernum;
+	int playernum = 0;
 	size_t messageLen;
 	qboolean bIsCL = false;
 
