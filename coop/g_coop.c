@@ -1677,7 +1677,7 @@ void CoopGamemodeAdd (const char *gamemode, const char *realgamemode, const char
 		return;
 
 	if (gamemode_index > MAX_GAMEMODES - 1)
-		gi.error("Can't add gamemode %s to voting list.  Limit %d reached.");
+		gi.error("Can't add gamemode %s to voting list.  Limit %d reached.", gamemode, MAX_GAMEMODES);
 
 	Com_sprintf(gamemode_array[gamemode_index].gamemode, sizeof(gamemode_array[gamemode_index].gamemode), "%s", gamemode);
 	Com_sprintf(gamemode_array[gamemode_index].mapname, sizeof(gamemode_array[gamemode_index].mapname), "%s", mapname);
