@@ -630,7 +630,7 @@ void displayLogFileCont(edict_t *ent, int client, long logfilereadpos)
 					gi.cprintf (ent, PRINT_HIGH, "End Logfile %d (%s)\n", logNum + 1, logFiles[logNum].filename);
 				}
 				
-			fprintf(logfilePtr, "%s\n", logline);
+			//fprintf(logfilePtr, "%s\n", logline);
 			fclose(logfilePtr);
 		}
 	else

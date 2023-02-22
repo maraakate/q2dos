@@ -75,9 +75,12 @@ qboolean ReadDisableFile(char *disablename)
 			
 			// remove '\n'
 			len = q2a_strlen(buffer) - 1;
+			if (len < 0)
+				len = 0;
+
 			if(buffer[len] == '\n')
 				{
-					buffer[len] = 0x0;
+					buffer[len] = '\0';
 				}
 				
 			SKIPBLANK(cp);

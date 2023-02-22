@@ -1687,9 +1687,9 @@ void ADMIN_changemap(edict_t *ent,int client,char *mname)
 		ADMIN_players(ent,client);
 		return;
 	}
-	if (q2a_strstr (mname, "\""))
+	if (strchr (mname, '\"'))
 		return ;
-	if (q2a_strstr (mname, ";"))
+	if (strchr (mname, ';'))
 		return ;
 
 	gi.bprintf(PRINT_HIGH,"%s is changing map to %s.\n",proxyinfo[client].name,mname);
@@ -2256,7 +2256,7 @@ void timer_start(int client,edict_t *ent)
 		gi.cprintf(ent,PRINT_HIGH,"Timer seconds falls outside acceptable range of %i to %i.\n",timers_min_seconds,timers_max_seconds);
 		return;
 	}
-	if ((num<1) || (num>TIMERS_MAX))
+	if ((num<1) || (num>=TIMERS_MAX))
 	{
 		gi.cprintf(ent,PRINT_HIGH,"Invalid timer number\n");
 		return;
@@ -2276,7 +2276,7 @@ void timer_stop(int client,edict_t *ent)
 		return;
 	}
 		num = q2a_atoi(gi.argv(1));
-	if ((num<1) || (num>TIMERS_MAX))
+	if ((num<1) || (num>=TIMERS_MAX))
 	{
 		gi.cprintf(ent,PRINT_HIGH,"Invalid timer number\n");
 		return;

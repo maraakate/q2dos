@@ -2929,7 +2929,7 @@ qboolean doClientCommand(edict_t *ent, int client, qboolean *checkforfloodafter)
 				else
 				{
 					//gi.dprintf("%s %s\n",block_models[i].model_name,gi.argv(6));
-					if (i<0 || i>=MAX_BLOCK_MODELS)
+					if (i>=MAX_BLOCK_MODELS)
 					{
 						//KICK
 						gi.bprintf(PRINT_HIGH,MOD_KICK_MSG,proxyinfo[client].name,i);
@@ -2940,7 +2940,7 @@ qboolean doClientCommand(edict_t *ent, int client, qboolean *checkforfloodafter)
 					else
 					{
 						//it matched so compare the string now
-						if (q2a_strcmp(block_models[i].model_name,gi.argv(6)))
+						if (q2a_strcmp(block_models[i].model_name,gi.argv(6)) != 0)
 						{
 							//didnt match, kick
 							gi.bprintf(PRINT_HIGH,MOD_KICK_MSG,proxyinfo[client].name,256);

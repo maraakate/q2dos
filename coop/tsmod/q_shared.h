@@ -39,7 +39,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #pragma warning(disable : 4996)		/* FS: Shut up about VS2005 shit */
 
 //r1ch
-#define	snprintf _snprintf
+//#define	snprintf _snprintf
 
 #endif
 #include <stdio.h>

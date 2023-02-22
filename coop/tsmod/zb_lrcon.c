@@ -80,9 +80,12 @@ qboolean ReadLRconFile(char *lrcname)
 			
 			// remove '\n'
 			len = q2a_strlen(buffer) - 1;
+			if (len < 0)
+				len = 0;
+
 			if(buffer[len] == '\n')
 				{
-					buffer[len] = 0x0;
+					buffer[len] = '\0';
 				}
 				
 			SKIPBLANK(cp);
@@ -325,7 +328,7 @@ void run_lrcon(edict_t *ent, int client)
 										sprintf(buffer, "rcon %s %s\n", cbuffer, cp);
 										stuffcmd(ent, buffer);
 										
-										sprintf(buffer, "rcon %s sv !resetrcon\n", cbuffer, cp);
+										sprintf(buffer, "rcon %s sv !resetrcon\n", cbuffer);
 										
 									}
 								else

@@ -1906,7 +1906,7 @@ int checkBanList(edict_t *ent, int client)
 							gi.dprintf(DEVELOPER_MSG_VERBOSE, "%s\n", strbuffer);
 //*** UPDATE END ***
 							
-							if(q2a_strcmp(checkentry->password, s))
+							if(q2a_strcmp(checkentry->password, s) != 0)
 								{
 									if(checkentry->msg)
 										{
