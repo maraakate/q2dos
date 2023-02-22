@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -42,71 +42,71 @@ void addCmdQueue(int  client, byte command, float timeout, unsigned long data, c
 		gi.cprintf (NULL, PRINT_HIGH, "%s is being disconnected for %s.\n", proxyinfo[client].name, str);
 	}
 
-//*** UPDATE START ***
-	if ( proxyinfo[client].maxCmds >= ALLOWED_MAXCMDS_SAFETY)
+	//*** UPDATE START ***
+	if (proxyinfo[client].maxCmds >= ALLOWED_MAXCMDS_SAFETY)
 	{
 		proxyinfo[client].clientcommand |= CCMD_KICKED;
 		gi.bprintf (PRINT_HIGH, "%s tried to flood the server.\n", proxyinfo[client].name);
 		sprintf(tmptext, "kick %d\n", client);
 		//need to log
 		gi.AddCommandString(tmptext);
-    }
-//*** UPDATE END ***
+	}
+	//*** UPDATE END ***
 }
 
 qboolean getCommandFromQueue(int client, byte *command, unsigned long *data, char **str)
 {
 	unsigned int  i;
-	
-	for(i = 0; i < proxyinfo[client].maxCmds; i++)
+
+	for (i = 0; i < proxyinfo[client].maxCmds; i++)
+	{
+		if (proxyinfo[client].cmdQueue[i].timeout < ltime)
 		{
-			if(proxyinfo[client].cmdQueue[i].timeout < ltime)
-				{
-					// found good command..
-					// get info to return
-					*command = proxyinfo[client].cmdQueue[i].command;
-					*data = proxyinfo[client].cmdQueue[i].data;
-					
-					if(str)
-						{
-							*str = proxyinfo[client].cmdQueue[i].str;
-						}
-						
-					// remove command
-					proxyinfo[client].maxCmds--;
-					
-					if(i < proxyinfo[client].maxCmds)
-						{
-							q2a_memmove(proxyinfo[client].cmdQueue + i, proxyinfo[client].cmdQueue + i + 1, (proxyinfo[client].maxCmds - i) * sizeof(CMDQUEUE));
-						}
-						
-					return TRUE;
-				}
+			// found good command..
+			// get info to return
+			*command = proxyinfo[client].cmdQueue[i].command;
+			*data = proxyinfo[client].cmdQueue[i].data;
+
+			if (str)
+			{
+				*str = proxyinfo[client].cmdQueue[i].str;
+			}
+
+			// remove command
+			proxyinfo[client].maxCmds--;
+
+			if (i < proxyinfo[client].maxCmds)
+			{
+				q2a_memmove(proxyinfo[client].cmdQueue + i, proxyinfo[client].cmdQueue + i + 1, (proxyinfo[client].maxCmds - i) * sizeof(CMDQUEUE));
+			}
+
+			return TRUE;
 		}
-		
+	}
+
 	return FALSE;
 }
 
 void removeClientCommand(int client, byte command)
 {
 	unsigned int i = 0;
-	
-	while(i < proxyinfo[client].maxCmds)
+
+	while (i < proxyinfo[client].maxCmds)
+	{
+		if (proxyinfo[client].cmdQueue[i].command == command)
 		{
-			if(proxyinfo[client].cmdQueue[i].command == command)
-				{
-					// remove command
-					proxyinfo[client].maxCmds--;
-					if(i < proxyinfo[client].maxCmds)
-						{
-							q2a_memmove(proxyinfo[client].cmdQueue + i, proxyinfo[client].cmdQueue + i + 1, (proxyinfo[client].maxCmds - i) * sizeof(CMDQUEUE));
-						}
-				}
-			else
-				{
-					i++;
-				}
+			// remove command
+			proxyinfo[client].maxCmds--;
+			if (i < proxyinfo[client].maxCmds)
+			{
+				q2a_memmove(proxyinfo[client].cmdQueue + i, proxyinfo[client].cmdQueue + i + 1, (proxyinfo[client].maxCmds - i) * sizeof(CMDQUEUE));
+			}
 		}
+		else
+		{
+			i++;
+		}
+	}
 }
 
 void removeClientCommands(int client)
