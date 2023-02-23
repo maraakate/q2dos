@@ -50,8 +50,6 @@ int maxdisable_cmds = 0;
 qboolean disablecmds_enable = FALSE;
 
 
-
-
 qboolean ReadDisableFile(char *disablename)
 {
 	FILE *disablefile;
@@ -161,7 +159,6 @@ qboolean ReadDisableFile(char *disablename)
 }
 
 
-
 void freeDisableLists(void)
 {
 	while (maxdisable_cmds)
@@ -197,7 +194,6 @@ void readDisableLists(void)
 		logEvent(LT_INTERNALWARN, 0, NULL, DISABLEFILE " could not be found", IW_DISABLESETUPLOAD, 0.0);
 	}
 }
-
 
 
 void reloadDisableFileRun(int startarg, edict_t *ent, int client)
@@ -244,12 +240,7 @@ qboolean checkDisabledCommand(char *cmd)
 }
 
 
-
 //===================================================================
-
-
-
-
 
 
 void listdisablesRun(int startarg, edict_t *ent, int client)
@@ -267,15 +258,15 @@ void displayNextDisable(edict_t *ent, int client, long disablecmd)
 		switch (disablecmds[disablecmd].type)
 		{
 			case DISABLE_SW:
-				gi.cprintf (ent, PRINT_HIGH, "%4d SW:\"%s\"\n", disablecmd + 1, disablecmds[disablecmd].disablecmd);
+				gi.cprintf (ent, PRINT_HIGH, "%4ld SW:\"%s\"\n", disablecmd + 1, disablecmds[disablecmd].disablecmd);
 				break;
 
 			case DISABLE_EX:
-				gi.cprintf (ent, PRINT_HIGH, "%4d EX:\"%s\"\n", disablecmd + 1, disablecmds[disablecmd].disablecmd);
+				gi.cprintf (ent, PRINT_HIGH, "%4ld EX:\"%s\"\n", disablecmd + 1, disablecmds[disablecmd].disablecmd);
 				break;
 
 			case DISABLE_RE:
-				gi.cprintf (ent, PRINT_HIGH, "%4d RE:\"%s\"\n", disablecmd + 1, disablecmds[disablecmd].disablecmd);
+				gi.cprintf (ent, PRINT_HIGH, "%4ld RE:\"%s\"\n", disablecmd + 1, disablecmds[disablecmd].disablecmd);
 				break;
 		}
 		disablecmd++;
@@ -286,7 +277,6 @@ void displayNextDisable(edict_t *ent, int client, long disablecmd)
 		gi.cprintf (ent, PRINT_HIGH, "End disbled-entities List\n");
 	}
 }
-
 
 
 #define DISABLECMD     "[sv] !disablecmd [SW/EX/RE] \"command\"\n"
@@ -384,9 +374,7 @@ void disablecmdRun(int startarg, edict_t *ent, int client)
 }
 
 
-
 #define DISABLEDELCMD     "[sv] !disabledel disablenum\n"
-
 
 void disableDelRun(int startarg, edict_t *ent, int client)
 {
@@ -424,5 +412,3 @@ void disableDelRun(int startarg, edict_t *ent, int client)
 
 	gi.cprintf (ent, PRINT_HIGH, "Disbled command deleted\n");
 }
-
-

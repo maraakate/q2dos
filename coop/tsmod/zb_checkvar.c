@@ -308,11 +308,11 @@ void displayNextCheckvar(edict_t *ent, int client, long checkvarcmd)
 		switch (checkvarList[checkvarcmd].type)
 		{
 			case CV_CONSTANT:
-				gi.cprintf (ent, PRINT_HIGH, "%4d CT: %s = \"%s\"\n", checkvarcmd + 1, checkvarList[checkvarcmd].variablename, checkvarList[checkvarcmd].value);
+				gi.cprintf (ent, PRINT_HIGH, "%4ld CT: %s = \"%s\"\n", checkvarcmd + 1, checkvarList[checkvarcmd].variablename, checkvarList[checkvarcmd].value);
 				break;
 
 			case CV_RANGE:
-				gi.cprintf (ent, PRINT_HIGH, "%4d RG: %s = %g to %g\n", checkvarcmd + 1, checkvarList[checkvarcmd].variablename, checkvarList[checkvarcmd].lower, checkvarList[checkvarcmd].upper);
+				gi.cprintf (ent, PRINT_HIGH, "%4ld RG: %s = %g to %g\n", checkvarcmd + 1, checkvarList[checkvarcmd].variablename, checkvarList[checkvarcmd].lower, checkvarList[checkvarcmd].upper);
 				break;
 		}
 		checkvarcmd++;

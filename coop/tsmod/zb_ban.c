@@ -29,20 +29,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "g_local.h"
 
 
-
 baninfo_t *banhead;
 chatbaninfo_t *chatbanhead;
-
 
 qboolean IPBanning_Enable = FALSE;
 qboolean NickBanning_Enable = FALSE;
 qboolean ChatBanning_Enable = TRUE;  // %%quadz -- was: FALSE
 qboolean kickOnNameChange = FALSE;
 
-
 char defaultBanMsg[256];
 char *currentBanMsg;
-
 
 long banNumUpto = 0;
 long chatBanNumUpto = 0;
@@ -200,7 +196,6 @@ qboolean ReadBanFile(char *bfname)
 							newentry->type = NOTUSED;
 						}
 
-
 						if (newentry->type == NICKRE)
 						{ // compile RE
 							q2a_strcpy(strbuffer, newentry->nick);
@@ -214,7 +209,6 @@ qboolean ReadBanFile(char *bfname)
 								newentry->r = 0;
 							}
 						}
-
 
 						SKIPBLANK(cp);
 					}
@@ -313,7 +307,6 @@ qboolean ReadBanFile(char *bfname)
 						newentry->subnetmask = 0;
 					}
 				}
-
 
 				// get PASSWORD
 				if (!newentry->exclude && startContains(cp, "PASSWORD"))
@@ -448,7 +441,6 @@ qboolean ReadBanFile(char *bfname)
 					cp++;
 
 					SKIPBLANK(cp);
-
 
 					num = q2a_strlen(buffer2);
 
@@ -591,7 +583,6 @@ qboolean ReadBanFile(char *bfname)
 
 					SKIPBLANK(cp);
 
-
 					num = q2a_strlen(buffer2);
 
 					if (num)
@@ -608,7 +599,6 @@ qboolean ReadBanFile(char *bfname)
 				{
 					cnewentry->msg = NULL;
 				}
-
 
 				// do you have a valid ban record?
 				if (cnewentry->type == CNOTUSED || (cnewentry->type == CHATRE && !cnewentry->r))
@@ -680,7 +670,6 @@ qboolean ReadBanFile(char *bfname)
 }
 
 
-
 void freeBanLists(void)
 {
 	while (banhead)
@@ -724,7 +713,6 @@ void freeBanLists(void)
 }
 
 
-
 void readBanLists(void)
 {
 	char cfgFile[100];
@@ -757,9 +745,7 @@ void readBanLists(void)
 }
 
 
-
 #define BANCMD_LAYOUT  "[sv] !BAN [+/-(-)] [ALL/[NAME [LIKE/RE] name/%%p x/BLANK/ALL(ALL)] [IP [xxx[.xxx(0)[.xxx(0)[.xxx(0)]]]/%%p x][/yy(32)]] [PASSWORD xxx] [MAX 0-xxx(0)] [FLOOD xxx(num) xxx(sec) xxx(silence] [MSG xxx] [TIME 1-xxx(mins)] [SAVE [MOD]] [NOCHECK]\n"
-
 
 void banRun(int startarg, edict_t *ent, int client)
 {
@@ -1342,7 +1328,6 @@ void banRun(int startarg, edict_t *ent, int client)
 		newentry->password[0] = 0;
 	}
 
-
 	// get MAX
 	if (!newentry->exclude && startContains(cp, "MAX"))
 	{
@@ -1418,7 +1403,6 @@ void banRun(int startarg, edict_t *ent, int client)
 
 		newentry->floodinfo.chatFloodProtectSilence = q2a_atoi(cp);
 
-
 		if (gi.argc() <= startarg)
 		{
 			cp = "";
@@ -1443,7 +1427,6 @@ void banRun(int startarg, edict_t *ent, int client)
 	{
 		newentry->floodinfo.chatFloodProtect = FALSE;
 	}
-
 
 	// get MSG
 	if (startContains(cp, "MSG"))
@@ -1606,7 +1589,6 @@ void banRun(int startarg, edict_t *ent, int client)
 		save = 0;
 	}
 
-
 	// get nocheck
 	if (startContains(cp, "NOCHECK"))
 	{
@@ -1721,16 +1703,11 @@ void banRun(int startarg, edict_t *ent, int client)
 }
 
 
-
-
-
 void reloadbanfileRun(int startarg, edict_t *ent, int client)
 {
 	readBanLists();
 	gi.cprintf (ent, PRINT_HIGH, "Bans reloaded.\n");
 }
-
-
 
 
 int checkBanList(edict_t *ent, int client)
@@ -1974,7 +1951,6 @@ int checkCheckIfBanned(edict_t *ent, int client)
 }
 
 
-
 void listbansRun(int startarg, edict_t *ent, int client)
 {
 	addCmdQueue(client, QCMD_DISPBANS, 0, 0, 0);
@@ -2067,7 +2043,7 @@ void displayNextBan(edict_t *ent, int client, long bannum)
 
 		if (!findentry->exclude && findentry->maxnumberofconnects)
 		{
-			sprintf(buffer + q2a_strlen(buffer), " MAX %d", findentry->maxnumberofconnects);
+			sprintf(buffer + q2a_strlen(buffer), " MAX %ld", findentry->maxnumberofconnects);
 		}
 
 		if (!findentry->exclude && findentry->floodinfo.chatFloodProtect)
@@ -2095,9 +2071,6 @@ void displayNextBan(edict_t *ent, int client, long bannum)
 		gi.cprintf (ent, PRINT_HIGH, "End of ban list.\n");
 	}
 }
-
-
-
 
 
 void delbanRun(int startarg, edict_t *ent, int client)
@@ -2222,7 +2195,6 @@ void chatbanRun(int startarg, edict_t *ent, int client)
 
 		cp = gi.argv(startarg);
 		startarg++;
-
 
 		q2a_strcat(savecmd, "RE ");
 
@@ -2422,9 +2394,6 @@ void chatbanRun(int startarg, edict_t *ent, int client)
 }
 
 
-
-
-
 int checkCheckIfChatBanned(char *txt)
 {
 	chatbaninfo_t *checkentry = chatbanhead;
@@ -2491,14 +2460,12 @@ int checkCheckIfChatBanned(char *txt)
 }
 
 
-
 void listchatbansRun(int startarg, edict_t *ent, int client)
 {
 	addCmdQueue(client, QCMD_DISPCHATBANS, 0, 0, 0);
 
 	gi.cprintf (ent, PRINT_HIGH, "Start Chat Ban List:\n");
 }
-
 
 
 void displayNextChatBan(edict_t *ent, int client, long chatbannum)
@@ -2555,9 +2522,6 @@ void displayNextChatBan(edict_t *ent, int client, long chatbannum)
 }
 
 
-
-
-
 void delchatbanRun(int startarg, edict_t *ent, int client)
 {
 	if (gi.argc() > startarg)
@@ -2611,4 +2575,3 @@ void delchatbanRun(int startarg, edict_t *ent, int client)
 		gi.cprintf (ent, PRINT_HIGH, "No chat ban number supplied to delete.\n");
 	}
 }
-

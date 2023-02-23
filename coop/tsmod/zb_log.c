@@ -39,7 +39,6 @@ typedef struct
 }
 ZB_LOGFILE;
 
-
 ZB_LOGFILE logFiles[32];
 
 
@@ -87,7 +86,6 @@ ZB_LOGTYPES logtypes[] =
 
 #define LOGTYPES_MAX    (sizeof(logtypes) / sizeof(logtypes[0]))
 #define LOGLISTFILE     "q2adminlog.txt"
-
 
 void expandOutPortNum(char *srcdest, int max)
 {
@@ -164,7 +162,6 @@ void expandOutPortNum(char *srcdest, int max)
 
 	org[max] = 0;
 }
-
 
 
 qboolean loadLogListFile(char *filename)
@@ -356,7 +353,6 @@ qboolean loadLogListFile(char *filename)
 }
 
 
-
 void loadLogList(void)
 {
 	unsigned int i;
@@ -376,7 +372,6 @@ void loadLogList(void)
 	{
 		ret = TRUE;
 	}
-
 
 	if (!ret)
 	{
@@ -525,7 +520,6 @@ qboolean isLogEvent(enum zb_logtypesenum ltype)
 	return logtypes[(int)ltype].log;
 }
 
-
 void logEvent(enum zb_logtypesenum ltype, int client, edict_t *ent, char *message, int number, float number2)
 {
 	if (logtypes[(int)ltype].log)
@@ -563,7 +557,6 @@ void logEvent(enum zb_logtypesenum ltype, int client, edict_t *ent, char *messag
 		}
 	}
 }
-
 
 
 void displaylogfileRun(int startarg, edict_t *ent, int client)
@@ -638,8 +631,6 @@ void displayLogFileCont(edict_t *ent, int client, long logfilereadpos)
 		gi.cprintf (ent, PRINT_HIGH, "End Logfile %d (%s)\n", logNum + 1, logFiles[logNum].filename);
 	}
 }
-
-
 
 
 void clearlogfileRun(int startarg, edict_t *ent, int client)
@@ -775,7 +766,6 @@ void logfileRun(int startarg, edict_t *ent, int client)
 			return;
 		}
 
-
 	}
 	else if (Q_stricmp(cmd, "DEL") == 0)
 	{
@@ -806,10 +796,9 @@ void logfileRun(int startarg, edict_t *ent, int client)
 }
 
 
-
 void displayLogFileListCont(edict_t *ent, int client, long logfilenum)
 {
-	gi.cprintf (ent, PRINT_HIGH, "  %3d    %s  %s\n", logfilenum + 1, logFiles[logfilenum].mod ? "Yes" : " No", logFiles[logfilenum].filename);
+	gi.cprintf (ent, PRINT_HIGH, "  %3ld    %s  %s\n", logfilenum + 1, logFiles[logfilenum].mod ? "Yes" : " No", logFiles[logfilenum].filename);
 
 	for (logfilenum++; logfilenum < 32; logfilenum++)
 	{
@@ -828,7 +817,6 @@ void displayLogFileListCont(edict_t *ent, int client, long logfilenum)
 		gi.cprintf (ent, PRINT_HIGH, "\nEnd Logfile List\n");
 	}
 }
-
 
 
 #define LOGEVENTCMD    "[sv] !logevent [view <logtype> / edit [logtype] <log [yes/no]> <logfiles [logfile[+logfile...]]> <format \"format\">]\n"
@@ -1031,7 +1019,6 @@ void logeventRun(int startarg, edict_t *ent, int client)
 		gi.cprintf (ent, PRINT_HIGH, LOGEVENTCMD);
 	}
 }
-
 
 
 void displayLogEventListCont(edict_t *ent, int client, long logevent, qboolean onetimeonly)

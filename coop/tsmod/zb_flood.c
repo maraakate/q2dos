@@ -48,8 +48,6 @@ floodcmd_t floodcmds[FLOOD_MAXCMDS];
 int maxflood_cmds = 0;
 
 
-
-
 qboolean ReadFloodFile(char *floodname)
 {
 	FILE *floodfile;
@@ -157,7 +155,6 @@ qboolean ReadFloodFile(char *floodname)
 }
 
 
-
 void freeFloodLists(void)
 {
 	while (maxflood_cmds)
@@ -192,7 +189,6 @@ void readFloodLists(void)
 		logEvent(LT_INTERNALWARN, 0, NULL, FLOODFILE " could not be found", IW_FLOODSETUPLOAD, 0.0);
 	}
 }
-
 
 
 void reloadFloodFileRun(int startarg, edict_t *ent, int client)
@@ -239,7 +235,6 @@ qboolean checkforfloodcmds(char *cp)
 }
 
 
-
 //===================================================================
 
 
@@ -271,7 +266,6 @@ qboolean checkForMute(int client, edict_t *ent, qboolean displayMsg)
 
 	return FALSE;
 }
-
 
 
 qboolean checkForFlood(int client)
@@ -327,10 +321,7 @@ qboolean checkForFlood(int client)
 }
 
 
-
 //===================================================================
-
-
 
 
 void nameChangeFloodProtectInit(char *arg)
@@ -369,8 +360,6 @@ void nameChangeFloodProtectInit(char *arg)
 }
 
 
-
-
 void nameChangeFloodProtectRun(int startarg, edict_t *ent, int client)
 {
 	if (gi.argc() > startarg + 2)
@@ -396,10 +385,7 @@ void nameChangeFloodProtectRun(int startarg, edict_t *ent, int client)
 }
 
 
-
 //===================================================================
-
-
 
 
 void skinChangeFloodProtectInit(char *arg)
@@ -436,8 +422,6 @@ void skinChangeFloodProtectInit(char *arg)
 		}
 	}
 }
-
-
 
 
 void skinChangeFloodProtectRun(int startarg, edict_t *ent, int client)
@@ -508,8 +492,6 @@ void chatFloodProtectInit(char *arg)
 }
 
 
-
-
 void chatFloodProtectRun(int startarg, edict_t *ent, int client)
 {
 	if (gi.argc() > startarg + 2)
@@ -541,7 +523,6 @@ void chatFloodProtectRun(int startarg, edict_t *ent, int client)
 		gi.cprintf (ent, PRINT_HIGH, "chatfloodprotect disabled\n");
 	}
 }
-
 
 
 void muteRun(int startarg, edict_t *ent, int client)
@@ -615,8 +596,6 @@ void muteRun(int startarg, edict_t *ent, int client)
 		gi.cprintf(ent, PRINT_HIGH, "[sv] !mute [LIKE/RE/CL] name [time(seconds)/PERM]\n");
 	}
 }
-
-
 
 
 void clientchatfloodprotectRun(int startarg, edict_t *ent, int client)
@@ -697,15 +676,7 @@ void clientchatfloodprotectRun(int startarg, edict_t *ent, int client)
 }
 
 
-
-
-
-
-
-
 //===================================================================
-
-
 
 
 void listfloodsRun(int startarg, edict_t *ent, int client)
@@ -723,15 +694,15 @@ void displayNextFlood(edict_t *ent, int client, long floodcmd)
 		switch (floodcmds[floodcmd].type)
 		{
 			case FLOOD_SW:
-				gi.cprintf (ent, PRINT_HIGH, "%4d SW:\"%s\"\n", floodcmd + 1, floodcmds[floodcmd].floodcmd);
+				gi.cprintf (ent, PRINT_HIGH, "%4ld SW:\"%s\"\n", floodcmd + 1, floodcmds[floodcmd].floodcmd);
 				break;
 
 			case FLOOD_EX:
-				gi.cprintf (ent, PRINT_HIGH, "%4d EX:\"%s\"\n", floodcmd + 1, floodcmds[floodcmd].floodcmd);
+				gi.cprintf (ent, PRINT_HIGH, "%4ld EX:\"%s\"\n", floodcmd + 1, floodcmds[floodcmd].floodcmd);
 				break;
 
 			case FLOOD_RE:
-				gi.cprintf (ent, PRINT_HIGH, "%4d RE:\"%s\"\n", floodcmd + 1, floodcmds[floodcmd].floodcmd);
+				gi.cprintf (ent, PRINT_HIGH, "%4ld RE:\"%s\"\n", floodcmd + 1, floodcmds[floodcmd].floodcmd);
 				break;
 		}
 		floodcmd++;
@@ -742,7 +713,6 @@ void displayNextFlood(edict_t *ent, int client, long floodcmd)
 		gi.cprintf (ent, PRINT_HIGH, "End flood commands List\n");
 	}
 }
-
 
 
 #define FLOODCMD     "[sv] !floodcmd [SW/EX/RE] \"command\"\n"
@@ -840,9 +810,7 @@ void floodcmdRun(int startarg, edict_t *ent, int client)
 }
 
 
-
 #define FLOODDELCMD     "[sv] !flooddel floodnum\n"
-
 
 void floodDelRun(int startarg, edict_t *ent, int client)
 {
@@ -880,5 +848,3 @@ void floodDelRun(int startarg, edict_t *ent, int client)
 
 	gi.cprintf (ent, PRINT_HIGH, "flood command deleted\n");
 }
-
-

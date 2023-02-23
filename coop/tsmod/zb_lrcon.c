@@ -329,7 +329,6 @@ void run_lrcon(edict_t *ent, int client)
 						stuffcmd(ent, buffer);
 
 						sprintf(buffer, "rcon %s sv !resetrcon\n", cbuffer);
-
 					}
 					else
 					{
@@ -356,7 +355,6 @@ void run_lrcon(edict_t *ent, int client)
 
 	gi.cprintf(ent, PRINT_HIGH, "Unknown lrcon command\n");
 }
-
 
 
 void check_lrcon_password (void)
@@ -394,15 +392,15 @@ void displayNextLRCon(edict_t *ent, int client, long lrconnum)
 		switch (lrconcmds[lrconnum].type)
 		{
 			case LRC_SW:
-				gi.cprintf (ent, PRINT_HIGH, "%4d SW:\"%s\" \"%s\"\n", lrconnum + 1, lrconcmds[lrconnum].password, lrconcmds[lrconnum].lrconcmd);
+				gi.cprintf (ent, PRINT_HIGH, "%4ld SW:\"%s\" \"%s\"\n", lrconnum + 1, lrconcmds[lrconnum].password, lrconcmds[lrconnum].lrconcmd);
 				break;
 
 			case LRC_EX:
-				gi.cprintf (ent, PRINT_HIGH, "%4d EX:\"%s\" \"%s\"\n", lrconnum + 1, lrconcmds[lrconnum].password, lrconcmds[lrconnum].lrconcmd);
+				gi.cprintf (ent, PRINT_HIGH, "%4ld EX:\"%s\" \"%s\"\n", lrconnum + 1, lrconcmds[lrconnum].password, lrconcmds[lrconnum].lrconcmd);
 				break;
 
 			case LRC_RE:
-				gi.cprintf (ent, PRINT_HIGH, "%4d RE:\"%s\" \"%s\"\n", lrconnum + 1, lrconcmds[lrconnum].password, lrconcmds[lrconnum].lrconcmd);
+				gi.cprintf (ent, PRINT_HIGH, "%4ld RE:\"%s\" \"%s\"\n", lrconnum + 1, lrconcmds[lrconnum].password, lrconcmds[lrconnum].lrconcmd);
 				break;
 		}
 		lrconnum++;
@@ -413,7 +411,6 @@ void displayNextLRCon(edict_t *ent, int client, long lrconnum)
 		gi.cprintf (ent, PRINT_HIGH, "End lrcon's List\n");
 	}
 }
-
 
 
 #define LRCONCMD     "[sv] !lrcon [SW/EX/RE] \"password\" \"command\"\n"
@@ -528,9 +525,7 @@ void lrconRun(int startarg, edict_t *ent, int client)
 }
 
 
-
 #define LRCONDELCMD     "[sv] !lrcondel lrconnum\n"
-
 
 void lrconDelRun(int startarg, edict_t *ent, int client)
 {
@@ -569,5 +564,3 @@ void lrconDelRun(int startarg, edict_t *ent, int client)
 
 	gi.cprintf (ent, PRINT_HIGH, "lrcon deleted\n");
 }
-
-

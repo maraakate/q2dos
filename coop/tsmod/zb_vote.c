@@ -66,7 +66,6 @@ int clientMaxVoteTimeout = 0;
 int clientMaxVotes = 0;
 
 
-
 qboolean ReadVoteFile(char *votename)
 {
 	FILE *votefile;
@@ -176,7 +175,6 @@ qboolean ReadVoteFile(char *votename)
 }
 
 
-
 void freeVoteLists(void)
 {
 	while (maxvote_cmds)
@@ -258,12 +256,7 @@ qboolean checkVoteCommand(char *cp)
 }
 
 
-
 //===================================================================
-
-
-
-
 
 
 void listvotesRun(int startarg, edict_t *ent, int client)
@@ -281,15 +274,15 @@ void displayNextVote(edict_t *ent, int client, long votecmd)
 		switch (votecmds[votecmd].type)
 		{
 			case VOTE_SW:
-				gi.cprintf (ent, PRINT_HIGH, "%4d SW:\"%s\"\n", votecmd + 1, votecmds[votecmd].votecmd);
+				gi.cprintf (ent, PRINT_HIGH, "%4ld SW:\"%s\"\n", votecmd + 1, votecmds[votecmd].votecmd);
 				break;
 
 			case VOTE_EX:
-				gi.cprintf (ent, PRINT_HIGH, "%4d EX:\"%s\"\n", votecmd + 1, votecmds[votecmd].votecmd);
+				gi.cprintf (ent, PRINT_HIGH, "%4ld EX:\"%s\"\n", votecmd + 1, votecmds[votecmd].votecmd);
 				break;
 
 			case VOTE_RE:
-				gi.cprintf (ent, PRINT_HIGH, "%4d RE:\"%s\"\n", votecmd + 1, votecmds[votecmd].votecmd);
+				gi.cprintf (ent, PRINT_HIGH, "%4ld RE:\"%s\"\n", votecmd + 1, votecmds[votecmd].votecmd);
 				break;
 		}
 		votecmd++;
@@ -300,7 +293,6 @@ void displayNextVote(edict_t *ent, int client, long votecmd)
 		gi.cprintf (ent, PRINT_HIGH, "End Vote Command List\n");
 	}
 }
-
 
 
 #define VOTECMD     "[sv] !votecmd [SW/EX/RE] \"command\"\n"
@@ -398,9 +390,7 @@ void votecmdRun(int startarg, edict_t *ent, int client)
 }
 
 
-
 #define VOTEDELCMD     "[sv] !votedel votenum\n"
-
 
 void voteDelRun(int startarg, edict_t *ent, int client)
 {
@@ -438,7 +428,6 @@ void voteDelRun(int startarg, edict_t *ent, int client)
 
 	gi.cprintf (ent, PRINT_HIGH, "Vote command deleted\n");
 }
-
 
 
 void displayVote(void)
@@ -498,8 +487,6 @@ void displayVote(void)
 		}
 	}
 }
-
-
 
 
 void run_vote(edict_t *ent, int client)
@@ -700,11 +687,6 @@ void run_vote(edict_t *ent, int client)
 		gi.cprintf(ent, PRINT_HIGH, "Invalid vote command specified.\n");
 	}
 }
-
-
-
-
-
 
 
 void checkOnVoting(void)

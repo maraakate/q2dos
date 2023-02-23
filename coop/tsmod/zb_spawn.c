@@ -49,11 +49,7 @@ spawncmd_t;
 spawncmd_t spawncmds[SPAWN_MAXCMDS];
 int maxspawn_cmds = 0;
 
-
-
 int entity_classname_offset = (sizeof(struct edict_s)) + 20;  // default byte offset to the classname variable.
-
-
 
 
 qboolean ReadSpawnFile(char *spawnname, qboolean onelevelflag)
@@ -167,7 +163,6 @@ qboolean ReadSpawnFile(char *spawnname, qboolean onelevelflag)
 }
 
 
-
 void freeSpawnLists(void)
 {
 	while (maxspawn_cmds)
@@ -211,8 +206,6 @@ void freeOneLevelSpawnLists(void)
 	}
 }
 
-
-
 void readSpawnLists(void)
 {
 	qboolean ret;
@@ -233,7 +226,6 @@ void readSpawnLists(void)
 		logEvent(LT_INTERNALWARN, 0, NULL, SPAWNFILE " could not be found", IW_SPAWNSETUPLOAD, 0.0);
 	}
 }
-
 
 
 void reloadSpawnFileRun(int startarg, edict_t *ent, int client)
@@ -295,15 +287,15 @@ void displayNextSpawn(edict_t *ent, int client, long spawncmd)
 		switch (spawncmds[spawncmd].type)
 		{
 			case SPAWN_SW:
-				gi.cprintf (ent, PRINT_HIGH, "%4d SW:\"%s\"\n", spawncmd + 1, spawncmds[spawncmd].spawncmd);
+				gi.cprintf (ent, PRINT_HIGH, "%4ld SW:\"%s\"\n", spawncmd + 1, spawncmds[spawncmd].spawncmd);
 				break;
 
 			case SPAWN_EX:
-				gi.cprintf (ent, PRINT_HIGH, "%4d EX:\"%s\"\n", spawncmd + 1, spawncmds[spawncmd].spawncmd);
+				gi.cprintf (ent, PRINT_HIGH, "%4ld EX:\"%s\"\n", spawncmd + 1, spawncmds[spawncmd].spawncmd);
 				break;
 
 			case SPAWN_RE:
-				gi.cprintf (ent, PRINT_HIGH, "%4d RE:\"%s\"\n", spawncmd + 1, spawncmds[spawncmd].spawncmd);
+				gi.cprintf (ent, PRINT_HIGH, "%4ld RE:\"%s\"\n", spawncmd + 1, spawncmds[spawncmd].spawncmd);
 				break;
 		}
 		spawncmd++;
