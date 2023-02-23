@@ -36,7 +36,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "game.h"
 
 #include <ctype.h>
+#ifndef _WIN32
+#include <regex.h>
+#else
 #include "regex.h"
+#endif
 
 //*** UPDATE START ***
 #define PRIVATE_COMMANDS  8
