@@ -36,13 +36,19 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "g_local.h"
 
-#ifdef __GNUC__
-#include <dlfcn.h>
-#elif defined(WIN32)
+#if defined(_WIN32)
 #include <windows.h>
+#else
+#include <dlfcn.h>
 #endif
 
-#ifdef __GNUC__
+#if defined(_WIN32) /* FS: FIXME: This is stupid -- is/was gamex86.real.dll */
+HINSTANCE hdll;
+#define DLLNAME   "gamex86.dll"  /* Not sure how this was suppsoed to work, but it was loading itself and overwriting its own gi.vars when just called "gamex86.dll" */
+#define DLLNAMEMODDIR "gamex86.dll"
+
+#else /* unix: */
+
 void *hdll = NULL;
 
 #ifdef LINUXAXP
@@ -54,16 +60,10 @@ void *hdll = NULL;
 #elif defined (LINUX)
 #define DLLNAME "gamei386.real.so"
 #else
-#error Unknown GNUC OS
-#endif
-
-#elif defined(WIN32) /* FS: FIXME: This is stupid -- is/was gamex86.real.dll */
-HINSTANCE hdll;
-#define DLLNAME   "gamex86.dll"  // Not sure how this was suppsoed to work, but it was loading itself and overwriting its own gi.vars when just called "gamex86.dll"
-#define DLLNAMEMODDIR "gamex86.dll"
-#else
 #error Unknown OS
 #endif
+
+#endif /**/
 
 typedef game_export_t *GAMEAPI (game_import_t *import);
 
@@ -107,10 +107,10 @@ void ShutdownGame (void)
 		STOPPERFORMANCE(2, "mod->ShutdownGame", 0, NULL);
 	}
 
-#ifdef __GNUC__
-	dlclose(hdll);
-#elif defined(WIN32)
+#if defined(_WIN32)
 	FreeLibrary(hdll);
+#else
+	dlclose(hdll);
 #endif
 
 	dllloaded = FALSE;
@@ -124,15 +124,8 @@ void ShutdownGame (void)
 qboolean Load_Game_DLL (game_import_t *import)
 {
 	GAMEAPI *getapi;
-#ifdef __GNUC__
-	int loadtype;
-#endif
 
-#ifdef __GNUC__
-	loadtype = soloadlazy ? RTLD_LAZY : RTLD_NOW;
-	sprintf(dllname, "%s/%s", moddir, DLLNAME);
-	hdll = dlopen(dllname, loadtype);
-#elif defined(WIN32)
+#if defined(_WIN32)
 	if (quake2dirsupport)
 	{
 		sprintf(dllname, "%s/%s", moddir, DLLNAME);
@@ -143,6 +136,10 @@ qboolean Load_Game_DLL (game_import_t *import)
 	}
 
 	hdll = LoadLibrary(dllname);
+#else
+	int loadtype = soloadlazy ? RTLD_LAZY : RTLD_NOW;
+	sprintf(dllname, "%s/%s", moddir, DLLNAME);
+	hdll = dlopen(dllname, loadtype);
 #endif
 
 	if (hdll == NULL)
@@ -150,15 +147,8 @@ qboolean Load_Game_DLL (game_import_t *import)
 		// try the baseq2 directory...
 		sprintf(dllname, "baseq2/%s", DLLNAME);
 
-#ifdef __GNUC__
-		hdll = dlopen(dllname, loadtype);
-#elif defined(WIN32)
+#if defined(_WIN32)
 		hdll = LoadLibrary(dllname);
-#endif
-
-#ifdef __GNUC__
-		sprintf(dllname, "%s/%s", moddir, DLLNAME);
-#elif defined(WIN32)
 		if (quake2dirsupport)
 		{
 			sprintf(dllname, "%s/%s", moddir, DLLNAME);
@@ -167,6 +157,9 @@ qboolean Load_Game_DLL (game_import_t *import)
 		{
 			sprintf(dllname, "%s/%s", moddir, DLLNAMEMODDIR);
 		}
+#else
+		hdll = dlopen(dllname, loadtype);
+		sprintf(dllname, "%s/%s", moddir, DLLNAME);
 #endif
 
 		if (hdll == NULL)
@@ -180,18 +173,18 @@ qboolean Load_Game_DLL (game_import_t *import)
 		}
 	}
 
-#ifdef __GNUC__
-	getapi = (GAMEAPI *)dlsym(hdll, "GetGameAPI");
-#elif defined(WIN32)
+#if defined(_WIN32)
 	getapi = (GAMEAPI *)GetProcAddress (hdll, "GetGameAPI");
+#else
+	getapi = (GAMEAPI *)dlsym(hdll, "GetGameAPI");
 #endif
 
 	if (getapi == NULL)
 	{
-#ifdef __GNUC__
-		dlclose(hdll);
-#elif defined(WIN32)
+#if defined(_WIN32)
 		FreeLibrary(hdll);
+#else
+		dlclose(hdll);
 #endif
 
 		gi.dprintf(DEVELOPER_MSG_VERBOSE, "No \"GetGameApi\" entry in DLL %s.\n", dllname);

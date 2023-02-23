@@ -1060,7 +1060,6 @@ typedef struct
 player_state_t;
 
 
-
 /* FS: Developer flags for developer cvar and DPrintf's */
 /* FS: No 0x00000001 because that would be developer->value 1 and we use that to show it all! */
 #define DEVELOPER_MSG_STANDARD		0x00000002 // 2
