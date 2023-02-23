@@ -603,10 +603,10 @@ void muteRun(int startarg, edict_t *ent, int client)
 
 		if (ent)
 		{
-			gi.cprintf(ent, PRINT_HIGH, "%s has been muted.\n", proxyinfo[clienti].name, seconds);
+			gi.cprintf(ent, PRINT_HIGH, "%s has been muted.\n", proxyinfo[clienti].name);
 		}
 
-		gi.cprintf(enti, PRINT_HIGH, "You have been muted.\n", seconds);
+		gi.cprintf(enti, PRINT_HIGH, "You have been muted.\n");
 
 		proxyinfo[clienti].clientcommand |= CCMD_PCSILENCE;
 	}
