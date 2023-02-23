@@ -28,7 +28,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
 #define REGEX_MALLOC  1
 
-
 #define _GNU_SOURCE
 
 #define STDC_HEADERS 1
@@ -1643,10 +1642,12 @@ handle_open:
 						if (syntax & RE_NO_BK_PARENS) goto normal_backslash;
 
 						if (COMPILE_STACK_EMPTY)
+						{
 							if (syntax & RE_UNMATCHED_RIGHT_PAREN_ORD)
 								goto normal_backslash;
 							else
 								return REG_ERPAREN;
+						}
 
 handle_close:
 						if (fixup_alt_jump)
@@ -1663,10 +1664,12 @@ handle_close:
 
 						/* See similar code for backslashed left paren above.  */
 						if (COMPILE_STACK_EMPTY)
+						{
 							if (syntax & RE_UNMATCHED_RIGHT_PAREN_ORD)
 								goto normal_char;
 							else
 								return REG_ERPAREN;
+						}
 
 						/* Since we just checked for an empty stack above, this
 						``can't happen''.  */
@@ -3989,7 +3992,6 @@ on_failure:
 				PUSH_FAILURE_POINT(p + mcnt, d, -2);
 				break;
 
-
 				/* A smart repeat ends with `maybe_pop_jump'.
 				We change it to either `pop_failure_jump' or `jump'.  */
 			case maybe_pop_jump:
@@ -4072,7 +4074,6 @@ on_failure:
 					goto unconditional_jump;
 				}
 				/* Note fall through.  */
-
 
 				/* The end of a simple repeat has a pop_failure_jump back to
 				its matching on_failure_jump, where the latter will push a
