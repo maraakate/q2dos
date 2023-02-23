@@ -1593,7 +1593,7 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 		//my check here, if maxfps = 0 and it has length we will NOT allow
 		if (proxyinfo[client].maxfps == 0)
 		{
-			gi.bprintf(PRINT_HIGH, (PRV_KICK_MSG, proxyinfo[client].name));
+			gi.bprintf(PRINT_HIGH, PRV_KICK_MSG, proxyinfo[client].name);
 			if (proxyinfo[client].inuse)
 			{
 				//r1ch: wtf is going on here?
