@@ -172,7 +172,7 @@ char *processstring(char *output, char *input, int max, char end)
 	{
 		if (*input == '\\')
 		{
-			*input++;
+			input++;
 
 			if ((*input == 'n') || (*input == 'N'))
 			{

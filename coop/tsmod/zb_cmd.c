@@ -1470,7 +1470,7 @@ void cprintf_internal(edict_t *ent, int printlevel, char *fmt, ...)
 				*cp = ' ';
 			}
 
-			*cp++;
+			cp++;
 		}
 	}
 
@@ -1560,7 +1560,7 @@ void bprintf_internal(int printlevel, char *fmt, ...)
 					*cp = ' ';
 				}
 
-				*cp++;
+				cp++;
 			}
 		}
 

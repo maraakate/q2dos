@@ -2411,7 +2411,7 @@ int checkCheckIfChatBanned(char *txt)
 				*cp = ' ';
 			}
 
-			*cp++;
+			cp++;
 		}
 	}
 
