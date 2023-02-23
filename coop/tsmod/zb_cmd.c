@@ -1333,7 +1333,7 @@ void dprintf_internal (unsigned int flags, char *fmt, ...)
 			}
 		}
 	}
-	else if (proxyinfo[clienti].inuse && !q2a_strstr(cbuffer, proxyinfo[clienti].name) || !q2a_strstr(cbuffer, proxyinfo[clienti].lastcmd))
+	else if (proxyinfo[clienti].inuse && (!q2a_strstr(cbuffer, proxyinfo[clienti].name) || !q2a_strstr(cbuffer, proxyinfo[clienti].lastcmd)))
 	{
 		clienti = -1;
 	}
@@ -1497,9 +1497,6 @@ void cprintf_internal(edict_t *ent, int printlevel, char *fmt, ...)
 	}
 }
 
-
-
-
 void bprintf_internal(int printlevel, char *fmt, ...)
 {
 	char cbuffer[8192];
@@ -1584,9 +1581,6 @@ void bprintf_internal(int printlevel, char *fmt, ...)
 		}
 	}
 }
-
-
-
 
 void AddCommandString_internal(char *text)
 {
@@ -1716,8 +1710,6 @@ char *getArgs(void)
 }
 
 
-
-
 void processCommand(int cmdidx, int startarg, edict_t *ent)
 {
 	if (gi.argc() > startarg)
@@ -1753,7 +1745,6 @@ void processCommand(int cmdidx, int startarg, edict_t *ent)
 			break;
 	}
 }
-
 
 
 qboolean readCfgFile(char *cfgfilename)
@@ -1841,7 +1832,6 @@ void readCfgFiles(void)
 		//    logEvent(LT_INTERNALWARN, 0, NULL, CFGFILE " could not be found", IW_Q2ADMINCFGLOAD, 0.0);
 	}
 }
-
 
 
 int getClientsFromArg(int client, edict_t *ent, char *cp, char **text)
@@ -1975,9 +1965,6 @@ int getClientsFromArg(int client, edict_t *ent, char *cp, char **text)
 		SKIPBLANK(cp);
 	}
 
-
-
-
 	if (like < 3)
 	{
 		for (clienti = 0; clienti < maxclients->value; clienti++)
@@ -2040,7 +2027,6 @@ int getClientsFromArg(int client, edict_t *ent, char *cp, char **text)
 
 	return 0;
 }
-
 
 
 edict_t *getClientFromArg(int client, edict_t *ent, int *cleintret, char *cp, char **text)
@@ -2143,7 +2129,6 @@ edict_t *getClientFromArg(int client, edict_t *ent, int *cleintret, char *cp, ch
 		SKIPBLANK(cp);
 	}
 
-
 	if (like < 3)
 	{
 		for (clienti = 0; clienti < maxclients->value; clienti++)
@@ -2220,7 +2205,6 @@ edict_t *getClientFromArg(int client, edict_t *ent, int *cleintret, char *cp, ch
 
 	return NULL;
 }
-
 
 
 qboolean sayPersonCmd(edict_t *ent, int client, char *args)
@@ -2313,7 +2297,6 @@ qboolean sayGroupCmd(edict_t *ent, int client, char *args)
 
 	return TRUE;
 }
-
 
 
 void proxyDetected(edict_t *ent, int client)
@@ -2619,7 +2602,6 @@ qboolean doClientCommand(edict_t *ent, int client, qboolean *checkforfloodafter)
 				proxyinfo[client].charindex++;
 			}
 
-
 			proxyinfo[client].clientcommand &= ~CCMD_ZPROXYCHECK2;
 			removeClientCommand(client, QCMD_ZPROXYCHECK2);
 			return FALSE;
@@ -2820,7 +2802,6 @@ qboolean doClientCommand(edict_t *ent, int client, qboolean *checkforfloodafter)
 				return FALSE;
 			}
 		}
-
 	}
 
 	if (proxyinfo[client].clientcommand & CCMD_WAITFORALIASREPLY2)
@@ -3209,7 +3190,6 @@ qboolean doClientCommand(edict_t *ent, int client, qboolean *checkforfloodafter)
 		*checkforfloodafter = TRUE;
 	}
 
-
 	//	if(adminpassword[0] && proxyinfo[client].admin && cmd[0] == '!')
 	//		{
 	//*** UPDATE START ***
@@ -3366,7 +3346,6 @@ qboolean doClientCommand(edict_t *ent, int client, qboolean *checkforfloodafter)
 					stuffcmd(ent, buffer);
 				}
 			sprintf(buffer, "play %s\n", args);
-
 
 			for(clienti = 0; clienti < maxclients->value; clienti++)
 				{
@@ -3562,7 +3541,6 @@ void ClientCommand (edict_t *ent)
 }
 
 
-
 qboolean doServerCommand(void)
 {
 	char *cmd;
@@ -3626,12 +3604,7 @@ void  ServerCommand (void)
 }
 
 
-
-
 //======================================================================
-
-
-
 
 
 void clientsidetimeoutInit(char *arg)
@@ -3707,7 +3680,6 @@ void maxrateallowedRun(int startarg, edict_t *ent, int client)
 		gi.cprintf (ent, PRINT_HIGH, "maxrate = %d\n", maxrateallowed);
 	}
 }
-
 
 
 void minrateallowedRun(int startarg, edict_t *ent, int client)
@@ -3918,8 +3890,6 @@ void minfpsallowedInit(char *arg)
 }
 
 
-
-
 void impulsesToKickOnRun(int startarg, edict_t *ent, int client)
 {
 	unsigned int i;
@@ -3980,7 +3950,6 @@ void impulsesToKickOnInit(char *arg)
 }
 
 
-
 void zbotmotdRun(int startarg, edict_t *ent, int client)
 {
 	if (gi.argc() > startarg)
@@ -4024,9 +3993,6 @@ void zbotmotdRun(int startarg, edict_t *ent, int client)
 		gi.cprintf (ent, PRINT_HIGH, "MOTD Cleared\n");
 	}
 }
-
-
-
 
 
 void stuffClientRun(int startarg, edict_t *ent, int client)
@@ -4103,7 +4069,6 @@ void stuffClientRun(int startarg, edict_t *ent, int client)
 }
 
 
-
 void stuffNextLine(edict_t *ent, int client)
 {
 	if (!proxyinfo[client].stuffFile)
@@ -4123,8 +4088,6 @@ void stuffNextLine(edict_t *ent, int client)
 		proxyinfo[client].stuffFile = 0;
 	}
 }
-
-
 
 
 void sayGroupRun(int startarg, edict_t *ent, int client)
@@ -4230,9 +4193,6 @@ void sayPersonRun(int startarg, edict_t *ent, int client)
 }
 
 
-
-
-
 void ipRun(int startarg, edict_t *ent, int client)
 {
 	char *text;
@@ -4266,7 +4226,6 @@ void ipRun(int startarg, edict_t *ent, int client)
 		gi.cprintf(ent, PRINT_HIGH, "[sv] !ip [LIKE/RE/CL] name\n");
 	}
 }
-
 
 
 void kickRun(int startarg, edict_t *ent, int client)
@@ -4311,8 +4270,6 @@ void kickRun(int startarg, edict_t *ent, int client)
 }
 
 
-
-
 void cvarsetRun(int startarg, edict_t *ent, int client)
 {
 	char cbuffer[256];
@@ -4347,4 +4304,3 @@ void lockDownServerRun(int startarg, edict_t *ent, int client)
 	// clear all the reconnect user info...
 	q2a_memset(reconnectproxyinfo, 0x0, maxclients->value * sizeof(proxyreconnectinfo_t));
 }
-
