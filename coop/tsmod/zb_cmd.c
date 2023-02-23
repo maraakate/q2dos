@@ -3892,7 +3892,7 @@ void minfpsallowedInit(char *arg)
 
 void impulsesToKickOnRun(int startarg, edict_t *ent, int client)
 {
-	unsigned int i;
+	unsigned int i, impulses;
 	char *cp = gi.argv(startarg);
 
 	if (Q_stricmp(cp, "ADD") == 0)
@@ -3905,13 +3905,15 @@ void impulsesToKickOnRun(int startarg, edict_t *ent, int client)
 		startarg++;
 	}
 
-	while (startarg < gi.argc() && maxImpulses < MAXIMPULSESTOTEST)
+	impulses = maxImpulses;
+	while (startarg < gi.argc() && impulses < MAXIMPULSESTOTEST)
 	{
-		impulsesToKickOn[maxImpulses] = q2a_atoi(gi.argv(startarg));
+		impulsesToKickOn[impulses] = q2a_atoi(gi.argv(startarg));
 
-		maxImpulses++;
+		impulses++;
 		startarg++;
 	}
+	maxImpulses = impulses;
 
 	gi.cprintf (ent, PRINT_HIGH, "impulsestokickon = ");
 
@@ -3934,11 +3936,12 @@ void impulsesToKickOnRun(int startarg, edict_t *ent, int client)
 
 void impulsesToKickOnInit(char *arg)
 {
-	while (*arg && maxImpulses < MAXIMPULSESTOTEST)
+	unsigned int impulses = maxImpulses;
+	while (*arg && impulses < MAXIMPULSESTOTEST)
 	{
-		impulsesToKickOn[maxImpulses] = q2a_atoi(arg);
+		impulsesToKickOn[impulses] = q2a_atoi(arg);
 
-		maxImpulses++;
+		impulses++;
 
 		while (*arg && *arg != ' ')
 		{
@@ -3947,6 +3950,7 @@ void impulsesToKickOnInit(char *arg)
 
 		SKIPBLANK(arg);
 	}
+	maxImpulses = impulses;
 }
 
 
