@@ -16,7 +16,7 @@
 //based on: ALSA (http://www.alsa-project.org) and ICH-DOS wav player from Jeff Leyda
 
 //#define MPXPLAY_USE_DEBUGF
-#define ICH_DEBUG_OUTPUT stdout
+//#define ICH_DEBUG_OUTPUT stdout
 
 #include "libaudef.h"
 #include "pcibios.h"
@@ -46,7 +46,7 @@
 #define ICH_PO_BDBAR_REG  0x10  // PCM out buffer descriptor BAR
 #define ICH_PO_LVI_REG    0x15  // PCM out Last Valid Index (set it)
 #define ICH_PO_CIV_REG    0x14  // PCM out current Index value (RO?)
-#define ICH_PO_PICB_REG   0x18  // PCM out position in current buffer(RO)
+#define ICH_PO_PICB_REG   0x18  // PCM out position in current buffer(RO) (remaining, not processed pos)
 
 #define ICH_ACC_SEMA_REG  0x34  // codec write semiphore register
 #define ICH_CODEC_BUSY    0x01  // codec register I/O is happening self clearing
@@ -80,7 +80,7 @@ struct intel_card_s
  float ac97_clock_corrector;
 };
 
-struct	intel_card_s	ich;
+static struct intel_card_s	ich;
 
 enum { DEVICE_INTEL, DEVICE_INTEL_ICH4, DEVICE_NFORCE };
 static const char *ich_devnames[3]={"ICH","ICH4","NForce"};
@@ -167,7 +167,6 @@ static unsigned int snd_intel_buffer_init(struct intel_card_s *card,struct mpxpl
  card->virtualpagetable=(uint32_t *)card->dm->linearptr; // pagetable requires 8 byte align, but dos-allocmem gives 16 byte align (so we don't need alignment correction)
  card->pcmout_buffer=((char *)card->virtualpagetable)+ICH_DMABUF_PERIODS*2*sizeof(uint32_t);
  aui->card_DMABUFF=card->pcmout_buffer;
-
 #ifdef __DJGPP__
  aui->card_DMABUFF=(char *)((unsigned int)aui->card_DMABUFF + __djgpp_conventional_base);
 #endif
@@ -251,7 +250,7 @@ static void snd_intel_prepare_playback(struct intel_card_s *card,struct mpxplay_
  mpxplay_debugf(ICH_DEBUG_OUTPUT,"dma stop timeout: %d",retry);
 
  // reset codec
- snd_intel_write_8(card,ICH_PO_CR_REG,ICH_PO_CR_RESET);
+ snd_intel_write_8(card,ICH_PO_CR_REG, snd_intel_read_8(card, ICH_PO_CR_REG) | ICH_PO_CR_RESET);
 
  // set channels (2) and bits (16/32)
  cmd=snd_intel_read_32(card,ICH_GLOB_CNT_REG);
@@ -289,7 +288,6 @@ static void snd_intel_prepare_playback(struct intel_card_s *card,struct mpxplay_
 
  //set period table
  table_base=card->virtualpagetable;
-
 #ifdef __DJGPP__
  table_base=(uint32_t *)((unsigned int)table_base + __djgpp_conventional_base);
 #endif
@@ -354,22 +352,41 @@ static void INTELICH_card_info(struct mpxplay_audioout_info_s *aui)
 
 static int INTELICH_adetect(struct mpxplay_audioout_info_s *aui)
 {
+ int iobase = 0xF000; // 0xFFFF didn't work
  struct intel_card_s *card=&ich;
  aui->card_private_data=card;
  card->pci_dev=&libau_pci;
 
- if(pcibios_search_devices(ich_devices,card->pci_dev)!=PCI_SUCCESSFUL)
+ if(pcibios_search_devices(&ich_devices[0],card->pci_dev)!=PCI_SUCCESSFUL)
   goto err_adetect;
 
+ if(card->pci_dev->device_type == DEVICE_INTEL_ICH4)
+ { //enable leagcy IO space, must be set before setting PCI CMD's IO space bit.
+  mpxplay_debugf(ICH_DEBUG_OUTPUT,"Eanble legacy io space for ICH4");
+  pcibios_WriteConfig_Byte(card->pci_dev, 0x41, 1); //IOSE:enable IO space
+ }
  mpxplay_debugf(ICH_DEBUG_OUTPUT,"chip init : enable PCI io and busmaster");
  pcibios_set_master(card->pci_dev);
 
  card->baseport_bm = pcibios_ReadConfig_Dword(card->pci_dev, PCIR_NABMBAR)&0xfff0;
- if(!card->baseport_bm)
-  goto err_adetect;
+ //some BIOSes don't set NAMBAR/NABMBAR at all. assign manually
+ if(!card->baseport_bm) {
+  pcibios_WriteConfig_Dword(card->pci_dev, PCIR_NABMBAR, iobase);
+  card->baseport_bm = pcibios_ReadConfig_Dword(card->pci_dev, PCIR_NABMBAR)&0xfff0;
+  if(!card->baseport_bm)
+   goto err_adetect;
+ }
+
  card->baseport_codec = pcibios_ReadConfig_Dword(card->pci_dev, PCIR_NAMBAR)&0xfff0;
- if(!card->baseport_codec)
-  goto err_adetect;
+ if(!card->baseport_codec) {
+  iobase -= 256;
+  iobase &= ~0xFF;
+  pcibios_WriteConfig_Dword(card->pci_dev, PCIR_NAMBAR, iobase);
+  card->baseport_codec = pcibios_ReadConfig_Dword(card->pci_dev, PCIR_NAMBAR)&0xfff0;
+  if(!card->baseport_codec)
+   goto err_adetect;
+ }
+
  card->irq = pcibios_ReadConfig_Byte(card->pci_dev, PCIR_INTR_LN);
 
  card->device_type=card->pci_dev->device_type;
@@ -453,7 +470,7 @@ static void INTELICH_stop(struct mpxplay_audioout_info_s *aui)
 static void snd_intel_measure_ac97_clock(struct mpxplay_audioout_info_s *aui)
 {
  struct intel_card_s *card=(struct intel_card_s *)aui->card_private_data;
- mpxp_int64_t starttime,endtime,timelen; // in usecs
+ int64_t starttime,endtime,timelen; // in usecs
  long freq_save=aui->freq_card,dmabufsize;
 
  aui->freq_card=48000;
@@ -515,23 +532,24 @@ static long INTELICH_getbufpos(struct mpxplay_audioout_info_s *aui)
   index=snd_intel_read_8(card,ICH_PO_CIV_REG);    // number of current period
   //mpxplay_debugf(ICH_DEBUG_OUTPUT,"index1: %d",index);
   if(index>=ICH_DMABUF_PERIODS){
-   if(retry>1)    continue;
+   if(retry>1)
+    continue;
    MDma_clearbuf(aui);
    snd_intel_write_8(card,ICH_PO_LVI_REG,(ICH_DMABUF_PERIODS-1));
-   snd_intel_write_8(card,ICH_PO_CIV_REG,0);
+   //snd_intel_write_8(card,ICH_PO_CIV_REG,0); // RO
    funcbit_enable(aui->card_infobits,AUINFOS_CARDINFOBIT_DMAUNDERRUN);
    continue;
   }
 
-  pcmpos=snd_intel_read_16(card,ICH_PO_PICB_REG); // position in the current period (in samples)
+  pcmpos=snd_intel_read_16(card,ICH_PO_PICB_REG); // position in the current period (remaining unprocessed in SAMPLEs)
   pcmpos*=aui->bits_card>>3;
-  pcmpos*=aui->chan_card;
+  //pcmpos*=aui->chan_card;
   //mpxplay_debugf(ICH_DEBUG_OUTPUT,"pcmpos: %d",pcmpos);
   if(!pcmpos || (pcmpos>card->period_size_bytes)){
    if(snd_intel_read_8(card,ICH_PO_LVI_REG)==index){
     MDma_clearbuf(aui);
     snd_intel_write_8(card,ICH_PO_LVI_REG,(index-1)%ICH_DMABUF_PERIODS); // to keep playing in an endless loop
-    snd_intel_write_8(card,ICH_PO_CIV_REG,index); // ???
+    //snd_intel_write_8(card,ICH_PO_CIV_REG,index); // ??? -RO
     funcbit_enable(aui->card_infobits,AUINFOS_CARDINFOBIT_DMAUNDERRUN);
    }
    continue;
