@@ -53,6 +53,8 @@ By Neozeed, [HCI]Mara'akate, and sezero.
 ---------------------------------------------------------
 * Playing in a Windows 9x DOS box.
 * Several PCI sound cards like AC'97 or HDA (run with -sndpci)
+  - You can also try using SBEMU, a legacy sound blaster emulator for DOS,
+    with your PCI sound card: https://github.com/crazii/SBEMU
 * Mouse wheel support. (see info below.)
 * Hor+ FOV scaling. (see info below.)
 
