@@ -25,6 +25,8 @@ void SV_CheckSkillCvar(void); /* FS: Valid skill values are 0, 1, 2 and 3. */
 server_static_t	svs;				// persistant server info
 server_t		sv;					// local server
 
+extern int num_sz_getspace_overflows;
+
 /*
 ================
 SV_FindIndex
@@ -204,6 +206,7 @@ void SV_SpawnServer (char *server, char *spawnpoint, server_state_t serverstate,
 	svs.realtime = 0;
 	sv.loadgame = loadgame;
 	sv.attractloop = attractloop;
+	num_sz_getspace_overflows = 0; /* FS: Bullshit coop hack. */
 
 	// save name for levels that don't set message
 //	strncpy (sv.configstrings[CS_NAME], server);

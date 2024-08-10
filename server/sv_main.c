@@ -65,6 +65,10 @@ cvar_t	*sv_idlekick; /* FS: Kick excessive idlers.  From R1Q2 */
 cvar_t		*sv_filter_wallfly_rcon_request;
 cvar_t		*sv_filter_wallfly_ip;
 
+cvar_t		*sv_getspace_overflow_hack; /* FS: Bullshit hack for coop mod. */
+
+extern	int num_sz_getspace_overflows;
+
 void Master_Shutdown (void);
 
 
@@ -999,7 +1003,6 @@ void SV_RunGameFrame (void)
 
 	if (host_speeds->intValue)
 		time_after_game = Sys_Milliseconds ();
-
 }
 
 /*
@@ -1062,6 +1065,12 @@ void SV_Frame (int msec)
 	// clear teleport flags, etc for next frame
 	SV_PrepWorldFrame ();
 
+	if (sv_getspace_overflow_hack->intValue && num_sz_getspace_overflows >= 1000)
+	{
+		num_sz_getspace_overflows = 0;
+		Com_Printf("SZ_GetSpace() overflow hack - problem map: %s\n", sv.name);
+		Cbuf_AddText(va("map %s\n", sv.name));
+	}
 }
 
 //============================================================================
@@ -1254,6 +1263,9 @@ void SV_Init (void)
 	sv_filter_wallfly_ip = Cvar_Get ("sv_filter_wallfly_ip", "23.227.170.221", 0);
 	Cvar_SetDescription("sv_filter_wallfly_ip", "WallFly/Tastyspleen IP for filtering rcon requests.  Requires sv_filter_wallfly_rcon_request CVAR to be enabled.");
 
+	sv_getspace_overflow_hack = Cvar_Get("sv_getspace_overflow_hack", "0", 0);
+	Cvar_SetDescription("sv_getspace_overflow_hack", "Reset map if stuck in SZ_GetSpace() overflow loop.  Resets after 1000 overflowed packets.\n");
+
 	sv_noreload = Cvar_Get ("sv_noreload", "0", 0);
 
 	sv_airaccelerate = Cvar_Get("sv_airaccelerate", "0", CVAR_LATCH);
@@ -1351,4 +1363,3 @@ void SV_GetUptime (void) /* FS: Uptime for /info */
 	units = seconds - 10*tens;
 	Com_sprintf (uptime_infostring, sizeof(uptime_infostring), "%3i:%i%i", minutes, tens, units);
 }
-

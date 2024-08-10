@@ -77,6 +77,8 @@ int	time_after_game;
 int	time_before_ref;
 int	time_after_ref;
 
+int num_sz_getspace_overflows;
+
 /*
 ============================================================================
 
@@ -957,11 +959,12 @@ void *SZ_GetSpace (sizebuf_t *buf, int length)
 		Com_Printf ("SZ_GetSpace: overflow\n");
 		SZ_Clear (buf); 
 		buf->overflowed = true;
+		num_sz_getspace_overflows++; /* FS: Bullshit hack for coop maps that get stuck sometimes so I don't have to reboot the server. */
 	}
 
 	data = buf->data + buf->cursize;
 	buf->cursize += length;
-	
+
 	return data;
 }
 
