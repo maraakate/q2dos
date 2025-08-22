@@ -1,35 +1,5 @@
-     .,o'       `o,.
-   ,o8'           `8o.
-  o8'               `8o
- o8:                 ;8o
-.88                   88.
-:88.                 ,88:
-`888                 888'
- 888o   `888 888'   o888
- `888o,. `88 88' .,o888'
-  `8888888888888888888'
-    `888888888888888'
-       `::88;88;:'
-          88 88
-          88 88
-          `8 8'
-           ` '
-
 Welcome to the Quake II for MS-DOS port.
 By Neozeed, [HCI]Mara'akate, and sezero.
-
-+-----------------------------------------+
-|            Table of Contents            |
-|                                         |
-|  1 - What's Required?                   |
-|  2 - What works?                        |
-|  3 - What works but needs more testing? |
-|  4 - What doesn't work                  |
-|  5 - Tips and other misc. info          |
-|  6 - 3DFX Notes                         |
-|  7 - Links and Credits                  |
-|  8 - Tools Used                         |
-+-----------------------------------------+
 
 1 - What's required?
 ---------------------------------------------------------
