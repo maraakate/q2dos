@@ -197,7 +197,7 @@ void S_StreamBackgroundTrack (void)
 		s_rawend = paintedtime;
 
 	scale = (float)s_bgTrack.rate / dma.speed;
-	maxSamples = sizeof(s_streamDataPtr) / s_bgTrack.channels / s_bgTrack.width;
+	maxSamples = (sizeof(byte) * s_rawsamples_size) / s_bgTrack.channels / s_bgTrack.width;
 
 	while (1)
 	{

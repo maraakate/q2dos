@@ -241,7 +241,7 @@ void S_StreamWAVBackgroundTrack(void)
 		s_rawend = paintedtime;
 
 	scale = (float)musicWavInfo.rate / dma.speed;
-	maxSamples = sizeof(s_streamDataPtr) / musicWavInfo.channels / musicWavInfo.width;
+	maxSamples = (sizeof(byte) * s_rawsamples_size) / musicWavInfo.channels / musicWavInfo.width;
 //	Com_Printf("Scale: %f.  Max Samples: %i\n", scale, maxSamples);
 
 	while (1)
