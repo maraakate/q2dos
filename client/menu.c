@@ -4935,7 +4935,7 @@ void PlayerConfig_MenuDraw( void )
 	{
 		int			yaw; // was static
 		vec3_t		modelOrg;
-		entity_t	playerconfig_Entity[2], *ent;
+		entity_t	*ent;
 
 		refdef.num_entities = 0;
 		refdef.entities = playerconfig_Entity;

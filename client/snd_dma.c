@@ -39,7 +39,8 @@ void S_StopAllSounds(void);
 
 int			s_registration_sequence;
 
-channel_t   channels[MAX_CHANNELS];
+channel_t   *channels;
+size_t		s_max_channels_size;
 
 qboolean	snd_initialized = false;
 int			sound_started=0;
@@ -80,11 +81,17 @@ cvar_t		*s_show;
 cvar_t		*s_mixahead;
 cvar_t		*s_primary;
 cvar_t		*s_musicvolume;
+cvar_t		*s_max_channels;
+cvar_t		*s_paintbuffer_size_cvar;
+cvar_t		*s_rawsamples_size_cvar;
 
 int		s_rawend;
-portable_samplepair_t	s_rawsamples[MAX_RAW_SAMPLES];
+portable_samplepair_t	*s_rawsamples;
+size_t	s_rawsamples_size;
+
 extern int	havegus; /* FS: Added */
 
+byte *s_streamDataPtr;
 
 // ====================================================================
 // User-setable variables
@@ -124,6 +131,10 @@ void S_Init (void)
 	if (!cv->intValue)
 	{
 		dma.buffer = NULL;/* just in case */
+		paintbuffer = NULL;
+		s_rawsamples = NULL;
+		s_streamDataPtr = NULL;
+
 		Com_Printf ("not initializing.\n");
 	}
 	else
@@ -138,6 +149,9 @@ void S_Init (void)
 		s_primary = Cvar_Get ("s_primary", "0", CVAR_ARCHIVE);	// win32 specific
 		s_musicvolume = Cvar_Get ("s_musicvolume", "1.0", CVAR_ARCHIVE); // Knightmare added
 		Cvar_SetDescription("s_musicvolume", "Volume for music played from WAV and OGG files.");
+		s_max_channels = Cvar_Get("s_max_channels", "32", CVAR_ARCHIVE);
+		s_paintbuffer_size_cvar = Cvar_Get("s_paintbuffer_size", va("%d", PAINTBUFFER_SIZE), 0);
+		s_rawsamples_size_cvar = Cvar_Get("s_rawsamples_size", va("%d", MAX_RAW_SAMPLES), 0);
 
 		if (s_khz->value < 7000) /* FS: Old config, fix it up */
 			Cvar_SetValue("s_khz", 11025);
@@ -164,7 +178,47 @@ void S_Init (void)
 		soundtime = 0;
 		paintedtime = 0;
 
-		Com_Printf ("sound sampling rate: %i\n", dma.speed);
+		paintbuffer_size = bound(128, s_paintbuffer_size_cvar->intValue, SND_BUFFER_SIZE);
+		paintbuffer = (portable_samplepair_t *)calloc(1, paintbuffer_size * sizeof(portable_samplepair_t));
+		if (!paintbuffer)
+		{
+			dma.buffer = NULL;
+			return;
+		}
+
+		s_rawsamples_size = bound(128, s_rawsamples_size_cvar->intValue, SND_BUFFER_SIZE);
+		s_rawsamples = (portable_samplepair_t *)calloc(1, s_rawsamples_size * sizeof(portable_samplepair_t));
+		if (!s_rawsamples)
+		{
+			free(paintbuffer);
+			dma.buffer = NULL;
+			return;
+		}
+
+		s_streamDataPtr = (byte *)calloc(1, s_rawsamples_size * sizeof(byte));
+		if (!s_streamDataPtr)
+		{
+			free(s_rawsamples);
+			s_rawsamples = NULL;
+			free(paintbuffer);
+			dma.buffer = NULL;
+			return;
+		}
+
+		s_max_channels_size = bound(1, s_max_channels->intValue, 128);
+		channels = (channel_t *)calloc(1, s_max_channels_size * sizeof(channel_t));
+		if (!channels)
+		{
+			free(s_streamDataPtr);
+			s_streamDataPtr = NULL;
+			free(s_rawsamples);
+			s_rawsamples = NULL;
+			free(paintbuffer);
+			dma.buffer = NULL;
+			return;
+		}
+
+		Com_Printf("Channels: %d, Bits: %d, Rate: %d\nPaint Buffer Size: %d\nRaw Samples Buffer Size: %d\nMaximum Samples: %d\n", dma.channels, dma.samplebits, dma.speed, (int)paintbuffer_size, (int)s_rawsamples_size, (int)s_max_channels_size);
 
 		S_StopAllSounds ();
 	}
@@ -438,7 +492,7 @@ channel_t *S_PickChannel(int entnum, int entchannel)
 // Check for replacement sound, or find the best one to replace
 	first_to_die = -1;
 	life_left = 0x7fffffff;
-	for (ch_idx=0 ; ch_idx < MAX_CHANNELS ; ch_idx++)
+	for (ch_idx=0 ; ch_idx < s_max_channels_size ; ch_idx++)
 	{
 		if (entchannel != 0		// channel 0 never overrides
 		&& channels[ch_idx].entnum == entnum
@@ -827,9 +881,10 @@ void S_ClearBuffer (void)
 		return;
 
 	s_rawend = 0;
-	for (i = 0; i < MAX_RAW_SAMPLES; i++) /* FS: Clear out the s_rawsamples too.  Should not matter, but just in case we read ahead of some garbage data on load. */
+	for (i = 0; i < s_rawsamples_size; i++) /* FS: Clear out the s_rawsamples too.  Should not matter, but just in case we read ahead of some garbage data on load. */
 	{
 		memset(&s_rawsamples[i], 0, sizeof(portable_samplepair_t));
+		memset(&s_streamDataPtr[i], 0, sizeof(byte));
 	}
 
 	if (dma.samplebits == 8)
@@ -873,7 +928,7 @@ void S_StopAllSounds(void)
 	}
 
 	// clear all the channels
-	memset(channels, 0, sizeof(channels));
+	memset(channels, 0, sizeof(channel_t));
 
 	// Stop background track
 	S_StopBackgroundTrack (); // Knightmare added
@@ -1035,7 +1090,7 @@ void S_RawSamples (int samples, int rate, int width, int channels, byte *data, q
 			src = i * scale;
 			if (src >= samples)
 				break;
-			dst = s_rawend & (MAX_RAW_SAMPLES - 1);
+			dst = s_rawend & (s_rawsamples_size - 1);
 			s_rawend++;
 			s_rawsamples [dst].left = ((short *) data)[src * 2] * intVolume;
 			s_rawsamples [dst].right = ((short *) data)[src * 2 + 1] * intVolume;
@@ -1048,7 +1103,7 @@ void S_RawSamples (int samples, int rate, int width, int channels, byte *data, q
 			src = i * scale;
 			if (src >= samples)
 				break;
-			dst = s_rawend & (MAX_RAW_SAMPLES - 1);
+			dst = s_rawend & (s_rawsamples_size - 1);
 			s_rawend++;
 			s_rawsamples [dst].left = ((short *) data)[src] * intVolume;
 			s_rawsamples [dst].right = ((short *) data)[src] * intVolume;
@@ -1063,7 +1118,7 @@ void S_RawSamples (int samples, int rate, int width, int channels, byte *data, q
 			src = i * scale;
 			if (src >= samples)
 				break;
-			dst = s_rawend & (MAX_RAW_SAMPLES - 1);
+			dst = s_rawend & (s_rawsamples_size - 1);
 			s_rawend++;
 		//	s_rawsamples [dst].left = ((signed char *) data)[src * 2] * intVolume;
 		//	s_rawsamples [dst].right = ((signed char *) data)[src * 2 + 1] * intVolume;
@@ -1080,7 +1135,7 @@ void S_RawSamples (int samples, int rate, int width, int channels, byte *data, q
 			src = i * scale;
 			if (src >= samples)
 				break;
-			dst = s_rawend & (MAX_RAW_SAMPLES - 1);
+			dst = s_rawend & (s_rawsamples_size - 1);
 			s_rawend++;
 		//	s_rawsamples [dst].left = ((signed char *) data)[src] * intVolume;
 		//	s_rawsamples [dst].right = ((signed char *) data)[src] * intVolume;
@@ -1163,7 +1218,7 @@ void S_Update(vec3_t origin, vec3_t forward, vec3_t right, vec3_t up)
 
 	// update spatialization for dynamic sounds	
 	ch = channels;
-	for (i=0 ; i<MAX_CHANNELS; i++, ch++)
+	for (i=0 ; i<s_max_channels_size; i++, ch++)
 	{
 		if (!ch->sfx)
 			continue;
@@ -1190,7 +1245,7 @@ void S_Update(vec3_t origin, vec3_t forward, vec3_t right, vec3_t up)
 	{
 		total = 0;
 		ch = channels;
-		for (i=0 ; i<MAX_CHANNELS; i++, ch++)
+		for (i=0 ; i<s_max_channels_size; i++, ch++)
 			if (ch->sfx && (ch->leftvol || ch->rightvol) )
 			{
 				Com_Printf ("%3i %3i %s\n", ch->leftvol, ch->rightvol, ch->sfx->name);
