@@ -146,6 +146,7 @@ qboolean PCI_Init(void)
 	dma.channels = aui->chan_set;
 	if (dma.speed != s_khz->intValue) /* FS: our rate was not liked, so force the change. */
 		Cvar_SetValue("s_khz", dma.speed);
+
 	dma.samples = aui->card_dmasize / aui->bytespersample_card;
 	dma.samplepos = 0;
 	dma.submission_chunk = 1;

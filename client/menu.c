@@ -24,12 +24,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "qmenu.h"
 #include "snd_loc.h"
 
-#ifdef __DJGPP__
-extern int	havegus; /* FS: DOS GUS */
-#else
-static const int havegus = 0;
-#endif
-
 static int	m_main_cursor;
 
 #define NUM_CURSOR_FRAMES 15

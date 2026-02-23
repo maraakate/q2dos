@@ -89,7 +89,7 @@ int		s_rawend;
 portable_samplepair_t	*s_rawsamples;
 size_t	s_rawsamples_size;
 
-extern int	havegus; /* FS: Added */
+int	havegus; /* FS: Added */
 
 byte *s_streamDataPtr;
 

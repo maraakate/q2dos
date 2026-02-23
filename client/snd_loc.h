@@ -155,6 +155,9 @@ void	SNDDMA_BeginPainting (void);
 
 void	SNDDMA_Submit(void);
 #ifdef __DJGPP__
+/* FS: Gravis UltraSound specific stuff.  Mostly for the s_khz menu. */
+#define GUS_CLASSIC 1
+#define GUS_MAXPNP 2
 void GUS_ClearDMA (void); /* FS: This stops the constant clicking sound during map loads and pause screens */
 #endif
 
@@ -210,5 +213,7 @@ void S_Spatialize(channel_t *ch);
 void S_StopBackgroundTrack(void);
 
 extern byte *s_streamDataPtr;
+
+extern int havegus; /* FS: Added */
 
 #endif // __SND_LOC_H

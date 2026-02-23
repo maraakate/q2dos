@@ -299,30 +299,30 @@ static void IN_MouseSetPS2Rate (void)
 	Com_Printf("Setting PS/2 sample rate to ");
 	switch (rate)
 	{
-	case 0:
-		Com_Printf("10hz\n");
-		break;
-	case 1:
-		Com_Printf("20hz\n");
-		break;
-	case 2:
-		Com_Printf("40hz\n");
-		break;
-	case 3:
-		Com_Printf("60hz\n");
-		break;
-	case 4:
-		Com_Printf("80hz\n");
-		break;
-	case 5:
-		Com_Printf("100hz\n");
-		break;
-	case 6:
-		Com_Printf("200hz\n");
-		break;
-	default:
-		Com_Printf("UNKNOWN!  THIS IS AN ERROR!\n");
-		break;
+		case 0:
+			Com_Printf("10hz\n");
+			break;
+		case 1:
+			Com_Printf("20hz\n");
+			break;
+		case 2:
+			Com_Printf("40hz\n");
+			break;
+		case 3:
+			Com_Printf("60hz\n");
+			break;
+		case 4:
+			Com_Printf("80hz\n");
+			break;
+		case 5:
+			Com_Printf("100hz\n");
+			break;
+		case 6:
+			Com_Printf("200hz\n");
+			break;
+		default:
+			Com_Printf("UNKNOWN!  THIS IS AN ERROR!\n");
+			break;
 	}
 
 	regs.h.ah = 0;
@@ -373,16 +373,16 @@ static const char *IN_MouseGetPS2ResolutionString (short val)
 {
 	switch (val)
 	{
-	case 0:
-		return "one count per mm";
-	case 1:
-		return "two counts per mm";
-	case 2:
-		return "four counts per mm";
-	case 3:
-		return "eight counts per mm";
-	default:
-		return "UNKNOWN!  THIS IS AN ERROR!";
+		case 0:
+			return "one count per mm";
+		case 1:
+			return "two counts per mm";
+		case 2:
+			return "four counts per mm";
+		case 3:
+			return "eight counts per mm";
+		default:
+			return "UNKNOWN!  THIS IS AN ERROR!";
 	}
 
 	return "UNKNOWN!  THIS IS AN ERROR!\n";

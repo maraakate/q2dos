@@ -30,7 +30,6 @@ BLASTER SUPPORT
 
 ===============================================================================
 */
-
 static int	firstInit = true;
 
 static	short *dma_buffer = NULL; // sezero
@@ -403,10 +402,9 @@ qboolean BLASTER_Init(void)
 	dma.speed = 11025;
 	rc = COM_CheckParm("-sspeed");
 
-
-	if (s_khz->value > 7000) /* FS: S_KHZ.  7000 for future Disney Sound Source someday... */
+	if (s_khz->intValue > 7000) /* FS: S_KHZ.  7000 for future Disney Sound Source someday... */
 	{
-		dma.speed = s_khz->value;
+		dma.speed = s_khz->intValue;
 	}
 
 	if (rc)

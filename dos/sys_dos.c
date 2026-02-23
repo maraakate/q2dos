@@ -122,6 +122,7 @@ static void Sys_DetectLFN (void)
 
 static qboolean Sys_DetectWinNT (void) /* FS: Wisdom from Gisle Vanem */
 {
+	/* FS: Might sound crazy, but you could use that swsvpkt driver in NTVDM... */
 	if(_get_dos_version(1) == 0x0532)
 		return true;
 	return false;
