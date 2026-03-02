@@ -82,7 +82,6 @@ cvar_t		*s_mixahead;
 cvar_t		*s_primary;
 cvar_t		*s_musicvolume;
 cvar_t		*s_max_channels;
-cvar_t		*s_paintbuffer_size_cvar;
 cvar_t		*s_rawsamples_size_cvar;
 
 int		s_rawend;
@@ -131,7 +130,6 @@ void S_Init (void)
 	if (!cv->intValue)
 	{
 		dma.buffer = NULL;/* just in case */
-		paintbuffer = NULL;
 		s_rawsamples = NULL;
 		s_streamDataPtr = NULL;
 
@@ -150,7 +148,6 @@ void S_Init (void)
 		s_musicvolume = Cvar_Get ("s_musicvolume", "1.0", CVAR_ARCHIVE); // Knightmare added
 		Cvar_SetDescription("s_musicvolume", "Volume for music played from WAV and OGG files.");
 		s_max_channels = Cvar_Get("s_max_channels", "32", CVAR_ARCHIVE);
-		s_paintbuffer_size_cvar = Cvar_Get("s_paintbuffer_size", va("%d", PAINTBUFFER_SIZE), 0);
 		s_rawsamples_size_cvar = Cvar_Get("s_rawsamples_size", va("%d", MAX_RAW_SAMPLES), 0);
 
 		if (s_khz->value < 7000) /* FS: Old config, fix it up */
@@ -178,19 +175,10 @@ void S_Init (void)
 		soundtime = 0;
 		paintedtime = 0;
 
-		paintbuffer_size = bound(128, s_paintbuffer_size_cvar->intValue, SND_BUFFER_SIZE);
-		paintbuffer = (portable_samplepair_t *)calloc(1, paintbuffer_size * sizeof(portable_samplepair_t));
-		if (!paintbuffer)
-		{
-			dma.buffer = NULL;
-			return;
-		}
-
 		s_rawsamples_size = bound(128, s_rawsamples_size_cvar->intValue, SND_BUFFER_SIZE);
 		s_rawsamples = (portable_samplepair_t *)calloc(1, s_rawsamples_size * sizeof(portable_samplepair_t));
 		if (!s_rawsamples)
 		{
-			free(paintbuffer);
 			dma.buffer = NULL;
 			return;
 		}
@@ -200,7 +188,6 @@ void S_Init (void)
 		{
 			free(s_rawsamples);
 			s_rawsamples = NULL;
-			free(paintbuffer);
 			dma.buffer = NULL;
 			return;
 		}
@@ -213,12 +200,11 @@ void S_Init (void)
 			s_streamDataPtr = NULL;
 			free(s_rawsamples);
 			s_rawsamples = NULL;
-			free(paintbuffer);
 			dma.buffer = NULL;
 			return;
 		}
 
-		Com_Printf("Channels: %d, Bits: %d, Rate: %d\nPaint Buffer Size: %d\nRaw Samples Buffer Size: %d\nMaximum Samples: %d\n", dma.channels, dma.samplebits, dma.speed, (int)paintbuffer_size, (int)s_rawsamples_size, (int)s_max_channels_size);
+		Com_Printf("Channels: %d, Bits: %d, Rate: %d\nRaw Samples Buffer Size: %d\nMaximum Samples: %d\n", dma.channels, dma.samplebits, dma.speed, (int)s_rawsamples_size, (int)s_max_channels_size);
 
 		S_StopAllSounds ();
 	}

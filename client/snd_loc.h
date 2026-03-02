@@ -34,8 +34,7 @@ typedef struct
 	int			right;
 } portable_samplepair_t;
 
-extern portable_samplepair_t *paintbuffer;
-extern size_t paintbuffer_size;
+extern portable_samplepair_t paintbuffer[];
 
 typedef struct
 {

@@ -22,8 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "client.h"
 #include "snd_loc.h"
 
-portable_samplepair_t *paintbuffer; /* FS: Made dynamic for tweakers. */
-size_t paintbuffer_size;
+portable_samplepair_t paintbuffer[PAINTBUFFER_SIZE];
 int		snd_scaletable[32][256];
 int 	*snd_p, snd_linear_count, snd_vol;
 short	*snd_out;
@@ -236,8 +235,8 @@ void S_PaintChannels(int endtime)
 	{
 	// if paintbuffer is smaller than DMA buffer
 		end = endtime;
-		if (endtime - paintedtime > paintbuffer_size)
-			end = paintedtime + paintbuffer_size;
+		if (endtime - paintedtime > PAINTBUFFER_SIZE)
+			end = paintedtime + PAINTBUFFER_SIZE;
 
 		// start any playsounds
 		while (1)
