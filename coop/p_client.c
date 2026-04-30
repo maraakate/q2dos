@@ -3004,12 +3004,7 @@ ClientDisconnect(edict_t *ent)
 {
 	int playernum;
 
-	if (!ent)
-	{
-		return;
-	}
-
-	if (!ent->client)
+	if (!ent || !ent->inuse || !ent->client)
 	{
 		return;
 	}
