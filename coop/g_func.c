@@ -2625,6 +2625,11 @@ door_use(edict_t *self, edict_t *other /* unused */, edict_t *activator)
 	edict_t *ent;
 	vec3_t center; /* FS: Coop: Rogue specific */
 
+	if (!activator) /* FS: Fix by 'Proceduarl C++' for Defensive Measures map. */
+	{
+		activator = other;
+	}
+
 	if (!self || !activator)
 	{
 		return;
