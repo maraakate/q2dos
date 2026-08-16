@@ -105,7 +105,7 @@ qboolean	CL_CheckOrDownloadFile (char *filename)
 		return true;
 	}
 
-	if (FS_LoadFile (filename, NULL) != -1)
+	if (FS_FileExists(filename))
 	{	// it exists, no need to download
 		return true;
 	}
@@ -639,11 +639,11 @@ void CL_PlayBackgroundTrack (void)
 		Com_sprintf (name, sizeof(name), "music/%s.", cl.configstrings[CS_CDTRACK]);
 		p = name + strlen(name);
 		strcpy (p, "wav");
-		if (FS_LoadFile(name, NULL) != -1)
+		if (FS_FileExists(name))
 			have_extmusic |= BGMUSIC_WAV;
 #ifdef OGG_SUPPORT
 		strcpy (p, "ogg");
-		if (FS_LoadFile(name, NULL) != -1)
+		if (FS_FileExists(name))
 			have_extmusic |= BGMUSIC_OGG;
 #endif
 
@@ -678,11 +678,11 @@ void CL_PlayBackgroundTrack (void)
 	Com_sprintf (name, sizeof(name), "music/track%02i.", CL_MissionPackCDTrack(track));
 	p = name + strlen(name);
 	strcpy (p, "wav");
-	if (FS_LoadFile(name, NULL) != -1)
+	if (FS_FileExists(name))
 		have_extmusic |= BGMUSIC_WAV;
 #ifdef OGG_SUPPORT
 	strcpy (p, "ogg");
-	if (FS_LoadFile(name, NULL) != -1)
+	if (FS_FileExists(name))
 		have_extmusic |= BGMUSIC_OGG;
 #endif
 

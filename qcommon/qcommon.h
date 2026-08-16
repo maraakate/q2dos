@@ -772,6 +772,8 @@ void		FS_AddPAKFile (const char *packPath);
 qboolean	FS_LocalFileExists (char *path);
 // end Knightmare
 
+qboolean FS_FileExists (char *filename); /* FS */
+
 /*
 ==============================================================
 

@@ -18,6 +18,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
+#include <errno.h>
+
+#include <sys/stat.h>
+
+#if !defined(_WIN32)
+#include <unistd.h>
+#ifndef errno_t
+#define errno_t int
+#endif // errno_t
+
+#ifndef _stat
+#define _stat stat
+#endif // _stat
+#endif // ! defined(_WIN32)
+
 #include "qcommon.h"
 
 // enables faster binary pak searck, still experimental
@@ -60,6 +75,7 @@ char	fs_gamedir[MAX_OSPATH];
 cvar_t	*fs_basedir;
 cvar_t	*fs_cddir;
 cvar_t	*fs_gamedirvar;
+cvar_t	*fs_fileexistsstrategy = NULL; /* FS */
 
 typedef struct filelink_s
 {
@@ -783,6 +799,132 @@ static pack_t *FS_LoadPackFile (const char *packfile)
 	return pack;
 }
 
+qboolean FS_FileExists (char *filename) /* FS */
+{
+	searchpath_t *search;
+	char			netpath[MAX_OSPATH];
+	pack_t *pak;
+	filelink_t *link;
+	struct _stat buf = { 0 };
+	errno_t err;
+	int len;
+	long hash;
+	unsigned int typeFlag;
+
+	if (fs_fileexistsstrategy && fs_fileexistsstrategy->intValue >= 2)
+	{
+		len = FS_LoadFile(filename, NULL);
+		if (len > 0)
+			return true;
+
+		return false;
+	}
+
+	// Knightmare added
+	hash = Com_HashFileName(filename, 0, false);
+	typeFlag = FS_TypeFlagForPakItem(filename);
+
+	if (filename == NULL || filename[0] == 0)
+	{
+		Com_Printf("Could not open file: NULL\n");
+		return false;
+	}
+
+	for (link = fs_links; link; link = link->next)
+	{
+		if (!strncmp (filename, link->from, link->fromlength))
+		{
+			Com_sprintf(netpath, sizeof(netpath), "%s%s", link->to, filename + link->fromlength);
+#if !defined(_WIN32)
+			if (!fs_fileexistsstrategy || fs_fileexistsstrategy->intValue <= 0)
+#endif // !defined(_WIN32)
+			{
+				err = _stat(netpath, &buf);
+				if (err == 0)
+				{
+					return true;
+				}
+			}
+#if !defined(_WIN32)
+			else
+			{
+				if (access(netpath, F_OK) == 0)
+				{
+					return true;
+				}
+			}
+#endif // !defined(_WIN32)
+
+			return false;
+		}
+	}
+
+	//
+	// search through the path, one element at a time
+	//
+	for (search = fs_searchpaths; search; search = search->next)
+	{
+		// is the element a pak file?
+		if (search->pack)
+		{
+			//get the pack_t structure.
+			pak = search->pack;
+
+			// Knightmare- skip if pack doesn't contain this type of file
+			if (typeFlag != 0 && !(pak->contentFlags & typeFlag))
+				continue;
+
+#ifdef BINARY_PACK_SEARCH /* Knightmare- use new binary algorithm */
+			/* find index of pack item */
+			if (FS_FindPackItem (pak, filename, hash) >= 0) /* found it! */
+			{
+				return true;
+			}
+#else
+			for (i = 0; i < pak->numfiles; i++)
+			{
+				if (pak->files[i].ignore)	// Knightmare- skip blacklisted files
+					continue;
+				if (hash != pak->files[i].hash)	// Knightmare- compare hash first
+					continue;
+				if (!Q_strcasecmp (pak->files[i].name, filename))
+				{	// found it!
+					return true;
+				}
+			}
+#endif /* BINARY_PACK_SEARCH */
+		}
+		else
+		{
+			// check a file in the directory tree
+			Com_sprintf(netpath, sizeof(netpath), "%s/%s", search->filename, filename);
+#if !defined(_WIN32)
+			if (!fs_fileexistsstrategy || fs_fileexistsstrategy->intValue <= 0)
+#endif // !defined(_WIN32)
+			{
+				err = _stat(netpath, &buf);
+				if (err != 0)
+				{
+					continue;
+				}
+			}
+#if !defined(_WIN32)
+			else
+			{
+				if (access(netpath, F_OK) != 0)
+				{
+					continue;
+				}
+			}
+#endif // !defined(_WIN32)
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
 /*
 =================
 FS_LocalFileExists
@@ -1251,6 +1393,17 @@ void FS_InitFilesystem (void)
 	fs_gamedirvar = Cvar_Get ("game", "", CVAR_LATCH|CVAR_SERVERINFO);
 	if (fs_gamedirvar->string[0])
 		FS_SetGamedir (fs_gamedirvar->string);
+
+#ifdef __DJGPP__
+	fs_fileexistsstrategy = Cvar_Get("fs_fileexistsstrategy", "1", 0);
+#else
+	fs_fileexistsstrategy = Cvar_Get("fs_fileexistsstrategy", "0", 0);
+#endif
+#ifdef _WIN32
+	Cvar_SetDescription("fs_fileexistsstrategy", "0 - stat(), 2 - FS_LoadFile()");
+#else
+	Cvar_SetDescription("fs_fileexistsstrategy", "0 - stat(), 1 - access(), 2 - FS_LoadFile()");
+#endif
 }
 
 // Knightmare added
