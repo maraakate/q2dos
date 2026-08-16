@@ -136,7 +136,7 @@
   but multitexturing is slower in Mesa and is recommended to be disabled
   (see below).
 * MESA_FX_IGNORE_TEXFMT set to any value (including 0) to disable the
-  32bpp-like quality on 16bpp modes.  This causes a slightly performance hit.
+  32bpp-like quality on 16bpp modes.  This causes a slight performance hit.
   This is enabled by default, and only affects Voodoo 4 and 5.
 
 6 - Interesting Sage parameters
@@ -154,8 +154,10 @@
   Since most people are likely to be using 16bpp and 640x480 through 1024x768
   gl_ext_multitexture defaults to 0.  If you would like to try it anyways
   set it to 1 and do a vid_restart.
-* 2xAA on Voodoo 5 5500 (With or without SLI) locks if LFB WC is set.
-  4xAA is OK.  A workaround for 2xAA is to SET FX_GLIDE_FORCE_OLD_AA=1.
+* 2xAA (With or without SLI) locks if LFB WC is set.  4xAA is OK.
+  A workaround for 2xAA is to SET FX_GLIDE_FORCE_OLD_AA=1.
+* Voodoo 5 6000 clones with 256MB RAM enabled (such as the Strange God)
+  will hardlock during glReadPixels().  This means taking screenshots.
 
 8 - Known Mesa Issues
 ---------------------------------------------------------
