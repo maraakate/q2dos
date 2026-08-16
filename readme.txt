@@ -122,6 +122,10 @@ By Neozeed, [HCI]Mara'akate, and sezero.
   saved.  You will need to add them to autoexec.cfg.  If you have problems
   with these CVARs or the PS/2 detection for this additional code you can
   start the game -nops2 parameter to bypass it.
+* Connecting to multiplayer servers will be slower because of the file I/O
+  when checking if a file exists.  It has been sped up with use of access()
+  over fopen/fclose.  However, it will be fastest if you disable downloading
+  entirely with allow_download CVAR.
 
 6 - 3DFX Notes
 ---------------------------------------------------------
@@ -138,7 +142,7 @@ http://dk.toastednet.org/
 Various code from
 * cURL -- (http://curl.haxx.se/)
 * DJGPP community -- (http://www.delorie.com/djgpp/)
-* Gamespy SDK -- Released publically in 2014.
+* Gamespy SDK -- Released publicly in 2014.
 * ggorts -- Ported 3ZB2, Action, Chaos, and DDay to Q2DOS.  Banked VGA code and
             Planar mode help.  3DFX/MesaFX help.
 * Glide Open Source Project -- (http://glide.sourceforge.net/)
