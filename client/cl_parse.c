@@ -209,7 +209,7 @@ void	CL_Download_f (void)
 	//Com_sprintf(filename, sizeof(filename), "%s", Cmd_Argv(1));
 	filename = Cmd_Argv(1);
 
-	if (FS_LoadFile (filename, NULL) != -1)
+	if (FS_FileExists(filename))
 	{	
 		// it exists, no need to download
 		Com_Printf("File already exists.\n");
