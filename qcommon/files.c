@@ -846,13 +846,22 @@ qboolean FS_FileExists (char *filename) /* FS */
 				}
 			}
 #if !defined(_WIN32)
-			else
+			else if (fs_fileexistsstrategy->intValue == 1)
 			{
 				if (access(netpath, F_OK) == 0)
 				{
 					return true;
 				}
 			}
+#ifdef __DJGPP__
+			else
+			{
+				if (__file_exists(netpath))
+				{
+					return true;
+				}
+			}
+#endif // __DJGPP__
 #endif // !defined(_WIN32)
 
 			return false;
@@ -909,13 +918,22 @@ qboolean FS_FileExists (char *filename) /* FS */
 				}
 			}
 #if !defined(_WIN32)
-			else
+			else if (fs_fileexistsstrategy->intValue == 1)
 			{
 				if (access(netpath, F_OK) != 0)
 				{
 					continue;
 				}
 			}
+#ifdef __DJGPP__
+			else
+			{
+				if (!__file_exists(netpath))
+				{
+					continue;
+				}
+			}
+#endif // __DJGPP__
 #endif // !defined(_WIN32)
 
 			return true;
@@ -1395,14 +1413,18 @@ void FS_InitFilesystem (void)
 		FS_SetGamedir (fs_gamedirvar->string);
 
 #ifdef __DJGPP__
-	fs_fileexistsstrategy = Cvar_Get("fs_fileexistsstrategy", "1", 0);
+	fs_fileexistsstrategy = Cvar_Get("fs_fileexistsstrategy", "2", 0);
 #else
 	fs_fileexistsstrategy = Cvar_Get("fs_fileexistsstrategy", "0", 0);
 #endif
 #ifdef _WIN32
-	Cvar_SetDescription("fs_fileexistsstrategy", "0 - stat(), 2 - FS_LoadFile()");
+	Cvar_SetDescription("fs_fileexistsstrategy", "0 - stat(), 3 - FS_LoadFile()");
 #else
-	Cvar_SetDescription("fs_fileexistsstrategy", "0 - stat(), 1 - access(), 2 - FS_LoadFile()");
+#ifdef __DJGPP__
+	Cvar_SetDescription("fs_fileexistsstrategy", "0 - stat(), 1 - access(), 2 - __file_exists(), 3 - FS_LoadFile()");
+#else
+	Cvar_SetDescription("fs_fileexistsstrategy", "0 - stat(), 1 - access(), 3 - FS_LoadFile()");
+#endif // __DJGPP__
 #endif
 }
 
