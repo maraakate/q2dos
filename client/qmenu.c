@@ -93,16 +93,16 @@ void Field_Draw( menufield_s *f )
 
 	strncpy( tempbuffer, f->buffer + f->visible_offset, f->visible_length );
 
-	Draw_Char( f->generic.x + f->generic.parent->x + 16, f->generic.y + f->generic.parent->y - 4, 18 );
-	Draw_Char( f->generic.x + f->generic.parent->x + 16, f->generic.y + f->generic.parent->y + 4, 24 );
+	Draw_Char( f->generic.x + f->generic.parent->x + 16, f->generic.y + f->generic.parent->y - 4, 18, SCALEZERO);
+	Draw_Char( f->generic.x + f->generic.parent->x + 16, f->generic.y + f->generic.parent->y + 4, 24, SCALEZERO);
 
-	Draw_Char( f->generic.x + f->generic.parent->x + 24 + f->visible_length * 8, f->generic.y + f->generic.parent->y - 4, 20 );
-	Draw_Char( f->generic.x + f->generic.parent->x + 24 + f->visible_length * 8, f->generic.y + f->generic.parent->y + 4, 26 );
+	Draw_Char( f->generic.x + f->generic.parent->x + 24 + f->visible_length * 8, f->generic.y + f->generic.parent->y - 4, 20, SCALEZERO);
+	Draw_Char( f->generic.x + f->generic.parent->x + 24 + f->visible_length * 8, f->generic.y + f->generic.parent->y + 4, 26, SCALEZERO);
 
 	for ( i = 0; i < f->visible_length; i++ )
 	{
-		Draw_Char( f->generic.x + f->generic.parent->x + 24 + i * 8, f->generic.y + f->generic.parent->y - 4, 19 );
-		Draw_Char( f->generic.x + f->generic.parent->x + 24 + i * 8, f->generic.y + f->generic.parent->y + 4, 25 );
+		Draw_Char( f->generic.x + f->generic.parent->x + 24 + i * 8, f->generic.y + f->generic.parent->y - 4, 19, SCALEZERO);
+		Draw_Char( f->generic.x + f->generic.parent->x + 24 + i * 8, f->generic.y + f->generic.parent->y + 4, 25, SCALEZERO);
 	}
 
 	Menu_DrawString( f->generic.x + f->generic.parent->x + 24, f->generic.y + f->generic.parent->y, tempbuffer );
@@ -120,13 +120,13 @@ void Field_Draw( menufield_s *f )
 		{
 			Draw_Char( f->generic.x + f->generic.parent->x + ( offset + 2 ) * 8 + 8,
 					   f->generic.y + f->generic.parent->y,
-					   11 );
+					   11, SCALEZERO);
 		}
 		else
 		{
 			Draw_Char( f->generic.x + f->generic.parent->x + ( offset + 2 ) * 8 + 8,
 					   f->generic.y + f->generic.parent->y,
-					   ' ' );
+					   ' ', SCALEZERO);
 		}
 	}
 }
@@ -387,11 +387,11 @@ void Menu_Draw( menuframework_s *menu )
 	{
 		if ( item->flags & QMF_LEFT_JUSTIFY )
 		{
-			Draw_Char( menu->x + item->x - 24 + item->cursor_offset, menu->y + item->y, 12 + ( ( int ) ( Sys_Milliseconds()/250 ) & 1 ) );
+			Draw_Char( menu->x + item->x - 24 + item->cursor_offset, menu->y + item->y, 12 + ( ( int ) ( Sys_Milliseconds()/250 ) & 1 ), SCALEZERO);
 		}
 		else
 		{
-			Draw_Char( menu->x + item->cursor_offset, menu->y + item->y, 12 + ( ( int ) ( Sys_Milliseconds()/250 ) & 1 ) );
+			Draw_Char( menu->x + item->cursor_offset, menu->y + item->y, 12 + ( ( int ) ( Sys_Milliseconds()/250 ) & 1 ), SCALEZERO);
 		}
 	}
 
@@ -437,7 +437,7 @@ void Menu_DrawString( int x, int y, const char *string )
 
 	for ( i = 0; i < len; i++ )
 	{
-		Draw_Char( ( x + i*8 ), y, string[i] );
+		Draw_Char( ( x + i*8 ), y, string[i], SCALEZERO);
 	}
 }
 
@@ -450,7 +450,7 @@ void Menu_DrawStringDark( int x, int y, const char *string )
 
 	for ( i = 0; i < len; i++ )
 	{
-		Draw_Char( ( x + i*8 ), y, string[i] + 128 );
+		Draw_Char( ( x + i*8 ), y, string[i] + 128, SCALEZERO);
 	}
 }
 
@@ -463,7 +463,7 @@ void Menu_DrawStringR2L( int x, int y, const char *string )
 
 	for ( i = 0; i < len; i++ )
 	{
-		Draw_Char( ( x - i*8 ), y, string[len-i-1] );
+		Draw_Char( ( x - i*8 ), y, string[len-i-1], SCALEZERO);
 	}
 }
 
@@ -476,7 +476,7 @@ void Menu_DrawStringR2LDark( int x, int y, const char *string )
 
 	for ( i = 0; i < len; i++ )
 	{
-		Draw_Char( ( x - i*8 ), y, string[len-i-1]+128 );
+		Draw_Char( ( x - i*8 ), y, string[len-i-1]+128, SCALEZERO);
 	}
 }
 
@@ -629,11 +629,11 @@ void Slider_Draw( menuslider_s *s )
 		s->range = 0;
 	if ( s->range > 1)
 		s->range = 1;
-	Draw_Char( s->generic.x + s->generic.parent->x + RCOLUMN_OFFSET, s->generic.y + s->generic.parent->y, 128);
+	Draw_Char( s->generic.x + s->generic.parent->x + RCOLUMN_OFFSET, s->generic.y + s->generic.parent->y, 128, SCALEZERO);
 	for ( i = 0; i < SLIDER_RANGE; i++ )
-		Draw_Char( RCOLUMN_OFFSET + s->generic.x + i*8 + s->generic.parent->x + 8, s->generic.y + s->generic.parent->y, 129);
-	Draw_Char( RCOLUMN_OFFSET + s->generic.x + i*8 + s->generic.parent->x + 8, s->generic.y + s->generic.parent->y, 130);
-	Draw_Char( ( int ) ( 8 + RCOLUMN_OFFSET + s->generic.parent->x + s->generic.x + (SLIDER_RANGE-1)*8 * s->range ), s->generic.y + s->generic.parent->y, 131);
+		Draw_Char( RCOLUMN_OFFSET + s->generic.x + i*8 + s->generic.parent->x + 8, s->generic.y + s->generic.parent->y, 129, SCALEZERO);
+	Draw_Char( RCOLUMN_OFFSET + s->generic.x + i*8 + s->generic.parent->x + 8, s->generic.y + s->generic.parent->y, 130, SCALEZERO);
+	Draw_Char( ( int ) ( 8 + RCOLUMN_OFFSET + s->generic.parent->x + s->generic.x + (SLIDER_RANGE-1)*8 * s->range ), s->generic.y + s->generic.parent->y, 131, SCALEZERO);
 }
 
 #if 0 /* FS: Unused */

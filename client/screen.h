@@ -19,6 +19,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // screen.h
 
+#ifndef __SCREEN_H
+#define __SCREEN_H
+
+#include "cl_scrn_scale.h"	// Knightmare
+
 void	SCR_Init (void);
 
 void	SCR_UpdateScreen (void);
@@ -43,6 +48,9 @@ extern	int			sb_lines;
 extern	cvar_t		*scr_viewsize;
 extern	cvar_t		*crosshair;
 
+extern cvar_t *scr_hudsize;	// Knightmare
+extern cvar_t *scr_crosshairsize;
+
 extern	vrect_t		scr_vrect;		// position of render window
 
 extern	char		crosshair_pic[MAX_QPATH];
@@ -60,3 +68,4 @@ void SCR_RunCinematic (void);
 void SCR_StopCinematic (void);
 void SCR_FinishCinematic (void);
 
+#endif // __SCREEN_H

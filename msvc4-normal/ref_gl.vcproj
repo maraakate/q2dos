@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="ref_gl"
 	ProjectGUID="{A8074BF8-ECF4-4830-986D-A365A39C1462}"
+	RootNamespace="ref_gl"
 	>
 	<Platforms>
 		<Platform
@@ -148,7 +149,7 @@
 				MinimalRebuild="true"
 				RuntimeLibrary="1"
 				FloatingPointModel="2"
-				BrowseInformation="1"
+				BrowseInformation="0"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				Detect64BitPortabilityProblems="true"

@@ -56,10 +56,11 @@ It can be clipped to the top of the screen to allow the console to be
 smoothly scrolled off.
 ================
 */
-void Draw_Char (int x, int y, int num)
+void Draw_Char (int x, int y, int num, const scrnscale_t parms)
 {
 	int				row, col;
 	float			frow, fcol, size;
+	float xScale, yScale;
 
 	num &= 255;
 	
@@ -76,17 +77,28 @@ void Draw_Char (int x, int y, int num)
 	fcol = col*0.0625;
 	size = 0.0625;
 
+	if (parms.flags & SCRNSCALEFLAG_SCALE)
+	{
+		xScale = parms.scaleX;
+		yScale = parms.scaleY;
+	}
+	else
+	{
+		xScale = 1.0f;
+		yScale = 1.0f;
+	}
+
 	GL_Bind (draw_chars->texnum);
 
 	qglBegin (GL_QUADS);
 	qglTexCoord2f (fcol, frow);
 	qglVertex2f (x, y);
 	qglTexCoord2f (fcol + size, frow);
-	qglVertex2f (x+8, y);
+	qglVertex2f (x+8 * xScale, y);
 	qglTexCoord2f (fcol + size, frow + size);
-	qglVertex2f (x+8, y+8);
+	qglVertex2f (x+8 * xScale, y+8 * yScale);
 	qglTexCoord2f (fcol, frow + size);
-	qglVertex2f (x, y+8);
+	qglVertex2f (x, y+8 * yScale);
 	qglEnd ();
 }
 
@@ -178,9 +190,10 @@ void Draw_StretchPic (int x, int y, int w, int h, char *pic)
 Draw_Pic
 =============
 */
-void Draw_Pic (int x, int y, char *pic)
+void Draw_Pic (int x, int y, char *pic, const scrnscale_t parms)
 {
 	image_t *gl;
+	int x1, x2, y1, y2;
 
 	gl = Draw_FindPic (pic);
 	if (!gl)
@@ -191,19 +204,34 @@ void Draw_Pic (int x, int y, char *pic)
 	if (scrap_dirty)
 		Scrap_Upload ();
 
+	x1 = x;
+	y1 = y;
+
+	if (parms.flags & SCRNSCALEFLAG_SCALE)
+	{
+		x2 = x + ((gl->width * parms.scaleX) + 0.5f);
+		y2 = y + ((gl->height * parms.scaleY) + 0.5f);
+	}
+	else
+	{
+		x2 = x + gl->width;
+		y2 = y + gl->height;
+	}
+
+	x1 = x;
 	if ((gl_config.renderer & (GL_RENDERER_MCD|GL_RENDERER_RENDITION)) && !gl->has_alpha)
 		qglDisable (GL_ALPHA_TEST);
 
 	GL_Bind (gl->texnum);
 	qglBegin (GL_QUADS);
 	qglTexCoord2f (gl->sl, gl->tl);
-	qglVertex2f (x, y);
+	qglVertex2f (x1, y1);
 	qglTexCoord2f (gl->sh, gl->tl);
-	qglVertex2f (x+gl->width, y);
+	qglVertex2f (x2, y1);
 	qglTexCoord2f (gl->sh, gl->th);
-	qglVertex2f (x+gl->width, y+gl->height);
+	qglVertex2f (x2, y2);
 	qglTexCoord2f (gl->sl, gl->th);
-	qglVertex2f (x, y+gl->height);
+	qglVertex2f (x1, y2);
 	qglEnd ();
 
 	if ((gl_config.renderer & (GL_RENDERER_MCD|GL_RENDERER_RENDITION)) && !gl->has_alpha)

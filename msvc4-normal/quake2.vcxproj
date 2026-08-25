@@ -258,6 +258,7 @@
     <ClCompile Include="..\CLIENT\cl_parse.c" />
     <ClCompile Include="..\CLIENT\cl_pred.c" />
     <ClCompile Include="..\CLIENT\cl_scrn.c" />
+    <ClCompile Include="..\client\cl_scrn_scale.c" />
     <ClCompile Include="..\CLIENT\cl_tent.c" />
     <ClCompile Include="..\CLIENT\cl_view.c" />
     <ClCompile Include="..\CLIENT\console.c" />
@@ -446,6 +447,7 @@
     <ClInclude Include="..\client\block8.h" />
     <ClInclude Include="..\client\cdaudio.h" />
     <ClInclude Include="..\client\client.h" />
+    <ClInclude Include="..\client\cl_scrn_scale.h" />
     <ClInclude Include="..\client\console.h" />
     <ClInclude Include="..\client\gspy.h" />
     <ClInclude Include="..\client\input.h" />

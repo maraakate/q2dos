@@ -87,13 +87,35 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #endif
 
-// Knightmare added
+/* Knightmare added- BEGIN */
+#ifndef bound_min
+#define bound_min(var, val) if (var < (val)) var = (val);
+#endif
+#ifndef bound_max
+#define bound_max(var, val) if (var > (val)) var = (val);
+#endif
+
+#ifndef bound_min_inline
+#define bound_min_inline(var, val) (((var) < (val)) ? (val) : (var))
+#endif
+#ifndef bound_max_inline
+#define bound_max_inline(var, val) (((var) > (val)) ? (val) : (var))
+#endif
+
 #ifndef min
 #define min(a,b)        (((a) < (b)) ? (a) : (b))
 #endif
 #ifndef max
 #define max(a,b)        (((a) > (b)) ? (a) : (b))
 #endif
+
+#ifndef min_inline
+#define min_inline(a,b)	(((a) < (b)) ? (a) : (b))
+#endif
+#ifndef max_inline
+#define max_inline(a,b)	(((a) > (b)) ? (a) : (b))
+#endif
+/* Knightmare added- END */
 
 //============================================================================
 

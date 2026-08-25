@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="quake2"
 	ProjectGUID="{E748B2A7-9EE3-46ED-A2AE-422E4024E9A1}"
+	RootNamespace="quake2"
 	>
 	<Platforms>
 		<Platform
@@ -148,7 +149,7 @@
 				MinimalRebuild="true"
 				RuntimeLibrary="1"
 				FloatingPointModel="2"
-				BrowseInformation="1"
+				BrowseInformation="0"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				Detect64BitPortabilityProblems="true"
@@ -882,6 +883,10 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\client\cl_scrn_scale.c"
+				>
 			</File>
 			<File
 				RelativePath="..\CLIENT\cl_tent.c"

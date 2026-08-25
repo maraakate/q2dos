@@ -60,6 +60,9 @@ cvar_t		*scr_graphscale;
 cvar_t		*scr_graphshift;
 cvar_t		*scr_drawall;
 
+cvar_t		*scr_hudsize;
+cvar_t		*scr_crosshairsize;
+
  /* FS: cl_draw* friends */
 cvar_t		*cl_drawfps;	// Knightmare
 cvar_t		*cl_drawtime;
@@ -446,7 +449,7 @@ void SCR_DrawCenterString (void)
 		SCR_AddDirtyPoint (x, y);
 		for (j=0 ; j<l ; j++, x+=8)
 		{
-			re.DrawChar (x, y, start[j]);	
+			re.DrawChar (x, y, start[j], SCALEZERO);
 			if (!remaining--)
 				return;
 		}
@@ -589,6 +592,8 @@ void SCR_Init (void)
 	scr_graphscale = Cvar_Get ("graphscale", "1", 0);
 	scr_graphshift = Cvar_Get ("graphshift", "0", 0);
 	scr_drawall = Cvar_Get ("scr_drawall", "0", 0);
+	scr_hudsize = Cvar_Get("scr_hudsize", "0", CVAR_ARCHIVE);	// Knightmare
+	scr_crosshairsize = Cvar_Get("scr_crosshairsize", "0", CVAR_ARCHIVE); /* FS: by request. */
 
 	 /* FS: cl_draw* friends */
 	cl_drawfps = Cvar_Get ("cl_drawfps", "0", CVAR_ARCHIVE);	// Knightmare
@@ -626,7 +631,7 @@ void SCR_DrawNet (void)
 		< CMD_BACKUP-1)
 		return;
 
-	re.DrawPic (scr_vrect.x+64, scr_vrect.y, "net");
+	re.DrawPic (scr_vrect.x+64, scr_vrect.y, "net", SCALEZERO);
 }
 
 /*
@@ -645,7 +650,7 @@ void SCR_DrawPause (void)
 		return;
 
 	re.DrawGetPicSize (&w, &h, "pause");
-	re.DrawPic ((viddef.width-w)/2, viddef.height/2 + 8, "pause");
+	re.DrawPic ((viddef.width-w)/2, viddef.height/2 + 8, "pause", SCALEZERO);
 }
 
 /*
@@ -662,7 +667,7 @@ void SCR_DrawLoading (void)
 
 	scr_draw_loading = false;
 	re.DrawGetPicSize (&w, &h, "loading");
-	re.DrawPic ((viddef.width-w)/2, (viddef.height-h)/2, "loading");
+	re.DrawPic ((viddef.width-w)/2, (viddef.height-h)/2, "loading", SCALEZERO);
 }
 
 //=============================================================================
@@ -1026,7 +1031,7 @@ void DrawHUDString (char *string, int x, int y, int centerwidth, int xor)
 			x = margin;
 		for (i=0 ; i<width ; i++)
 		{
-			re.DrawChar (x, y, line[i]^xor);
+			re.DrawChar (x, y, line[i]^xor, SCALEZERO);
 			x += 8;
 		}
 		if (*string)
@@ -1074,7 +1079,7 @@ void SCR_DrawField (int x, int y, int color, int width, int value)
 		else
 			frame = *ptr -'0';
 
-		re.DrawPic (x,y,sb_nums[color][frame]);
+		re.DrawPic (x,y,sb_nums[color][frame], SCALEZERO);
 		x += CHARACTER_WIDTH;
 		ptr++;
 		l--;
@@ -1196,7 +1201,7 @@ void SCR_ExecuteLayoutString (char *s)
 			{
 				SCR_AddDirtyPoint (x, y);
 				SCR_AddDirtyPoint (x+23, y+23);
-				re.DrawPic (x, y, cl.configstrings[CS_IMAGES+value]);
+				re.DrawPic (x, y, cl.configstrings[CS_IMAGES+value], SCALEZERO);
 			}
 			continue;
 		}
@@ -1235,7 +1240,7 @@ void SCR_ExecuteLayoutString (char *s)
 
 			if (!ci->icon)
 				ci = &cl.baseclientinfo;
-			re.DrawPic (x, y, ci->iconname);
+			re.DrawPic (x, y, ci->iconname, SCALEZERO);
 			continue;
 		}
 
@@ -1279,7 +1284,7 @@ void SCR_ExecuteLayoutString (char *s)
 			token = COM_Parse (&s);
 			SCR_AddDirtyPoint (x, y);
 			SCR_AddDirtyPoint (x+23, y+23);
-			re.DrawPic (x, y, token);
+			re.DrawPic (x, y, token, SCALEZERO);
 			continue;
 		}
 
@@ -1307,7 +1312,7 @@ void SCR_ExecuteLayoutString (char *s)
 				color = 1;
 
 			if (cl.frame.playerstate.stats[STAT_FLASHES] & 1)
-				re.DrawPic (x, y, "field_3");
+				re.DrawPic (x, y, "field_3", SCALEZERO);
 
 			SCR_DrawField (x, y, color, width, value);
 			continue;
@@ -1327,7 +1332,7 @@ void SCR_ExecuteLayoutString (char *s)
 				continue;	// negative number = don't show
 
 			if (cl.frame.playerstate.stats[STAT_FLASHES] & 4)
-				re.DrawPic (x, y, "field_3");
+				re.DrawPic (x, y, "field_3", SCALEZERO);
 
 			SCR_DrawField (x, y, color, width, value);
 			continue;
@@ -1345,7 +1350,7 @@ void SCR_ExecuteLayoutString (char *s)
 			color = 0;	// green
 
 			if (cl.frame.playerstate.stats[STAT_FLASHES] & 2)
-				re.DrawPic (x, y, "field_3");
+				re.DrawPic (x, y, "field_3", SCALEZERO);
 
 			SCR_DrawField (x, y, color, width, value);
 			continue;
@@ -1506,7 +1511,7 @@ void SCR_UpdateScreen (void)
 			re.CinematicSetPalette(NULL);
 			scr_draw_loading = false;
 			re.DrawGetPicSize (&w, &h, "loading");
-			re.DrawPic ((viddef.width-w)/2, (viddef.height-h)/2, "loading");
+			re.DrawPic ((viddef.width-w)/2, (viddef.height-h)/2, "loading", SCALEZERO);
 //			re.EndFrame();
 //			return;
 		} 

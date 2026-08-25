@@ -80,7 +80,7 @@ static void M_Banner( char *name )
 	int w, h;
 
 	re.DrawGetPicSize (&w, &h, name );
-	re.DrawPic( viddef.width / 2 - w / 2, viddef.height / 2 - 110, name );
+	re.DrawPic( viddef.width / 2 - w / 2, viddef.height / 2 - 110, name, SCALEZERO);
 }
 
 void M_PushMenu ( void (*draw) (void), const char *(*key) (int k) )
@@ -268,26 +268,26 @@ cx and cy are in 320*240 coordinates, and will be centered on
 higher res screens.
 ================
 */
-void M_DrawCharacter (int cx, int cy, int num)
+void M_DrawCharacter (int cx, int cy, int num, scrnscale_t parms)
 {
-	re.DrawChar ( cx + ((viddef.width - 320)>>1), cy + ((viddef.height - 240)>>1), num);
+	re.DrawChar ( cx + ((viddef.width - 320)>>1), cy + ((viddef.height - 240)>>1), num, parms);
 }
 
-void M_Print (int cx, int cy, char *str)
+void M_Print (int cx, int cy, char *str, scrnscale_t parms)
 {
 	while (*str)
 	{
-		M_DrawCharacter (cx, cy, (*str)+128);
+		M_DrawCharacter (cx, cy, (*str)+128, parms);
 		str++;
 		cx += 8;
 	}
 }
 
-void M_PrintWhite (int cx, int cy, char *str)
+void M_PrintWhite (int cx, int cy, char *str, scrnscale_t parms)
 {
 	while (*str)
 	{
-		M_DrawCharacter (cx, cy, *str);
+		M_DrawCharacter (cx, cy, *str, parms);
 		str++;
 		cx += 8;
 	}
@@ -295,7 +295,7 @@ void M_PrintWhite (int cx, int cy, char *str)
 
 void M_DrawPic (int x, int y, char *pic)
 {
-	re.DrawPic (x + ((viddef.width - 320)>>1), y + ((viddef.height - 240)>>1), pic);
+	re.DrawPic (x + ((viddef.width - 320)>>1), y + ((viddef.height - 240)>>1), pic, SCALEZERO);
 }
 
 
@@ -327,7 +327,7 @@ void M_DrawCursor( int x, int y, int f )
 	}
 
 	Com_sprintf( cursorname, sizeof(cursorname), "m_cursor%d", f );
-	re.DrawPic( x, y, cursorname );
+	re.DrawPic( x, y, cursorname, SCALEZERO);
 }
 
 void M_DrawTextBox (int x, int y, int width, int lines)
@@ -338,39 +338,39 @@ void M_DrawTextBox (int x, int y, int width, int lines)
 	// draw left side
 	cx = x;
 	cy = y;
-	M_DrawCharacter (cx, cy, 1);
+	M_DrawCharacter (cx, cy, 1, SCALEZERO);
 	for (n = 0; n < lines; n++)
 	{
 		cy += 8;
-		M_DrawCharacter (cx, cy, 4);
+		M_DrawCharacter (cx, cy, 4, SCALEZERO);
 	}
-	M_DrawCharacter (cx, cy+8, 7);
+	M_DrawCharacter (cx, cy+8, 7, SCALEZERO);
 
 	// draw middle
 	cx += 8;
 	while (width > 0)
 	{
 		cy = y;
-		M_DrawCharacter (cx, cy, 2);
+		M_DrawCharacter (cx, cy, 2, SCALEZERO);
 		for (n = 0; n < lines; n++)
 		{
 			cy += 8;
-			M_DrawCharacter (cx, cy, 5);
+			M_DrawCharacter (cx, cy, 5, SCALEZERO);
 		}
-		M_DrawCharacter (cx, cy+8, 8);
+		M_DrawCharacter (cx, cy+8, 8, SCALEZERO);
 		width -= 1;
 		cx += 8;
 	}
 
 	// draw right side
 	cy = y;
-	M_DrawCharacter (cx, cy, 3);
+	M_DrawCharacter (cx, cy, 3, SCALEZERO);
 	for (n = 0; n < lines; n++)
 	{
 		cy += 8;
-		M_DrawCharacter (cx, cy, 6);
+		M_DrawCharacter (cx, cy, 6, SCALEZERO);
 	}
-	M_DrawCharacter (cx, cy+8, 9);
+	M_DrawCharacter (cx, cy+8, 9, SCALEZERO);
 }
 
 		
@@ -418,18 +418,18 @@ void M_Main_Draw (void)
 	for ( i = 0; names[i] != NULL; i++ )
 	{
 		if ( i != m_main_cursor )
-			re.DrawPic( xoffset, ystart + i * 40 + 13, names[i] );
+			re.DrawPic( xoffset, ystart + i * 40 + 13, names[i], SCALEZERO);
 	}
 	strcpy( litname, names[m_main_cursor] );
 	strcat( litname, "_sel" );
-	re.DrawPic( xoffset, ystart + m_main_cursor * 40 + 13, litname );
+	re.DrawPic( xoffset, ystart + m_main_cursor * 40 + 13, litname, SCALEZERO);
 
 	M_DrawCursor( xoffset - 25, ystart + m_main_cursor * 40 + 11, (int)(cls.realtime / 100)%NUM_CURSOR_FRAMES );
 
 	re.DrawGetPicSize( &w, &h, "m_main_plaque" );
-	re.DrawPic( xoffset - 30 - w, ystart, "m_main_plaque" );
+	re.DrawPic( xoffset - 30 - w, ystart, "m_main_plaque", SCALEZERO);
 
-	re.DrawPic( xoffset - 30 - w, ystart + h + 5, "m_main_logo" );
+	re.DrawPic( xoffset - 30 - w, ystart + h + 5, "m_main_logo", SCALEZERO);
 }
 
 
@@ -758,9 +758,9 @@ static void M_FindKeysForCommand (char *command, int *twokeys)
 static void KeyCursorDrawFunc( menuframework_s *menu )
 {
 	if ( bind_grab )
-		re.DrawChar( menu->x, menu->y + menu->cursor * 9, '=' );
+		re.DrawChar( menu->x, menu->y + menu->cursor * 9, '=', SCALEZERO);
 	else
-		re.DrawChar( menu->x, menu->y + menu->cursor * 9, 12 + ( ( int ) ( Sys_Milliseconds() / 250 ) & 1 ) );
+		re.DrawChar( menu->x, menu->y + menu->cursor * 9, 12 + ( ( int ) ( Sys_Milliseconds() / 250 ) & 1 ), SCALEZERO);
 }
 
 static void DrawKeyBindingFunc( void *self )
@@ -1370,9 +1370,9 @@ static void UpdateSoundQualityFunc( void *unused )
 	Cvar_SetValue( "s_loadas8bit", !s_options_loadas8bit_box.curvalue );  /* FS: Added */
 
 	M_DrawTextBox( 8, 120 - 48, 36, 3 );
-	M_Print( 16 + 16, 120 - 48 + 8,  "Restarting the sound system. This" );
-	M_Print( 16 + 16, 120 - 48 + 16, "could take up to a minute, so" );
-	M_Print( 16 + 16, 120 - 48 + 24, "please be patient." );
+	M_Print( 16 + 16, 120 - 48 + 8,  "Restarting the sound system. This", SCALEZERO);
+	M_Print( 16 + 16, 120 - 48 + 16, "could take up to a minute, so", SCALEZERO);
+	M_Print( 16 + 16, 120 - 48 + 24, "please be patient.", SCALEZERO);
 
 	// the text box won't show up unless we do a buffer swap
 	re.EndFrame();
@@ -2311,9 +2311,9 @@ void M_Credits_MenuDraw( void )
 			x = ( viddef.width - credLen * 8 - stringoffset * 8 ) / 2 + ( j + stringoffset ) * 8;
 
 			if ( bold )
-				re.DrawChar( x, y, credits[i][j+stringoffset] + 128 );
+				re.DrawChar( x, y, credits[i][j+stringoffset] + 128, SCALEZERO);
 			else
-				re.DrawChar( x, y, credits[i][j+stringoffset] );
+				re.DrawChar( x, y, credits[i][j+stringoffset], SCALEZERO);
 		}
 	}
 
@@ -3023,9 +3023,9 @@ static void SearchLocalGames(void)
 		strcpy (local_server_names[i], NO_SERVER_STRING);
 
 	M_DrawTextBox( 8, 120 - 48, 36, 3 );
-	M_Print( 16 + 16, 120 - 48 + 8,  "Searching for local servers, this" );
-	M_Print( 16 + 16, 120 - 48 + 16, "could take up to a minute, so" );
-	M_Print( 16 + 16, 120 - 48 + 24, "please be patient." );
+	M_Print( 16 + 16, 120 - 48 + 8,  "Searching for local servers, this", SCALEZERO);
+	M_Print( 16 + 16, 120 - 48 + 16, "could take up to a minute, so", SCALEZERO);
+	M_Print( 16 + 16, 120 - 48 + 24, "please be patient.", SCALEZERO);
 
 	// the text box won't show up unless we do a buffer swap
 	re.EndFrame();
@@ -4995,7 +4995,7 @@ void PlayerConfig_MenuDraw( void )
 		Com_sprintf( scratch, sizeof( scratch ), "/players/%s/%s_i.pcx", 
 			s_pmi[s_player_model_box.curvalue].directory,
 			s_pmi[s_player_model_box.curvalue].skindisplaynames[s_player_skin_box.curvalue] );
-		re.DrawPic( s_player_config_menu.x - 40, refdef.y, scratch );
+		re.DrawPic( s_player_config_menu.x - 40, refdef.y, scratch, SCALEZERO);
 	}
 }
 
@@ -5102,7 +5102,7 @@ void M_Quit_Draw (void)
 	int		w, h;
 
 	re.DrawGetPicSize (&w, &h, "quit");
-	re.DrawPic ( (viddef.width-w)/2, (viddef.height-h)/2, "quit");
+	re.DrawPic ( (viddef.width-w)/2, (viddef.height-h)/2, "quit", SCALEZERO);
 }
 
 

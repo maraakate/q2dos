@@ -77,7 +77,7 @@ It can be clipped to the top of the screen to allow the console to be
 smoothly scrolled off.
 ================
 */
-void Draw_Char (int x, int y, int num)
+void Draw_Char (int x, int y, int num, const scrnscale_t parms)
 {
 	byte			*dest;
 	byte			*source;

@@ -99,6 +99,15 @@ typedef struct
 	float		white;			// highest of rgb
 } lightstyle_t;
 
+#define SCRNSCALEFLAG_SCALE		0x00000001
+
+typedef struct
+{
+	int flags;
+	float scaleY;
+	float scaleX;
+} scrnscale_t;
+
 typedef struct
 {
 	int			x, y, width, height;// in virtual screen coordinates
@@ -164,9 +173,9 @@ typedef struct
 	void	(*RenderFrame) (refdef_t *fd);
 
 	void	(*DrawGetPicSize) (int *w, int *h, char *name);	// will return 0 0 if not found
-	void	(*DrawPic) (int x, int y, char *name);
+	void	(*DrawPic) (int x, int y, char *name, const scrnscale_t parms);
 	void	(*DrawStretchPic) (int x, int y, int w, int h, char *name);
-	void	(*DrawChar) (int x, int y, int c);
+	void	(*DrawChar) (int x, int y, int c, const scrnscale_t parms);
 	void	(*DrawTileClear) (int x, int y, int w, int h, char *name);
 	void	(*DrawFill) (int x, int y, int w, int h, int c);
 	void	(*DrawFadeScreen) (void);

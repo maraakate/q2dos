@@ -25,7 +25,7 @@ console_t	con;
 
 cvar_t		*con_notifytime;
 cvar_t		*con_buffersize; /* FS: Now a CVAR. */
-
+cvar_t		*con_usehudscale;
 
 #define		MAXCMDLINE	256
 #define		CONWIDTH_AT_640X480	78 /* FS: Added */
@@ -33,24 +33,49 @@ cvar_t		*con_buffersize; /* FS: Now a CVAR. */
 extern	char	key_lines[32][MAXCMDLINE];
 extern	int		edit_line;
 extern	int		key_linepos;
-		
+
+static int con_fontHeight = 8;
+
+float Con_GetConsoleScale (void);
 
 void DrawString (int x, int y, char *s)
 {
+	float	scaledFontHeight, scaledLineHeight;	// Knightmare added 5/31/12
+	float	conLeft, conWidth;	// Knightmare added 7/27/14
+	scrnscale_t parms;
+	conLeft = 0;	conWidth = SCR_VIRTUAL_WIDTH;
+	SCR_ScaleCoords(viddef, &conLeft, NULL, &conWidth, NULL, ALIGN_STRETCH, HUDTYPE_NONE);
+	scaledFontHeight = con_fontHeight * Con_GetConsoleScale();
+	scaledLineHeight = (con_fontHeight + 2) * Con_GetConsoleScale();
+	parms.flags |= SCRNSCALEFLAG_SCALE;
+	parms.scaleX = Con_GetConsoleScale();
+	parms.scaleY = Con_GetConsoleScale();
+
 	while (*s)
 	{
-		re.DrawChar (x, y, *s);
-		x+=8;
+		re.DrawChar (x, y, *s, parms);
+		x+=scaledFontHeight;
 		s++;
 	}
 }
 
 void DrawAltString (int x, int y, char *s)
 {
+	float	scaledFontHeight, scaledLineHeight;	// Knightmare added 5/31/12
+	float	conLeft, conWidth;	// Knightmare added 7/27/14
+	scrnscale_t parms;
+	conLeft = 0;	conWidth = SCR_VIRTUAL_WIDTH;
+	SCR_ScaleCoords(viddef, &conLeft, NULL, &conWidth, NULL, ALIGN_STRETCH, HUDTYPE_NONE);
+	scaledFontHeight = con_fontHeight * Con_GetConsoleScale();
+	scaledLineHeight = (con_fontHeight + 2) * Con_GetConsoleScale();
+	parms.flags |= SCRNSCALEFLAG_SCALE;
+	parms.scaleX = Con_GetConsoleScale();
+	parms.scaleY = Con_GetConsoleScale();
+
 	while (*s)
 	{
-		re.DrawChar (x, y, *s ^ 0x80);
-		x+=8;
+		re.DrawChar (x, y, *s ^ 0x80, parms);
+		x+=scaledFontHeight;
 		s++;
 	}
 }
@@ -350,6 +375,8 @@ void Con_Init (void)
 	con_buffersize = Cvar_Get("con_buffersize", va("%d", DEFAULT_CON_TEXTSIZE), CVAR_ARCHIVE);
 	Cvar_SetDescription("con_buffersize", "Sets the buffer size of the console output.");
 	con_buffersize->modified = false;
+	con_usehudscale = Cvar_Get("con_usehudscale", "1", CVAR_ARCHIVE);
+	Cvar_SetDescription("con_usehudscale", "Scale console text with HUD scale.");
 
 	con.text = (char *)calloc(1, sizeof(char)*con_buffersize->intValue);
 	con.textsize = con_buffersize->intValue;
@@ -508,9 +535,13 @@ The input line scrolls horizontally if typing goes beyond the right edge
 */
 void Con_DrawInput (void)
 {
+	int		x;
 	int		y;
 	int		i;
 	char	*text;
+	float	scaledFontHeight, scaledLineHeight;	// Knightmare added 5/31/12
+	float	conLeft, conWidth;	// Knightmare added 7/27/14
+	scrnscale_t parms;
 
 	if (cls.key_dest == key_menu)
 		return;
@@ -529,12 +560,23 @@ void Con_DrawInput (void)
 //	prestep if horizontally scrolling
 	if (key_linepos >= con.linewidth)
 		text += 1 + key_linepos - con.linewidth;
-		
+
 // draw it
-	y = con.vislines-22;
+	conLeft = 0;	conWidth = SCR_VIRTUAL_WIDTH;
+	SCR_ScaleCoords(viddef, &conLeft, NULL, &conWidth, NULL, ALIGN_STRETCH, HUDTYPE_NONE);
+	scaledFontHeight = con_fontHeight * Con_GetConsoleScale();
+	scaledLineHeight = (con_fontHeight + 2) * Con_GetConsoleScale();
+	parms.flags |= SCRNSCALEFLAG_SCALE;
+	parms.scaleX = Con_GetConsoleScale();
+	parms.scaleY = Con_GetConsoleScale();
+
+	x = conLeft + (conWidth / 2) + 8;
+	y = con.vislines - scaledLineHeight;
 
 	for (i=0 ; i<con.linewidth ; i++)
-		re.DrawChar ( (i+1)<<3, y, text[i]);
+	{
+		re.DrawChar ( ((i+1)*scaledFontHeight), y, text[i], parms);
+	}
 
 // remove cursor
 	key_lines[edit_line][key_linepos] = 0;
@@ -556,6 +598,17 @@ void Con_DrawNotify (void)
 	int		time;
 	char	*s;
 	int		skip;
+	float	scaledFontHeight, scaledLineHeight;	// Knightmare added 5/31/12
+	float	conLeft, conWidth;	// Knightmare added 7/27/14
+	scrnscale_t parms;
+
+	conLeft = 0;	conWidth = SCR_VIRTUAL_WIDTH;
+	SCR_ScaleCoords(viddef, &conLeft, NULL, &conWidth, NULL, ALIGN_STRETCH, HUDTYPE_NONE);
+	scaledFontHeight = con_fontHeight * Con_GetConsoleScale();
+	scaledLineHeight = (con_fontHeight + 2) * Con_GetConsoleScale();
+	parms.flags |= SCRNSCALEFLAG_SCALE;
+	parms.scaleX = Con_GetConsoleScale();
+	parms.scaleY = Con_GetConsoleScale();
 
 	v = 0;
 	for (i= con.current-NUM_CON_TIMES+1 ; i<=con.current ; i++)
@@ -571,9 +624,9 @@ void Con_DrawNotify (void)
 		text = con.text + (i % con.totallines)*con.linewidth;
 		
 		for (x = 0 ; x < con.linewidth ; x++)
-			re.DrawChar ( (x+1)<<3, v, text[x]);
+			re.DrawChar ( (x+1)*scaledFontHeight, v, text[x], parms);
 
-		v += 8;
+		v += 8*parms.scaleY;
 	}
 
 
@@ -596,11 +649,11 @@ void Con_DrawNotify (void)
 		x = 0;
 		while(s[x])
 		{
-			re.DrawChar ( (x+skip)<<3, v, s[x]);
+			re.DrawChar ( (x+skip)*scaledFontHeight, v, s[x], parms);
 			x++;
 		}
-		re.DrawChar ( (x+skip)<<3, v, 10+((cls.realtime>>8)&1));
-		v += 8;
+		re.DrawChar ( (x+skip)*scaledFontHeight, v, 10+((cls.realtime>>8)&1), parms);
+		v += 8*parms.scaleY;
 	}
 	
 	if (v)
@@ -628,6 +681,9 @@ void Con_DrawConsole (float frac)
 	char			dlbar[1024];
 	int				verlen;
 	int				dlbarlen;
+	float	scaledFontHeight, scaledLineHeight;	// Knightmare added 5/31/12
+	float	conLeft, conWidth;	// Knightmare added 7/27/14
+	scrnscale_t parms;
 
 	lines = viddef.height * frac;
 	if (lines <= 0)
@@ -649,11 +705,19 @@ void Con_DrawConsole (float frac)
 	{
 		for (x=0 ; x<verlen ; x++)
 		{
-			re.DrawChar (viddef.width-(verlen*8+4)+x*8, lines-12, 128 + version[x] );
+			re.DrawChar (viddef.width-(verlen*8+4)+x*8, lines-12, 128 + version[x], SCALEZERO);
 		}
 	}
 
 // draw the text
+	conLeft = 0;	conWidth = SCR_VIRTUAL_WIDTH;
+	SCR_ScaleCoords(viddef, &conLeft, NULL, &conWidth, NULL, ALIGN_STRETCH, HUDTYPE_NONE);
+	scaledFontHeight = con_fontHeight * Con_GetConsoleScale();
+	scaledLineHeight = (con_fontHeight + 2) * Con_GetConsoleScale();
+	parms.flags |= SCRNSCALEFLAG_SCALE;
+	parms.scaleX = Con_GetConsoleScale();
+	parms.scaleY = Con_GetConsoleScale();
+
 	con.vislines = lines;
 	
 #if 0
@@ -661,9 +725,9 @@ void Con_DrawConsole (float frac)
 
 	y = lines - 24;
 #else
-	rows = (lines-22)>>3;		// rows of text to draw
+	rows = (lines-22)*scaledFontHeight;		// rows of text to draw
 
-	y = lines - 30;
+	y = (lines - 30) - scaledLineHeight;
 #endif
 
 // draw from the bottom up
@@ -671,14 +735,14 @@ void Con_DrawConsole (float frac)
 	{
 	// draw arrows to show the buffer is backscrolled
 		for (x=0 ; x<con.linewidth ; x+=4)
-			re.DrawChar ( (x+1)<<3, y, '^');
+			re.DrawChar ( (x+1)*scaledFontHeight, y, '^', parms);
 	
-		y -= 8;
+		y -= 8*parms.scaleY;
 		rows--;
 	}
 	
 	row = con.display;
-	for (i=0 ; i<rows ; i++, y-=8, row--)
+	for (i=0 ; i<rows ; i++, y-=8*parms.scaleY, row--)
 	{
 		if (row < 0)
 			break;
@@ -687,8 +751,10 @@ void Con_DrawConsole (float frac)
 			
 		text = con.text + (row % con.totallines)*con.linewidth;
 
-		for (x=0 ; x<con.linewidth ; x++)
-			re.DrawChar ( (x+1)<<3, y, text[x]);
+		for (x = 0; x < con.linewidth; x++)
+		{
+			re.DrawChar (((x + 1) * scaledFontHeight), y, text[x], parms);
+		}
 	}
 
 //ZOID- draw the download bar
@@ -783,9 +849,9 @@ void Con_DrawConsole (float frac)
 		dlbarlen = strlen(dlbar);
 
 		// draw it
-		y = con.vislines-12;
+		y = con.vislines-12-scaledLineHeight;
 		for (i = 0; i < dlbarlen; i++)
-			re.DrawChar ( (i+1)<<3, y, dlbar[i]);
+			re.DrawChar ( (i+1)*scaledFontHeight, y, dlbar[i], parms);
 	}
 //ZOID
 
@@ -795,7 +861,7 @@ void Con_DrawConsole (float frac)
 		text = "Gamespy";
 
 		x = con.linewidth - ((con.linewidth * 7) / 40);
-		y = x - strlen(text) - 8;
+		y = x - strlen(text) - scaledLineHeight;
 		i = con.linewidth/3;
 		if (strlen(text) > i) {
 			y = x - i - 11;
@@ -827,9 +893,9 @@ void Con_DrawConsole (float frac)
 		dlbarlen = strlen(dlbar);
 
 		// draw it
-		y = con.vislines-12;
+		y = con.vislines-12- scaledLineHeight;
 		for (i = 0; i < dlbarlen; i++)
-			re.DrawChar ( (i+1)<<3, y, dlbar[i]);
+			re.DrawChar ( (i+1)*scaledFontHeight, y, dlbar[i], parms);
 	}
 #endif
 
@@ -837,4 +903,13 @@ void Con_DrawConsole (float frac)
 	Con_DrawInput ();
 }
 
+float Con_GetConsoleScale (void)
+{
+	if (!con_usehudscale)	// not initialized
+		return 1.0f;
 
+	if (con_usehudscale->intValue)// && (con.mode == CON_QUICK))
+		return SCR_GetHudScale(viddef);
+	else
+		return 1.0f;
+}

@@ -246,6 +246,9 @@
     <ClCompile Include="..\qcommon\cmd_auto.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\client\cl_scrn_scale.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\client\adivtab.h">
@@ -324,6 +327,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\win32\winquake.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\client\cl_scrn_scale.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
