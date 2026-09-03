@@ -14,13 +14,9 @@
 ** successor clauses in the FAR, DOD or NASA FAR Supplement. Unpublished  -
 ** rights reserved under the Copyright Laws of the United States.
 **
-**
-** $Revision: 1.1.2.1 $ 
-** $Date: 2006/07/24 06:52:23 $ 
-**
 */
-static char revString[] = "@#%$Workfile: initat3d.c $ $Revision: 1.1.2.1 $";
 #define INIT_AT3D_LIB
+#undef FX_DLL_ENABLE /* so that we don't dllexport the symbols */
 
 #include <3dfx.h>
 
@@ -43,6 +39,18 @@ static char revString[] = "@#%$Workfile: initat3d.c $ $Revision: 1.1.2.1 $";
 
 #ifdef __WIN32__
 #include <windows.h>
+#ifdef __MINGW32__
+static inline unsigned char _inp_asm (unsigned short _port) {
+  unsigned char rc;
+  __asm__ __volatile__ ("inb %w1,%b0" : "=a" (rc) : "Nd" (_port));
+  return rc;
+}
+static inline void _outp_asm (unsigned short _port, unsigned char _data) {
+  __asm__ __volatile__ ("outb %b0,%w1" : : "a" (_data), "Nd" (_port));
+}
+#define _inp  _inp_asm
+#define _outp  _outp_asm
+#endif
 #endif /* __WIN32__ */
 
 #if defined(__WATCOMC__)
@@ -84,11 +92,11 @@ typedef struct _CLOCK_TABLE {
   unsigned char wM;
   unsigned char wL;
   unsigned char wFR;
-} CLOCK_TABLE, *LPCLOCK_TABLE;
+} CLOCK_TABLE;
 
 
 /* This table is for AT3D, other parts need different tables. */ 
-CLOCK_TABLE ClockTableAT3D[] =
+static const CLOCK_TABLE ClockTableAT3D[] =
 {
   { 25, 0x1b, 0x1, 0x3, 0x6 },
   { 40, 0x2c, 0x1, 0x3, 0x3 },
@@ -122,9 +130,9 @@ typedef struct _REGINFO {
 } REGINFO, *LPREGINFO;
 
 /* MCLK Constants */
-const unsigned char bBypass = 0;
-const unsigned char bHighSpeed = 1;
-const unsigned char bPowerOff = 0;
+static const unsigned char bBypass = 0;
+static const unsigned char bHighSpeed = 1;
+static const unsigned char bPowerOff = 0;
 
 
 /* HALData required for each partner */
@@ -288,7 +296,7 @@ initAT3DGetRegVals(int iFreq)
 {
 #define FN_NAME "initAT3DGetRegVals"
   /* Get the E8,E9, and EA values for given frequency. */
-  LPCLOCK_TABLE lpClockTable = (LPCLOCK_TABLE)ClockTableAT3D;
+  const CLOCK_TABLE *lpClockTable = (const CLOCK_TABLE *) ClockTableAT3D;
   int i;
   REGINFO RegInfo; 
   BYTE bN, bM, bL, bFreqRange;
@@ -607,6 +615,7 @@ INITAT3DENTRY(initAT3DSetVideo, FxBool, (GrScreenResolution_t res, GrScreenRefre
 #if defined(__DOS32__)
   union REGS r, rOut;
 #endif
+  const char *envp;
   FxBool
     fixVsync = FXFALSE,
     rv = FXTRUE;
@@ -726,22 +735,22 @@ INITAT3DENTRY(initAT3DSetVideo, FxBool, (GrScreenResolution_t res, GrScreenRefre
     }
   }
 
-  
-  if (myGetenv("INIT96_AT3D_VSYNC_END")) {
+  envp = myGetenv("INIT96_AT3D_VSYNC_END");
+  if (envp) {
     FxU16 vSyncEnd = 3;
     GDBG_INFO((80, "%s: Setting VSync End\n", FN_NAME));
-    vSyncEnd = atoi(myGetenv("INIT96_AT3D_VSYNC_END"));
+    vSyncEnd = atoi(envp);
     CRTC_SET(CC_VSYNC_END, vSyncEnd);
   }
   
-  if (myGetenv("INIT96_AT3D_VSYNC_START")) {
+  envp = myGetenv("INIT96_AT3D_VSYNC_START");
+  if (envp) {
     FxU16 vSyncStart = 0;
     GDBG_INFO((80, "%s: Setting VSync Start\n", FN_NAME));
-    vSyncStart = atoi(myGetenv("INIT96_AT3D_VSYNC_START"));
+    vSyncStart = atoi(envp);
     CRTC_SET(CC_VSYNC_START, vSyncStart);
   }
   
-
   GDBG_INFO((80, "%s: returning %s\n", FN_NAME, rv?"FXTRUE":"FXFALSE"));  
   return rv;
 #undef FN_NAME  
@@ -772,9 +781,6 @@ INITAT3DENTRY(initAT3DEnableRegs,FxBool,(InitRegisterDesc *rd))
   FxU8 tmp;
 
   GDBG_INFO((80, "%s:\n", FN_NAME));
-
-  /* Watcom warning suppression */
-  revString[0] = revString[0];
 
   GDBG_INFO((80, "%s:  Enabling writes to AT3D registers\n", FN_NAME)); 
   GDBG_INFO((80, "%s:  Setting VGA sequencer to point at flat model control\n", FN_NAME)); 
@@ -1353,9 +1359,6 @@ INITAT3DENTRY(initAT3DGetInfo,FxBool,(VG96Info *info))
     FxU32 bytes;
 
     GDBG_INFO((80, "%s:\n", FN_NAME));
-
-    /* Watcom warning suppression */
-    revString[0] = revString[0];
 
     info->vgaChip = 0;
     info->vg96Rev = 0;

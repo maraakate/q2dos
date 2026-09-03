@@ -16,10 +16,8 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-** $Revision: 1.1.1.1.8.4 $
-** $Date: 2004/10/05 14:39:55 $
 */
+
 #include <stddef.h>
 
 #ifdef __DJGPP__

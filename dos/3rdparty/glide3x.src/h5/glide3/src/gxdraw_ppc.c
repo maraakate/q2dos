@@ -17,7 +17,6 @@
  ** 
  ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
  **
- ** $Header: /cvsroot/glide/glide3x/h5/glide3/src/gxdraw_ppc.c,v 1.3 2000/11/15 23:32:53 joseph Exp $
  ** $Log: 
  **  3    3dfx      1.0.1.0.1.0 10/11/00 Brent           Forced check in to enforce
  **       branching.

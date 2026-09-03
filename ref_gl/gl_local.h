@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -24,8 +24,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <stdio.h>
 
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#include <OpenGL/glext.h>
+#else
 #include <GL/gl.h>
 #include <GL/glext.h>
+#endif
 #include <math.h>
 
 #ifndef __linux__
@@ -74,7 +79,7 @@ extern	viddef_t	vid;
 
 */
 
-typedef enum 
+typedef enum
 {
 	it_skin,
 	it_sprite,
@@ -103,8 +108,8 @@ typedef struct image_s
 #define	MAX_LIGHTMAPS	128		/* Knightmare- moved this here for use by macros */
 
 #define	TEXNUM_LIGHTMAPS	1024
-#define	TEXNUM_SCRAPS		TEXNUM_LIGHTMAPS + MAX_LIGHTMAPS	/* Knightmare- changed to use macro, was 1152 */
-#define	TEXNUM_IMAGES		TEXNUM_SCRAPS + 1	/* Knightmare- changed to use macro, was 1153 */
+#define	TEXNUM_SCRAPS		(TEXNUM_LIGHTMAPS + MAX_LIGHTMAPS)	/* Knightmare- changed to use macro, was 1152 */
+#define	TEXNUM_IMAGES		(TEXNUM_SCRAPS + 1)	/* Knightmare- changed to use macro, was 1153 */
 
 #define		MAX_GLTEXTURES	2048	/* Knightmare increased, was 1024 */
 
@@ -119,6 +124,13 @@ typedef enum
 
 	rserr_unknown
 } rserr_t;
+
+typedef enum /* FS: Borderless windows. */
+{
+	dt_windowed = 0,
+	dt_fullscreen = 1,
+	dt_borderless = 2
+} rdisptype_t;
 
 #include "gl_model.h"
 
@@ -301,6 +313,7 @@ extern	cvar_t	*vid_gamma;
 extern	cvar_t	*intensity;
 
 extern	cvar_t	*r_skydistance; /* Knightmare- variable sky range */
+extern	cvar_t	*r_gunfov; /* FS */
 
 extern	int		gl_lightmap_format;
 extern	int		gl_solid_format;
@@ -369,7 +382,7 @@ short BigShort (short l);
 int	LittleLong (int l);
 float LittleFloat (float f);
 
-char	*va(char *format, ...);
+char	*va(const char *format, ...);
 // does a varargs printf into a temp buffer
 #endif
 
@@ -416,7 +429,7 @@ void GL_TextureSolidMode( char *string );
 /*
 ** GL extension emulation functions
 */
-void GL_DrawParticles( int n, const particle_t particles[], const unsigned colortable[768] );
+void GL_DrawParticles( int n, const particle_t particles[], const unsigned colortable[] );
 
 /*
 ** GL config stuff
@@ -427,26 +440,11 @@ enum {
 
 	GL_RENDERER_MCD			= 1 << 1,
 	GL_RENDERER_3DLABS		= 1 << 2,
-	GL_RENDERER_GLINT_MX	= 1 << 3,
-	GL_RENDERER_PCX1		= 1 << 4,
-	GL_RENDERER_PCX2		= 1 << 5,
-	GL_RENDERER_PERMEDIA2	= 1 << 6,
-	GL_RENDERER_PMX			= 1 << 7,
-	GL_RENDERER_POWERVR		= 1 << 8,
-	GL_RENDERER_REALIZM		= 1 << 9,
-	GL_RENDERER_RENDITION	= 1 << 10,
-	GL_RENDERER_SGI			= 1 << 11,
-	GL_RENDERER_SIS			= 1 << 12,
-	GL_RENDERER_VOODOO		= 1 << 13,
-
-	GL_RENDERER_NVIDIA		= 1 << 14,
-	GL_RENDERER_GEFORCE		= 1 << 15,
-
-	GL_RENDERER_ATI			= 1 << 16,
-	GL_RENDERER_RADEON		= 1 << 17,
-
-	GL_RENDERER_MATROX		= 1 << 18,
-	GL_RENDERER_INTEL		= 1 << 19
+	GL_RENDERER_PERMEDIA2	= 1 << 3,
+	GL_RENDERER_POWERVR		= 1 << 4,
+	GL_RENDERER_REALIZM		= 1 << 5,
+	GL_RENDERER_RENDITION	= 1 << 6,
+	GL_RENDERER_VOODOO		= 1 << 7,
 };
 
 typedef struct
@@ -529,7 +527,7 @@ void		GLimp_BeginFrame( float camera_separation );
 void		GLimp_EndFrame( void );
 qboolean	GLimp_Init( void *hinstance, void *hWnd );
 void		GLimp_Shutdown( void );
-rserr_t 	GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen );
+rserr_t 	GLimp_SetMode( int *pwidth, int *pheight, int mode, rdisptype_t fullscreen );
 void		GLimp_AppActivate( qboolean active );
 void		GLimp_EnableLogging( qboolean enable );
 void		GLimp_LogNewFrame( void );

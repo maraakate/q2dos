@@ -134,7 +134,7 @@ static const int NUM_GL_RESOLUTIONS = (int) (sizeof(resolutions) / sizeof(resolu
 /*
 ** GLimp_SetMode
 */
-rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen )
+rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, rdisptype_t fullscreen )
 {
 	int width, height, bpp;
 	int stencil = 0;
@@ -204,7 +204,7 @@ qboolean GLimp_Init(void *nummodes, void *modeinfos)
 
 	/* HACK HACK HACK: sending the video mode infos to vid_dos.c
 	 * by exploiting our params. See: vid_dos.c:VID_LoadRefresh() */
-	vi = malloc(sizeof(resolutions) * sizeof(vmodeinfo_t));
+	vi = (vmodeinfo_t *) malloc(sizeof(resolutions) * sizeof(vmodeinfo_t));
 	for (i = 0; i < NUM_GL_RESOLUTIONS; ++i)
 	{
 		vi[i].height = resolutions[i].height;

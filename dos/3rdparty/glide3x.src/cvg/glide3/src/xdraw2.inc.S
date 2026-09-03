@@ -19,13 +19,6 @@
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 */
 
-/*  $Header: /cvsroot/glide/glide3x/cvg/glide3/src/xdraw2.inc.S,v 1.1.1.1 1999/12/07 21:42:36 joseph Exp $ */
-/*  $Revision: 1.1.1.1 $ */
-/*  $Log: xdraw2.inc.S,v $
-/*  Revision 1.1.1.1  1999/12/07 21:42:36  joseph
-/*  Initial checkin into SourceForge.
-/* */
-/*   */
 /*  2     10/30/97 6:53p Peter */
 /*  first real cut at tri asm */
 /*   */

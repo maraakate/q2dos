@@ -361,7 +361,7 @@ SP_target_blacklight(edict_t *ent)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		/* auto-remove for deathmatch */
 		G_FreeEdict(ent);
@@ -406,7 +406,7 @@ SP_target_orb(edict_t *ent)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		/* auto-remove for deathmatch */
 		G_FreeEdict(ent);

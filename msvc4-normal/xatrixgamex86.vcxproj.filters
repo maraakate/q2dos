@@ -1,0 +1,296 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{bfb1fd31-25bd-4744-98e9-73e6fed3dacc}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;for;f90</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{14340403-c8dd-4557-9d1c-a72bdccbb85e}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;fi;fd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{f9f7543c-93dc-4b46-868c-6b2106f1e99f}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\xsrc\g_ai.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\g_chase.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\g_cmds.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\g_combat.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\g_func.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\g_items.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\g_main.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\g_misc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\g_monster.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\g_phys.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\g_save.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\g_spawn.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\g_svcmds.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\g_target.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\g_trigger.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\g_turret.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\g_utils.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\g_weapon.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\m_actor.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\m_berserk.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\m_boss2.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\m_boss3.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\m_boss31.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\m_boss32.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\m_boss5.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\m_brain.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\m_chick.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\m_fixbot.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\m_flash.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\m_flipper.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\m_float.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\m_flyer.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\m_gekk.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\m_gladb.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\m_gladiator.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\m_gunner.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\m_hover.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\m_infantry.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\m_insane.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\m_medic.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\m_move.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\m_mutant.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\m_parasite.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\m_soldier.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\m_supertank.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\m_tank.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\p_client.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\p_hud.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\p_trail.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\p_view.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\p_weapon.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\q_shared.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xsrc\rand.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\xsrc\xatrix.def">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\xsrc\tables\clientfields.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xsrc\tables\fields.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xsrc\g_local.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xsrc\game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xsrc\tables\gamefunc_decs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xsrc\tables\gamefunc_list.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xsrc\tables\gamemmove_decs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xsrc\tables\gamemmove_list.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xsrc\tables\levelfields.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xsrc\m_actor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xsrc\m_berserk.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xsrc\m_boss2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xsrc\m_boss31.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xsrc\m_boss32.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xsrc\m_brain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xsrc\m_chick.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xsrc\m_fixbot.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xsrc\m_flipper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xsrc\m_float.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xsrc\m_flyer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xsrc\m_gekk.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xsrc\m_gladiator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xsrc\m_gunner.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xsrc\m_hover.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xsrc\m_infantry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xsrc\m_insane.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xsrc\m_medic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xsrc\m_mutant.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xsrc\m_parasite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xsrc\m_player.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xsrc\m_rider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xsrc\m_soldier.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xsrc\m_soldierh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xsrc\m_supertank.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xsrc\m_tank.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xsrc\q_shared.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xsrc\stdint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

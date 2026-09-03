@@ -42,11 +42,12 @@ void *Hunk_Begin (int maxsize)
 {
 	// reserve a huge chunk of memory, but don't commit any yet
 	cursize = 0;
+
 	hunkmaxsize = maxsize;
 #ifdef VIRTUAL_ALLOC
-	membase = VirtualAlloc (NULL, maxsize, MEM_RESERVE, PAGE_NOACCESS);
+	membase = (byte *)VirtualAlloc (NULL, maxsize, MEM_RESERVE, PAGE_NOACCESS);
 #else
-	membase = malloc (maxsize);
+	membase = (byte *)malloc (maxsize);
 	memset (membase, 0, maxsize);
 #endif
 	if (!membase)
@@ -67,7 +68,7 @@ void *Hunk_Alloc (int size)
 	buf = VirtualAlloc (membase, cursize+size, MEM_COMMIT, PAGE_READWRITE);
 	if (!buf)
 	{
-		FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &buf, 0, NULL);
+		FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR) &buf, 0, NULL);
 		Sys_Error ("VirtualAlloc commit failed.\n%s", (char *)buf);
 	}
 #endif
@@ -92,7 +93,7 @@ int Hunk_End (void)
 #endif
 
 	hunkcount++;
-//Com_Printf ("hunkcount: %i\n", hunkcount);
+	//Com_Printf ("hunkcount: %i\n", hunkcount);
 	return cursize;
 }
 
@@ -141,65 +142,61 @@ void Sys_Mkdir (char *path)
 
 char	findbase[MAX_OSPATH];
 char	findpath[MAX_OSPATH];
-int		findhandle;
+intptr_t	findhandle;
 
-static qboolean CompareAttributes( unsigned found, unsigned musthave, unsigned canthave )
+static qboolean CompareAttributes(unsigned found, unsigned musthave, unsigned canthave)
 {
-	if ( ( found & _A_RDONLY ) && ( canthave & SFF_RDONLY ) )
+	if ((found & _A_RDONLY) && (canthave & SFF_RDONLY))
 		return false;
-	if ( ( found & _A_HIDDEN ) && ( canthave & SFF_HIDDEN ) )
+	if ((found & _A_HIDDEN) && (canthave & SFF_HIDDEN))
 		return false;
-	if ( ( found & _A_SYSTEM ) && ( canthave & SFF_SYSTEM ) )
+	if ((found & _A_SYSTEM) && (canthave & SFF_SYSTEM))
 		return false;
-	if ( ( found & _A_SUBDIR ) && ( canthave & SFF_SUBDIR ) )
+	if ((found & _A_SUBDIR) && (canthave & SFF_SUBDIR))
 		return false;
-	if ( ( found & _A_ARCH ) && ( canthave & SFF_ARCH ) )
+	if ((found & _A_ARCH) && (canthave & SFF_ARCH))
 		return false;
 
-	if ( ( musthave & SFF_RDONLY ) && !( found & _A_RDONLY ) )
+	if ((musthave & SFF_RDONLY) && !(found & _A_RDONLY))
 		return false;
-	if ( ( musthave & SFF_HIDDEN ) && !( found & _A_HIDDEN ) )
+	if ((musthave & SFF_HIDDEN) && !(found & _A_HIDDEN))
 		return false;
-	if ( ( musthave & SFF_SYSTEM ) && !( found & _A_SYSTEM ) )
+	if ((musthave & SFF_SYSTEM) && !(found & _A_SYSTEM))
 		return false;
-	if ( ( musthave & SFF_SUBDIR ) && !( found & _A_SUBDIR ) )
+	if ((musthave & SFF_SUBDIR) && !(found & _A_SUBDIR))
 		return false;
-	if ( ( musthave & SFF_ARCH ) && !( found & _A_ARCH ) )
+	if ((musthave & SFF_ARCH) && !(found & _A_ARCH))
 		return false;
 
 	return true;
 }
 
-char *Sys_FindFirst (char *path, unsigned musthave, unsigned canthave )
+char *Sys_FindFirst (char *path, unsigned musthave, unsigned canthave)
 {
 	struct _finddata_t findinfo;
-
 	if (findhandle)
-		Sys_Error ("Sys_BeginFind without close");
+		Sys_Error("Sys_BeginFind without close");
 	findhandle = 0;
-
 	COM_FilePath (path, findbase);
 	findhandle = _findfirst (path, &findinfo);
 	if (findhandle == -1)
 		return NULL;
-	if ( !CompareAttributes( findinfo.attrib, musthave, canthave ) )
+	if (!CompareAttributes(findinfo.attrib, musthave, canthave))
 		return NULL;
-	Com_sprintf (findpath, sizeof(findpath), "%s/%s", findbase, findinfo.name);
+	Com_sprintf(findpath, sizeof(findpath), "%s/%s", findbase, findinfo.name);
 	return findpath;
 }
 
-char *Sys_FindNext ( unsigned musthave, unsigned canthave )
+char *Sys_FindNext (unsigned musthave, unsigned canthave)
 {
 	struct _finddata_t findinfo;
-
 	if (findhandle == -1)
 		return NULL;
 	if (_findnext (findhandle, &findinfo) == -1)
 		return NULL;
-	if ( !CompareAttributes( findinfo.attrib, musthave, canthave ) )
+	if (!CompareAttributes(findinfo.attrib, musthave, canthave))
 		return NULL;
-
-	Com_sprintf (findpath, sizeof(findpath), "%s/%s", findbase, findinfo.name);
+	Com_sprintf(findpath, sizeof(findpath), "%s/%s", findbase, findinfo.name);
 	return findpath;
 }
 
@@ -212,4 +209,3 @@ void Sys_FindClose (void)
 
 
 //============================================
-

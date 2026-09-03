@@ -1,4 +1,3 @@
-/*-*-c++-*-*/
 /*
 ** THIS SOFTWARE IS SUBJECT TO COPYRIGHT PROTECTION AND IS OFFERED ONLY
 ** PURSUANT TO THE 3DFX GLIDE GENERAL PUBLIC LICENSE. THERE IS NO RIGHT
@@ -18,14 +17,11 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-**
-** $Revision: 1.2.8.1 $ 
-** $Date: 2005/04/25 22:08:47 $ 
-**
 ** Initialization code for loading SST-1 gamma tables
 **
 */
-#ifdef __WIN32__
+#undef FX_DLL_ENABLE /* so that we don't dllexport the symbols */
+#ifdef _MSC_VER
 #pragma optimize ("",off)
 #endif
 #include <stdio.h>
@@ -96,19 +92,23 @@ FX_EXPORT FxBool FX_CSTYLE sst1InitGammaRGB(FxU32 *sstbase,
 
   /* Get the user set definitions (cp or environment) */
   if(!calledBefore) {
+    const char *envp;
     calledBefore = FXTRUE;
-    
-    if(GETENV(("SSTV2_RGAMMA"))) {
-      userGammaR = (double) ATOF(GETENV(("SSTV2_RGAMMA")));
+    envp = GETENV(("SSTV2_RGAMMA"));
+    if(envp) {
+      userGammaR = (double) ATOF(envp);
     }
-    if(GETENV(("SSTV2_GGAMMA"))) {
-      userGammaG = (double) ATOF(GETENV(("SSTV2_GGAMMA")));
+    envp = GETENV(("SSTV2_GGAMMA"));
+    if(envp) {
+      userGammaG = (double) ATOF(envp);
     }
-    if(GETENV(("SSTV2_BGAMMA"))) {
-      userGammaB = (double) ATOF(GETENV(("SSTV2_BGAMMA")));
+    envp = GETENV(("SSTV2_BGAMMA"));
+    if(envp) {
+      userGammaB = (double) ATOF(envp);
     }
-    if(GETENV(("SSTV2_GAMMA"))) {
-      userGammaR = (double) ATOF(GETENV(("SSTV2_GAMMA")));
+    envp = GETENV(("SSTV2_GAMMA"));
+    if(envp) {
+      userGammaR = (double) ATOF(envp);
       userGammaG = userGammaR;
       userGammaB = userGammaR;
     }
@@ -251,6 +251,6 @@ FX_EXPORT FxBool FX_CSTYLE sst1InitGammaTable(FxU32 *sstbase, FxU32 nentries, Fx
     return(FXTRUE);
 }
 
-#ifdef __WIN32__
+#ifdef _MSC_VER
 #pragma optimize ("",on)
 #endif

@@ -17,14 +17,12 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-**
-** $Revision: 1.1.2.3 $ 
-** $Date: 2005/06/09 18:32:37 $ 
-**
 ** Initialization code for initializing supported SST-1 DACs
-**
 */
-#ifndef __GNUC__
+
+#undef FX_DLL_ENABLE /* so that we don't dllexport the symbols */
+
+#ifdef _MSC_VER
 #pragma optimize ("",off)
 #endif
 #include <stdio.h>
@@ -453,13 +451,15 @@ FxBool sst1InitDacDetectICS(FxU32 * sstbase)
 FX_EXPORT FxBool FX_CSTYLE sst1InitCalcGrxClk(FxU32 *sstbase)
 {
     FxU32 clkFreq;
+    const char *e;
 
     if(sst1InitCheckBoard(sstbase) == FXFALSE)
         return(FXFALSE);
 
-    if(GETENV(("SST_GRXCLK"))) {
+    e = GETENV(("SST_GRXCLK"));
+    if(e) {
         INIT_PRINTF(("sst1InitCalcGrxClk(): Overriding default clk frequency with SST_GRXCLK\n"));
-        clkFreq = ATOI(GETENV(("SST_GRXCLK")));
+        clkFreq = ATOI(e);
         if(clkFreq < 16)
             clkFreq = 16;
     } else {
@@ -1210,6 +1210,6 @@ FX_EXPORT FxBool FX_CSTYLE sst1InitDacIndexedEnable(FxU32 *sstbase,
     return(FXTRUE);
 }
 
-#ifndef __GNUC__
+#ifdef _MSC_VER
 #pragma optimize ("",on)
 #endif

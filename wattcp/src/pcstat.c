@@ -465,6 +465,7 @@ void print_tcp_stats (void)
   show_stat ("ACK nosent:",   tcpstats.tcps_rcvacktoomuch);
   show_stat ("dup ACK:",     tcpstats.tcps_rcvduppack);
   show_stat ("dup bytes:",   tcpstats.tcps_rcvdupbyte);
+  show_stat ("Outside win:", tcpstats.tcps_rcvpackafterwin);
   show_stat ("pers-drop:",   tcpstats.tcps_persistdrop);
 
   (*_printf) ("TCP   output stats:\n");

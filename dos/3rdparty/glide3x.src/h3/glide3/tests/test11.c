@@ -6,11 +6,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#ifndef __linux__
-#include <conio.h>
-#else
-#include <linutil.h>
-#endif
 #include <assert.h>
 
 #include <glide.h>
@@ -27,7 +22,7 @@ static const char usage[]   = "-n <frames> -r <res>";
 static int rRandom(int s, int e);
 static unsigned int iRandom (unsigned int maxr);
 
-void main( int argc, char **argv) {
+int main( int argc, char **argv) {
     char match; 
     char **remArgs;
     int  rv;
@@ -47,13 +42,13 @@ void main( int argc, char **argv) {
     assert( hwconfig = tlVoodooType() );
 
     /* Process Command Line Arguments */
-    while( rv = tlGetOpt( argc, argv, "nr", &match, &remArgs ) ) {
+    while ((rv = tlGetOpt(argc, argv, "nr", &match, &remArgs)) != 0) {
         if ( rv == -1 ) {
             printf( "Unrecognized command line argument\n" );
             printf( "%s %s\n", name, usage );
             printf( "Available resolutions:\n%s\n",
                     tlGetResolutionList() );
-            return;
+            return -1;
         }
         switch( match ) {
         case 'n':
@@ -138,7 +133,7 @@ void main( int argc, char **argv) {
 
         if ( tlScaleX(1.0f) < 64.0 ||
              tlScaleY(1.0f) < 64.0 )
-            return;
+            return -1;
         
         /* generate random start position */
         startX = (int)rRandom( 64, (int)tlScaleX(1.0f) - 65 );
@@ -213,7 +208,7 @@ void main( int argc, char **argv) {
     }
     
     grGlideShutdown();
-    return;
+    return 0;
 }
 
 static unsigned long randx = 1;

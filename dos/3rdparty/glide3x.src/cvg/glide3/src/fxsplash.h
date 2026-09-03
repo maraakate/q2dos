@@ -17,7 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/cvg/glide3/src/Attic/fxsplash.h,v 1.1.2.1 2004/12/13 08:38:37 dborca Exp $
 ** $Log: 
 **  3    3dfx      1.0.1.0.1.0 10/11/00 Brent           Forced check in to enforce
 **       branching.

@@ -16,12 +16,6 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-** $Header: /cvsroot/glide/glide3x/h3/incsrc/sst1vid.h,v 1.1.1.1 1999/11/24 21:45:03 joseph Exp $
-** $Log: sst1vid.h,v $
-** Revision 1.1.1.1  1999/11/24 21:45:03  joseph
-** Initial checkin for SourceForge
-**
 ** 
 ** 1     3/16/99 7:28p Sapphire
 ** 

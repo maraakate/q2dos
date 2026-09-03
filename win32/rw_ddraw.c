@@ -22,9 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 **
 ** This handles DirecTDraw management under Windows.
 */
-#ifndef _WIN32
-#  error You should not be compiling this file on this platform
-#endif
+
+#define CINTERFACE  /* for ddraw.h */
 
 #include <float.h>
 
@@ -48,14 +47,13 @@ qboolean DDRAW_Init( unsigned char **ppbuffer, int *ppitch )
 	int i;
 	extern cvar_t *sw_allow_modex;
 
-	HRESULT (WINAPI *QDirectDrawCreate)( GUID FAR *lpGUID, LPDIRECTDRAW FAR * lplpDDRAW, IUnknown FAR * pUnkOuter );
+	HRESULT (WINAPI *QDirectDrawCreate)(GUID FAR *, LPDIRECTDRAW FAR *, IUnknown FAR *);
 
 	ri.Con_Printf( PRINT_ALL, "Initializing DirectDraw\n");
 
-
 	for ( i = 0; i < 256; i++ )
 	{
-		palentries[i].peRed		= ( d_8to24table[i] >> 0  ) & 0xff;
+		palentries[i].peRed	= ( d_8to24table[i] >> 0  ) & 0xff;
 		palentries[i].peGreen	= ( d_8to24table[i] >> 8  ) & 0xff;
 		palentries[i].peBlue	= ( d_8to24table[i] >> 16 ) & 0xff;
 	}
@@ -66,7 +64,7 @@ qboolean DDRAW_Init( unsigned char **ppbuffer, int *ppitch )
 	if ( !sww_state.hinstDDRAW )
 	{
 		ri.Con_Printf( PRINT_ALL, "...loading DDRAW.DLL: ");
-		if ( ( sww_state.hinstDDRAW = LoadLibrary( "ddraw.dll" ) ) == NULL )
+		if ( ( sww_state.hinstDDRAW = LoadLibraryA( "ddraw.dll" ) ) == NULL )
 		{
 			ri.Con_Printf( PRINT_ALL, "failed\n" );
 			goto fail;
@@ -74,7 +72,7 @@ qboolean DDRAW_Init( unsigned char **ppbuffer, int *ppitch )
 		ri.Con_Printf( PRINT_ALL, "ok\n" );
 	}
 
-	if ( ( QDirectDrawCreate = ( HRESULT (WINAPI *)( GUID FAR *, LPDIRECTDRAW FAR *, IUnknown FAR * ) ) GetProcAddress( sww_state.hinstDDRAW, "DirectDrawCreate" ) ) == NULL )
+	if ( (QDirectDrawCreate = (HRESULT (WINAPI *)(GUID FAR *, LPDIRECTDRAW FAR *, IUnknown FAR *)) GetProcAddress(sww_state.hinstDDRAW, "DirectDrawCreate" )) == NULL )
 	{
 		ri.Con_Printf( PRINT_ALL, "*** DirectDrawCreate == NULL ***\n" );
 		goto fail;
@@ -97,7 +95,7 @@ qboolean DDRAW_Init( unsigned char **ppbuffer, int *ppitch )
 	sww_state.modex = false;
 
 	ri.Con_Printf( PRINT_ALL, "...setting exclusive mode: ");
-	if ( ( ddrval = sww_state.lpDirectDraw->lpVtbl->SetCooperativeLevel( sww_state.lpDirectDraw, 
+	if ( ( ddrval = sww_state.lpDirectDraw->lpVtbl->SetCooperativeLevel( sww_state.lpDirectDraw,
 																		 sww_state.hWnd,
 																		 DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN ) ) != DD_OK )
 	{
@@ -118,7 +116,7 @@ qboolean DDRAW_Init( unsigned char **ppbuffer, int *ppitch )
 	/*
 	** if no linear mode found, go for modex if we're trying 320x240
 	*/
-	else if ( ( sw_mode->value == 0 ) && sw_allow_modex->value )
+	else if ( ( sw_mode->intValue == 0 ) && sw_allow_modex->intValue)
 	{
 		ri.Con_Printf( PRINT_ALL, "failed\n" );
 		ri.Con_Printf( PRINT_ALL, "...attempting ModeX 320x240: ");
@@ -126,14 +124,14 @@ qboolean DDRAW_Init( unsigned char **ppbuffer, int *ppitch )
 		/*
 		** reset to normal cooperative level
 		*/
-		sww_state.lpDirectDraw->lpVtbl->SetCooperativeLevel( sww_state.lpDirectDraw, 
+		sww_state.lpDirectDraw->lpVtbl->SetCooperativeLevel( sww_state.lpDirectDraw,
 															 sww_state.hWnd,
 															 DDSCL_NORMAL );
 
 		/*
 		** set exclusive mode
 		*/
-		if ( ( ddrval = sww_state.lpDirectDraw->lpVtbl->SetCooperativeLevel( sww_state.lpDirectDraw, 
+		if ( ( ddrval = sww_state.lpDirectDraw->lpVtbl->SetCooperativeLevel( sww_state.lpDirectDraw,
 																			 sww_state.hWnd,
 																			 DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN | DDSCL_NOWINDOWCHANGES | DDSCL_ALLOWMODEX ) ) != DD_OK )
 		{
@@ -254,7 +252,7 @@ qboolean DDRAW_Init( unsigned char **ppbuffer, int *ppitch )
 	}
 	ri.Con_Printf( PRINT_ALL, "ok\n" );
 
-	*ppbuffer = ddsd.lpSurface;
+	*ppbuffer = (unsigned char *) ddsd.lpSurface;
 	*ppitch   = ddsd.lPitch;
 
 	for ( i = 0; i < vid.height; i++ )
@@ -265,6 +263,7 @@ qboolean DDRAW_Init( unsigned char **ppbuffer, int *ppitch )
 	sww_state.palettized = true;
 
 	return true;
+
 fail:
 	ri.Con_Printf( PRINT_ALL, "*** DDraw init failure ***\n" );
 
@@ -553,4 +552,3 @@ static const char *DDrawError (int code)
             return "UNKNOWN\0";
 	}
 }
-

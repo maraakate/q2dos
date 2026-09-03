@@ -26,6 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define _DOSISMS_H_
 
 #include <dpmi.h>
+#include <dos.h>
 
 #if defined(DEBUG) &&		\
    !defined(DJGPP_NO_INLINES)
@@ -76,6 +77,10 @@ typedef union {
 } regs_t;
 #endif	/* #if 0 */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int dos_lockmem (void *addr, int size);
 int dos_unlockmem (void *addr, int size);
 
@@ -91,20 +96,17 @@ unsigned int ptr2far (void *ptr);
 
 #if !defined(DJGPP_NO_INLINES)
 /* shortcuts for when we aren't debugging */
-#include <dos.h>
 
 #define dos_inportb		inportb
 #define dos_inportw		inportw
 #define dos_outportb		outportb
 #define dos_outportw		outportw
-
-#else	/* DJGPP_NO_INLINES */
-
+#else
 int dos_inportb (int port);
 int dos_inportw (int port);
 void dos_outportb (int port, int val);
 void dos_outportw (int port, int val);
-#endif	/* DJGPP_NO_INLINES */
+#endif
 
 void dos_irqenable (void);
 void dos_irqdisable (void);
@@ -117,5 +119,8 @@ int dos_int386 (int vec, __dpmi_regs *inregs, __dpmi_regs *outregs);
 /* global variables: */
 extern __dpmi_regs	regs;
 
-#endif	/* _DOSISMS_H_ */
+#ifdef __cplusplus
+}
+#endif
 
+#endif	/* _DOSISMS_H_ */

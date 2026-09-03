@@ -23,7 +23,7 @@
 /* $Id: getipnode.c,v 1.30 2001/07/18 02:37:08 mayer Exp $ */
 
 /* Originally from ISC's BIND 9.21; lightweigth resolver library (lwres).
- * Rewritten an simplified for Watt-32 by <giva@bgnett.no>  Nov-2003.
+ * Rewritten an simplified for Watt-32 by <gvanem@yahoo.no>  Nov-2003.
  */
 
 #include "socket.h"
@@ -72,6 +72,14 @@ getipnodebyname (const char *name, int af, int flags, int *error)
   int    tmp_err;
 
   SOCK_DEBUGF (("\ngetipnodebyname: %s ", name));
+
+#if !defined(USE_IPV6)
+  if (af == AF_INET6)
+  {
+    *error = HOST_NOT_FOUND;
+    return (NULL);
+  }
+#endif
 
   /* If we care about active interfaces then check.
    */
@@ -152,7 +160,7 @@ getipnodebyname (const char *name, int af, int flags, int *error)
 struct hostent * W32_CALL
 getipnodebyaddr (const void *src, size_t len, int af, int *error)
 {
-  struct hostent *he1, *he2;
+  struct hostent *he1, *he2 = NULL;
   const  BYTE *cp = (const BYTE*) src;
 
   SOCK_DEBUGF (("\ngetipnodebyaddr: "));
@@ -202,6 +210,7 @@ getipnodebyaddr (const void *src, size_t len, int af, int *error)
     if (af == AF_INET)
        goto ret_copy;
 
+#if defined(USE_IPV6)
     /* Convert from AF_INET to AF_INET6.
      */
     he2 = copyandmerge (he1, NULL, af, error);
@@ -212,6 +221,7 @@ getipnodebyaddr (const void *src, size_t len, int af, int *error)
                     inet_ntoa(*(struct in_addr*)&he2->h_addr) :
                     _inet6_ntoa(he2->h_addr)));
     }
+#endif
     return (he2);
   }
 
@@ -257,6 +267,12 @@ static struct hostent *copyandmerge (const struct hostent *he1,
   int    addresses = 1;      /* NULL terminator */
   int    names = 1;          /* NULL terminator */
   char **cpp, **npp;
+
+#if !defined(USE_IPV6)
+  BYTE in6addr_mapped[12];
+
+  WATT_ASSERT (af != AF_INET6);
+#endif
 
   /* Work out array sizes.
    */

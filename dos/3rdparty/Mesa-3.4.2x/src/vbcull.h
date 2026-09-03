@@ -32,7 +32,9 @@
 #include "types.h"
 
 
+#ifdef MESA_DEBUG
 extern const char *gl_prim_name[GL_POLYGON+2];
+#endif
 
 extern GLuint gl_cull_vb( struct vertex_buffer *VB );
 

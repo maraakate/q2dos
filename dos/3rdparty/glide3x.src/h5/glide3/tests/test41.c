@@ -16,17 +16,11 @@
  ** THE UNITED STATES.  
  ** 
  ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
- **
  */
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#ifndef __linux__
-#include <conio.h>
-#else
-#include <linutil.h>
-#endif
 #include <assert.h>
 #include <math.h>
 
@@ -543,7 +537,7 @@ void renderIntoTextures()
 
 
 
-void main( int argc, char **argv) {
+int main( int argc, char **argv) {
   char match; 
   char **remArgs;
   int  rv;
@@ -553,13 +547,13 @@ void main( int argc, char **argv) {
   assert( hwconfig = tlVoodooType() );
 
   /* Process Command Line Arguments */
-  while( rv = tlGetOpt( argc, argv, "nrpbtea", &match, &remArgs ) ) {
+  while((rv = tlGetOpt(argc, argv, "nrpbtea", &match, &remArgs)) != 0) {
     if ( rv == -1 ) {
       printf( "Unrecognized command line argument\n" );
       printf( "%s %s\n", name, usage );
       printf( "Available resolutions:\n%s\n",
               tlGetResolutionList() );
-      return;
+      return -1;
     }
     switch( match ) {
     case 'n':
@@ -627,14 +621,14 @@ void main( int argc, char **argv) {
 
   extension = grGetString(GR_EXTENSION);
 
-  if (extstr = strstr(extension, "TEXCHROMA")) {
+  if ((extstr = strstr(extension, "TEXCHROMA")) != NULL) {
     if (!strncmp(extstr, "TEXCHROMA", 9)) {
       grChromaRangeModeExt = grGetProcAddress("grChromaRangeModeExt");
       grChromaRangeExt = grGetProcAddress("grChromaRangeExt");
     }
   }
 
-  if (extstr = strstr(extension, "TEXTUREBUFFER")) {
+  if ((extstr = strstr(extension, "TEXTUREBUFFER")) != NULL) {
     if (!strncmp(extstr, "TEXTUREBUFFER", 13)) {
       grTextureBufferExt = grGetProcAddress("grTextureBufferExt");
       grTextureAuxBufferExt = grGetProcAddress("grTextureAuxBufferExt");
@@ -973,8 +967,6 @@ void main( int argc, char **argv) {
   while ( 1 ) 
   {
     Matrix rotm;
-    static FxBool
-      resetStateP = FXTRUE;
     int i;
     
     MatMakeYRot( rotm, DEG2RAD( y_angle ) );
@@ -1332,5 +1324,6 @@ void main( int argc, char **argv) {
 
   } /* endwhile (1) */
   grGlideShutdown();
+  return 0;
 }
 

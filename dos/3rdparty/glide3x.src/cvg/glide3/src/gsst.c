@@ -17,8 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/cvg/glide3/src/gsst.c,v 1.1.1.1.8.8 2005/08/13 21:06:57 jwrdegoede Exp $
-** $Log: gsst.c,v $
 ** Revision 1.1.1.1.8.8  2005/08/13 21:06:57  jwrdegoede
 ** Last needed 64 bit fixes for h5/h3, complete 64 bit support for cvg
 **
@@ -631,8 +629,7 @@ __tryReOpen:
       ** oem map board 
       */
       if (gc->oemInit) {
-        FARPROC oemInitMapBoard = NULL;
-        oemInitMapBoard = GetProcAddress(gc->oemInit, "_fxoemInitMapBoard@4");
+        FARPROC oemInitMapBoard = GetProcAddress(gc->oemInit, "_fxoemInitMapBoard@4");
         if (oemInitMapBoard != NULL)
           oemInitMapBoard(&gc->oemi);
         else
@@ -674,8 +671,8 @@ __tryReOpen:
       gc->oemi.vid.clkFreq24bpp = tvVidtiming.clkFreq24bpp;
       
       if (gc->oemInit) {
-        FARPROC oemInitVideoTiming = NULL;
-        if (oemInitVideoTiming = GetProcAddress(gc->oemInit, "_fxoemInitVideoTiming@4")) {
+        FARPROC oemInitVideoTiming = GetProcAddress(gc->oemInit, "_fxoemInitVideoTiming@4");
+        if (oemInitVideoTiming) {
           if (oemInitVideoTiming(&gc->oemi.vid)) {
             /*
             ** video timing is updated by oem dll
@@ -781,10 +778,12 @@ __tryReOpen:
     FARPROC oemGet;
     FxI32 tv_connected = 0;
     FxI32 slimaster[2], slislave[2];
-    if (oemInitSetVideo = GetProcAddress(gc->oemInit, "_fxoemInitSetVideo@4"))
+    oemInitSetVideo = GetProcAddress(gc->oemInit, "_fxoemInitSetVideo@4");
+    if (oemInitSetVideo)
       oemInitSetVideo(&gc->oemi);
     
-    if (oemGet = GetProcAddress(gc->oemInit, "_fxoemGet@12")) {
+    oemGet = GetProcAddress(gc->oemInit, "_fxoemGet@12");
+    if (oemGet) {
       oemGet(FX_OEM_TVOUT, 4, &tv_connected);
       /* Is tv connected to the board? */
       if (tv_connected) {
@@ -1227,7 +1226,7 @@ __errSliExit:
         
         /* Place fifo in hw. Taking all of the remainging memory up to the
          * byte swizzling bit in the cmd fifo address.
-         */          
+         */
         gc->cmdTransportInfo.fifoOffset = memEnd - fifoSize;
 
 #if (GLIDE_PLATFORM & GLIDE_HW_H3)
@@ -1409,11 +1408,12 @@ __errSliExit:
     const GrHwConfiguration* hwConfig = &_GlideRoot.hwConfig;
     FxU32 textureMode = (FxU32)SST_SEQ_8_DOWNLD;
 
+    /*
     if ((hwConfig->SSTs[_GlideRoot.current_sst].type == GR_SSTTYPE_VOODOO) && 
         (hwConfig->SSTs[_GlideRoot.current_sst].sstBoard.VoodooConfig.tmuConfig[tmu].tmuRev == 0)) {
       textureMode = 0;
     }
-
+    */
     gc->state.tmu_config[tmu].textureMode     = textureMode;
     gc->state.tmu_config[tmu].tLOD            = 0x00000000;
     gc->state.tmu_config[tmu].tDetail         = 0x00000000;
@@ -1528,18 +1528,54 @@ __errSliExit:
 #ifdef GLIDE_SPLASH
 #if (GLIDE_PLATFORM & GLIDE_OS_WIN32)
   if (!_GlideRoot.environment.noSplash) {
-    HMODULE newSplash;
+    HMODULE newSplash = LoadLibrary("3dfxspl3.dll");
 
-    if (newSplash = LoadLibrary("3dfxspl3.dll")) {
-      FARPROC fxSplash;
+    if (newSplash) {
+      GrState glideState;
+      FxBool didLoad;
+      GrSplashProc fxSplash;
+      GrSplashInitProc fxSplashInit;
+      GrSplashPlugProc fxSplashPlug;
+      GrSplashShutdownProc fxSplashShutdown;
 
-      if (fxSplash = GetProcAddress(newSplash, "_fxSplash@16")) {
-        GrState glideState;
+      fxSplash = (GrSplashProc)GetProcAddress(newSplash, "_fxSplash@20");
+      fxSplashInit = (GrSplashInitProc)GetProcAddress(newSplash, "_fxSplashInit@24");
+      fxSplashPlug = (GrSplashPlugProc)GetProcAddress(newSplash, "_fxSplashPlug@16");
+      fxSplashShutdown = (GrSplashShutdownProc)GetProcAddress(newSplash, "_fxSplashShutdown@0");
+
+      didLoad = ((fxSplash != NULL) &&
+                 (fxSplashInit != NULL) &&
+                 (fxSplashPlug != NULL) &&
+                 (fxSplashShutdown != NULL));
+
+      if (didLoad & 0/* [dBorca] i am evil! harr-harr */) {
+        /* new style DLL */
         grGlideGetState(&glideState);
-        fxSplash(hWnd, gc->state.screen_width, gc->state.screen_height, nAuxBuffers);
-        _GlideRoot.environment.noSplash = 1;        
-        grGlideSetState(&glideState);
-      } 
+        didLoad = fxSplashInit(hWnd,
+                               gc->state.screen_width, gc->state.screen_height,
+                               nColBuffers, nAuxBuffers,
+                               format);
+        if (didLoad) {
+          fxSplash(0.0f, 0.0f, 
+                   (float)gc->state.screen_width,
+                   (float)gc->state.screen_height,
+                   0);
+          fxSplashShutdown();
+          _GlideRoot.environment.noSplash = 1;
+        }
+        grGlideSetState((const void*)&glideState);
+      } else {
+        /* old style DLL */
+        typedef int (FX_CALL *GrSplashOld) (FxU32 hWind, FxU32 scrWidth, FxU32 scrHeight, FxU32 nAuxBuffers);
+        GrSplashOld fxSplashOld = (GrSplashOld)GetProcAddress(newSplash, "_fxSplash@16");
+        if (fxSplashOld) {
+            grGlideGetState(&glideState);
+            fxSplashOld(hWnd, gc->state.screen_width, gc->state.screen_height, nAuxBuffers);
+            _GlideRoot.environment.noSplash = 1;
+	    grGlideSetState((const void*)&glideState);
+	}
+      }
+
       FreeLibrary(newSplash);
     }
   }
@@ -1794,9 +1830,9 @@ _grSstControl(GrControl_t code)
       if (isValidP) sst1InitVgaPassCtrl(gc->base_ptr, passFlag);
 #if (GLIDE_PLATFORM & GLIDE_OS_WIN32)
       {
-        FARPROC oemControl = NULL;
         if (gc->oemInit) {
-          if ((oemControl = GetProcAddress(gc->oemInit, "_fxoemControl@4")))
+          FARPROC oemControl = GetProcAddress(gc->oemInit, "_fxoemControl@4");
+          if (oemControl)
             oemControl(code);
         }
       }
@@ -1969,11 +2005,6 @@ GR_ENTRY(guGammaCorrectionRGB, void, (float r, float g, float b))
 {
   GR_BEGIN_NOFIFOCHECK("guGammaCorrectionValue",80);
   GDBG_INFO_MORE(gc->myLevel,"(%g %g %g)\n",r, g, b);
-
-  GR_CHECK_F(myName,
-             (_GlideRoot.hwConfig.SSTs[_GlideRoot.current_sst].type != GR_SSTTYPE_Voodoo2)
-             ||  (_GlideRoot.hwConfig.SSTs[_GlideRoot.current_sst].type != GR_SSTTYPE_Voodoo2), 
-             "grGammaCorrectionRGB not supported.");
 
 #if GLIDE_INIT_HAL
   fxHalInitGamma(hw, gamma);

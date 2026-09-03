@@ -22,11 +22,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#ifndef __linux__
-#include <conio.h>
-#else
-#include <linutil.h>
-#endif
 #include <assert.h>
 
 #include <glide.h>
@@ -40,7 +35,7 @@ static const char name[]    = "test22";
 static const char purpose[] = "fog with multi-pass texturing";
 static const char usage[]   = "-n <frames> -r <res>";
 
-void main( int argc, char **argv) {
+int main( int argc, char **argv) {
     char match; 
     char **remArgs;
     int  rv;
@@ -55,7 +50,7 @@ void main( int argc, char **argv) {
     TlTexture  lightTexture;
     unsigned long lightTextureAddr;
 
-    int                  ftsize = 0;
+    FxI32                ftsize = 0;
     GrFog_t              *fogtable = NULL;
 
     TlVertex3D srcVerts[4];
@@ -68,13 +63,13 @@ void main( int argc, char **argv) {
     assert( hwconfig = tlVoodooType() );
 
     /* Process Command Line Arguments */
-    while( rv = tlGetOpt( argc, argv, "nr", &match, &remArgs ) ) {
+    while ((rv = tlGetOpt(argc, argv, "nr", &match, &remArgs)) != 0) {
         if ( rv == -1 ) {
             printf( "Unrecognized command line argument\n" );
             printf( "%s %s\n", name, usage );
             printf( "Available resolutions:\n%s\n",
                     tlGetResolutionList() );
-            return;
+            return -1;
         }
         switch( match ) {
         case 'n':
@@ -116,8 +111,8 @@ void main( int argc, char **argv) {
               60, 15, 0xffffff );
     
     /* Set up Render State - decal - bilinear - nearest mipmapping - fogging */
-    grGet(GR_ZDEPTH_MIN_MAX, 8, (FxI32 *)zrange);  
-    grGet(GR_FOG_TABLE_ENTRIES, 4, (FxI32 *)&ftsize);
+    grGet(GR_ZDEPTH_MIN_MAX, 8, (FxI32 *)zrange);
+    grGet(GR_FOG_TABLE_ENTRIES, 4, &ftsize);
     fogtable = malloc(sizeof(GrFog_t)*ftsize);
     assert(fogtable);
 
@@ -317,7 +312,7 @@ void main( int argc, char **argv) {
     free(fogtable);
  __errExit:    
     grGlideShutdown();
-    return;
+    return 0;
 }
 
 

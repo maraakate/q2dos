@@ -1,0 +1,215 @@
+# SDL client (SDL for sound and cdaudio on Mac OS X)
+USE_SDL=1
+# abrash's asm optimizations:
+USE_ASM=0
+# use nasm or gas as assembler:
+USE_NASM=0
+# ogg/vorbis music:
+USE_OGG=1
+# use tremor library for ogg/vorbis:
+USE_TREMOR=0
+# gamespy/server browser:
+USE_GAMESPY=1
+# dynamically linked gamespy:
+GAMESPY_DLL=0
+# libcurl/http downloads:
+USE_CURL=1
+
+# build tools:
+CC = gcc
+NASM = nasm
+
+# build flags:
+INCLUDES = -Iclient -Igame -Iqcommon -Iserver -Ilinux -Imacosx -IGoa -IGoa/CEngine
+CPPFLAGS =
+# comment this out to enable assertions:
+CPPFLAGS+= -DNDEBUG
+CPPFLAGS+= -DSPLIT_NETWORK_FRAME=1
+CPPFLAGS+= $(INCLUDES)
+
+ifeq ($(DEBUG),1)
+CFLAGS = -g -ggdb
+else
+CFLAGS = -O2
+endif
+CFLAGS+= -Wall
+CFLAGS+= -ffast-math
+#CFLAGS+= -fwrapv
+
+LDFLAGS =
+LIBS =
+EXE = quake2
+
+ifeq ($(DEDICATED_ONLY),1)
+USE_SDL=0
+USE_ASM=0
+CPPFLAGS+= -DDEDICATED_ONLY
+EXE = q2ded
+endif
+
+ifeq ($(USE_SDL),1)
+SYSOBJ_CDA = linux/cd_sdl.o
+SYSOBJ_SND = linux/snd_sdl.o
+CPPFLAGS+= -DSDL_CLIENT
+SDL_FRAMEWORK_PATH=macosx
+SDL_LIBS  =-F$(SDL_FRAMEWORK_PATH)
+SDL_CFLAGS=-F$(SDL_FRAMEWORK_PATH)
+SDL_LIBS +=-Wl,-framework,SDL
+CFLAGS+= $(SDL_CFLAGS)
+LIBS  += $(SDL_LIBS)
+endif
+ifneq ($(DEDICATED_ONLY),1)
+# either for SDL, or for Cocoa calls in sys_osx.m:
+LIBS  += -Wl,-framework,Cocoa
+endif
+
+
+ifeq ($(USE_ASM),1)
+CPPFLAGS+= -Did386=1
+else
+CPPFLAGS+= -Did386=0
+endif
+ifeq ($(USE_NASM),1)
+ASMDIR=nasm
+else
+ASMDIR=gas
+endif
+
+ifneq ($(DEDICATED_ONLY),1)
+ifeq ($(USE_GAMESPY),1)
+CPPFLAGS+= -DGAMESPY
+ifneq ($(GAMESPY_DLL),1)
+CPPFLAGS+= -DGAMESPY_HARD_LINKED
+endif
+endif
+
+ifeq ($(USE_CURL),1)
+CPPFLAGS+= -DUSE_CURL -DCURL_NO_OLDIES
+LIBS += -lcurl
+endif
+endif
+
+ifeq ($(USE_OGG),1)
+CPPFLAGS+= -Imacosx/include
+CPPFLAGS+= -DOGG_SUPPORT
+LIBS += -Lmacosx/lib -lvorbisfile -lvorbis -logg
+endif
+
+LINUX = linux/net_bsd.o \
+	linux/q_shlinux.o \
+	linux/glob.o \
+	macosx/sys_osx.o \
+	linux/sys_linux.o
+ifeq ($(USE_SDL),1)
+LINUX+= macosx/SDLMain.o
+endif
+
+ifeq ($(DEDICATED_ONLY),1)
+CLIENT = null/cl_null.o \
+	null/cd_null.o
+else
+LINUXCLIENT = \
+	$(SYSOBJ_CDA) \
+	$(SYSOBJ_SND) \
+	linux/vid_menu.o \
+	linux/vid_so.o
+
+CLIENT = client/cl_input.o \
+	client/cl_inv.o \
+	client/cl_main.o \
+	client/cl_cin.o \
+	client/cl_ents.o \
+	client/cl_http.o \
+	client/cl_fx.o \
+	client/cl_parse.o \
+	client/cl_pred.o \
+	client/cl_scrn.o \
+	client/cl_tent.o \
+	client/cl_view.o \
+	client/menu.o \
+	client/console.o \
+	client/keys.o \
+	client/snd_dma.o \
+	client/snd_mem.o \
+	client/snd_mix.o \
+	client/snd_stream.o \
+	client/snd_wavstream.o \
+	client/qmenu.o \
+	client/cl_newfx.o
+
+ifeq ($(USE_GAMESPY),1)
+ifneq ($(GAMESPY_DLL),1)
+GAMESPY = Goa/CEngine/darray.o \
+	Goa/CEngine/gserver.o \
+	Goa/CEngine/gserverlist.o \
+	Goa/CEngine/gutil.o \
+	Goa/CEngine/hashtable.o \
+	Goa/nonport.o
+endif
+endif
+endif
+
+QCOMMON = qcommon/cmd.o \
+	qcommon/cmd_auto.o \
+	qcommon/cmodel.o \
+	qcommon/common.o \
+	qcommon/crc.o \
+	qcommon/cvar.o \
+	qcommon/files.o \
+	qcommon/md4.o \
+	qcommon/net_chan.o \
+	qcommon/pmove.o \
+	game/m_flash.o \
+	game/q_shared.o
+
+SERVER = server/sv_ccmds.o \
+	server/sv_ents.o \
+	server/sv_game.o \
+	server/sv_init.o \
+	server/sv_main.o \
+	server/sv_send.o \
+	server/sv_user.o \
+	server/sv_world.o
+
+ifeq ($(USE_ASM),1)
+COMMONASM = $(ASMDIR)/math.o
+CLIENTASM = $(ASMDIR)/snd_mixa.o
+endif
+
+OBJECTS = $(CLIENT) $(CLIENTASM) $(QCOMMON) $(COMMONASM) $(SERVER) $(GAMESPY) $(LINUX) $(LINUXCLIENT)
+
+
+.PHONY: clean
+
+all: $(EXE)
+
+$(EXE): $(OBJECTS)
+	$(CC) $(OBJECTS) $(LDFLAGS) $(LIBS) -o $(EXE)
+
+clean:
+	rm -f qcommon/*.o
+	rm -f client/*.o
+	rm -f server/*.o
+	rm -f linux/*.o
+	rm -f macosx/*.o
+	rm -f gas/*.o
+	rm -f nasm/*.o
+	rm -f null/*.o
+	rm -f Goa/*.o
+	rm -f Goa/CEngine/*.o
+	rm -f game/*.o
+
+DO_AS=$(CC) -x assembler-with-cpp
+
+%.o: %.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+
+%.o: %.m
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+
+%.o: %.s
+	$(DO_AS) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+
+%.o: %.asm
+	$(NASM) -Inasm/ -f macho -o $@ $<
+

@@ -16,9 +16,6 @@
 ;; 
 ;; COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 ;;
-;; $Header: /cvsroot/glide/glide3x/cvg/glide3/src/xdraw2.asm,v 1.1.1.1.8.3 2004/11/25 19:11:02 koolsmoky Exp $
-;; $Revision: 1.1.1.1.8.3 $
-;; $Log: xdraw2.asm,v $
 ;; Revision 1.1.1.1.8.3  2004/11/25 19:11:02  koolsmoky
 ;; set up 3dnow! triangle/vertex list routines
 ;;
@@ -99,7 +96,7 @@ extrn   _FifoMakeRoom
 
 %ENDMACRO ; WRITE_MM1LOW_FIFO
 
-segment		DATA
+segment		SEG_DATA
     One         DD  1.0
     Area        DD  0
 
@@ -122,7 +119,7 @@ _vc$    equ 12 + STKOFF
 X       equ 0
 Y       equ 4
 
-segment		CONST
+segment		SEG_CONST
 T2003  DD  12288.0      ; 12288
 T2005  DD  1.0          ; 1
 T2006  DD  256.0        ; 256
@@ -137,7 +134,7 @@ T2006  DD  256.0        ; 256
 
 ;--------------------------------------------------------------------------
 
-segment		TEXT
+segment		SEG_TEXT
 
             ALIGN  32
 

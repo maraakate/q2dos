@@ -17,8 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/h3/glide3/src/ditex.c,v 1.1.1.1.8.2 2005/06/09 18:32:28 jwrdegoede Exp $
-** $Log: ditex.c,v $
 ** Revision 1.1.1.1.8.2  2005/06/09 18:32:28  jwrdegoede
 ** Fixed all warnings with gcc4 -Wall -W -Wno-unused-parameter, except for a couple I believe to be a gcc bug. This has been reported to gcc.
 **

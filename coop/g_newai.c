@@ -995,7 +995,7 @@ SP_hint_path(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;
@@ -1534,7 +1534,7 @@ M_MonsterDodge(edict_t *self, edict_t *attacker, float eta, trace_t *tr)
 	}
 
 	/* skill level determination.. */
-	if (r > (0.25 * ((skill->value) + 1)))
+	if (r > (0.25 * ((skill->intValue) + 1)))
 	{
 		return;
 	}
@@ -1749,7 +1749,7 @@ PickCoopTarget(edict_t *self)
 	}
 
 	/* if we're not in coop, this is a noop */
-	if (!coop || !coop->value)
+	if (!coop || !coop->intValue)
 	{
 		return NULL;
 	}
@@ -1801,7 +1801,7 @@ CountPlayers(void)
 	int player;
 
 	/* if we're not in coop, this is a noop */
-	if (!coop || !coop->value)
+	if (!coop || !coop->intValue)
 	{
 		return 1;
 	}

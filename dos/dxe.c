@@ -34,6 +34,8 @@
 #include <sys/movedata.h>
 #include <setjmp.h>
 #include <crt0.h>
+#include <string.h>
+#include <float.h> /* __dj_float_epsilon */
 #include <ctype.h>
 #if 1 /* for mesa w/o 3dfx glide */
 #include <stubinfo.h>
@@ -112,6 +114,7 @@ DXE_EXPORT_TABLE (syms)
 	DXE_EXPORT (strnicmp)
 	DXE_EXPORT (strlwr)
 	DXE_EXPORT (strupr)
+	DXE_EXPORT (stpcpy)
 
 	/* stdio */
 	DXE_EXPORT (__dj_stderr)
@@ -150,6 +153,7 @@ DXE_EXPORT_TABLE (syms)
 	DXE_EXPORT (mkdir)
 	/* unistd */
 	DXE_EXPORT (usleep)
+	DXE_EXPORT (write)
 	/* time */
 	DXE_EXPORT (clock)
 	DXE_EXPORT (uclock)
@@ -168,6 +172,9 @@ DXE_EXPORT_TABLE (syms)
 
 	/* math */
 	DXE_EXPORT (__dj_huge_val)
+	/* FLT_EPSILON may be defined as
+	 * __dj_float_epsilon */
+	DXE_EXPORT (__dj_float_epsilon)
 	DXE_EXPORT (acos)
 	DXE_EXPORT (asin)
 	DXE_EXPORT (atan)
@@ -185,6 +192,7 @@ DXE_EXPORT_TABLE (syms)
 	DXE_EXPORT (exp)
 	DXE_EXPORT (frexp)
 	DXE_EXPORT (ldexp)
+	DXE_EXPORT (fmod)
 
 	/* crt0 */
 	DXE_EXPORT (_crt0_startup_flags)
@@ -292,7 +300,7 @@ int Sys_dlclose (void *handle)
 }
 
 #ifndef GAME_HARD_LINKED
-static void (*game_library)(void);
+static void *game_library;
 
 void Sys_UnloadGame (void)
 {
@@ -310,6 +318,8 @@ void *Sys_GetGameAPI (void *parms)
 	const char *gamename = "gamex86.dxe";
 
 	getcwd(curpath, sizeof(curpath));
+	if (game_library)
+		Com_Error (ERR_FATAL, "Sys_GetGameAPI without Sys_UnloadGame");
 
 	Com_Printf("------- Loading %s -------\n", gamename);
 
@@ -335,13 +345,12 @@ void *Sys_GetGameAPI (void *parms)
 		Com_Printf("dlsym() failed on %s\n", gamename);
 		return NULL;
 	}
-
 	return GetGameAPI (parms);
 }
 #endif /* GAME_HARD_LINKED */
 
 #if defined(GAMESPY) && !defined(GAMESPY_HARD_LINKED)
-static void (*gamespy_library)(void);
+static void *gamespy_library;
 
 void *Sys_GetGameSpyAPI(void *parms)
 {

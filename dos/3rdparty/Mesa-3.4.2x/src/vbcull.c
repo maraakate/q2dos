@@ -63,7 +63,7 @@
  * 
  */
 
-
+#ifdef MESA_DEBUG
 const char *gl_prim_name[GL_POLYGON+2] = {
    "GL_POINTS",
    "GL_LINES",
@@ -77,6 +77,7 @@ const char *gl_prim_name[GL_POLYGON+2] = {
    "GL_POLYGON",
    "culled primitive"
 };
+#endif
 
 static GLuint gl_cull_points( struct vertex_buffer *VB,
 			      GLuint start, 

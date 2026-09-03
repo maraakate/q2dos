@@ -16,11 +16,6 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-**
-** $Revision: 1.2.6.2 $ 
-** $Date: 2005/05/25 08:56:29 $ 
-**
 */
 
 #ifndef _PCILIB_H_

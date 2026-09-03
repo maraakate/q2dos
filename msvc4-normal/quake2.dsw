@@ -131,12 +131,6 @@ Package=<5>
 
 Package=<4>
 {{{
-    Begin Project Dependency
-    Project_Dep_Name ref_soft
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name gamex86
-    End Project Dependency
 }}}
 
 ###############################################################################

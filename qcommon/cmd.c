@@ -20,19 +20,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // cmd.c -- Quake script command processing module
 
 #include "qcommon.h"
+#include "cmd.h"
 
 #ifndef DEDICATED_ONLY
 void Cmd_ForwardToServer (void);
 #endif
-
-#define	MAX_ALIAS_NAME	32
-
-typedef struct cmdalias_s
-{
-	struct cmdalias_s	*next;
-	char	name[MAX_ALIAS_NAME];
-	char	*value;
-} cmdalias_t;
 
 cmdalias_t	*cmd_alias;
 
@@ -278,7 +270,7 @@ void Cbuf_AddEarlyCommands (qboolean clear)
 	for (i=0 ; i<COM_Argc() ; i++)
 	{
 		s = COM_Argv(i);
-		if (strcmp (s, "+set"))
+		if (strcmp (s, "+set") != 0)
 			continue;
 		Cbuf_AddText (va("set %s %s\n", COM_Argv(i+1), COM_Argv(i+2)));
 		if (clear)
@@ -503,20 +495,12 @@ void Cmd_Alias_f (void)
 =============================================================================
 */
 
-typedef struct cmd_function_s
-{
-	struct cmd_function_s	*next;
-	char					*name;
-	xcommand_t				function;
-} cmd_function_t;
-
-
 static	int			cmd_argc;
 static	char		*cmd_argv[MAX_STRING_TOKENS];
 static	char		*cmd_null_string = "";
 static	char		cmd_args[MAX_STRING_CHARS];
 
-static	cmd_function_t	*cmd_functions;		// possible commands to execute
+cmd_function_t	*cmd_functions;		// possible commands to execute
 
 /*
 ============
@@ -899,6 +883,26 @@ void	Cmd_ExecuteString (char *text)
 	}
 }
 
+static int cmpr_cmds (const void *a, const void *b)
+{
+	cmd_function_t *aa = *(cmd_function_t **)a;
+	cmd_function_t *bb = *(cmd_function_t **)b;
+
+	return strcmp(aa->name, bb->name);
+}
+
+static int GetCmdCount (void)
+{
+	int i = 0;
+	cmd_function_t* cmd;
+
+	for (cmd = cmd_functions; cmd; cmd = cmd->next)
+	{
+		i++;
+	}
+
+	return i;
+}
 /*
 ============
 Cmd_List_f
@@ -906,37 +910,72 @@ Cmd_List_f
 */
 void Cmd_List_f (void)
 {
+	cmd_function_t	**sorted_cmds = NULL; /* FS: Sort by name. */
+	cmd_function_t	*head = &cmd_functions[0];
 	cmd_function_t	*cmd;
-	qboolean endReached = false; /* FS: For the filter */
-	qboolean endIsAMatch = false; /* FS: For the filter */
-	int				i;
+	const char *search_filter = NULL;
+	int		i = 0, j = 0, q = 0, args = 0, search_filter_len = 0, cmd_count = 0;
 
-	i = 0;
-	for (cmd=cmd_functions ; cmd ; cmd=cmd->next, i++)
+	args = Cmd_Argc();
+	if (args > 1) /* FS */
 	{
-		if(Cmd_Argc() > 1)
+		search_filter = Cmd_Argv(1);
+		if (search_filter)
 		{
-			if (i == 0)
-				Com_Printf("Listing matches for '%s'...\n", Cmd_Argv(1));
-			while( !strstr(cmd->name, Cmd_Argv(1)) && cmd->next)
+			Com_Printf("Listing matches for '%s'...\n", search_filter);
+
+			if (args > 2)
 			{
-				if(cmd->next)
-					cmd = cmd->next;
-			}
-			if(!cmd->next)
-			{
-				if(strstr(cmd->name, Cmd_Argv(1))) /* FS: The last one in the search actually matches, so don't break out */
-					endIsAMatch = true;
-				endReached = true;
+				search_filter_len = strlen(search_filter);
 			}
 		}
-		if(endReached && !endIsAMatch) /* FS: We're at the end, and it's not a match to the filter so bust out. */
+	}
+
+	cmd_count = GetCmdCount();
+
+	sorted_cmds = (cmd_function_t **)malloc(sizeof(cmd_function_t*)*cmd_count);
+	if (!sorted_cmds)
+	{
+		Com_Error(ERR_FATAL, "Cmd_List_f: Failed to allocate memory.");
+		return;
+	}
+
+	for (q = 0; q < cmd_count; q++)
+	{
+		sorted_cmds[q] = cmd_functions;
+		cmd_functions = cmd_functions->next;
+	}
+
+	qsort(sorted_cmds, cmd_count, sizeof(cvar_t*), &cmpr_cmds);
+
+	for (i = 0; i < cmd_count; i++)
+	{
+		cmd = sorted_cmds[i];
+		if (!cmd)
 		{
 			break;
 		}
-		Com_Printf ("     %s\n", cmd->name); /* FS: Make it look consistent with cvarlist */
+
+		if ((args > 1) && (search_filter)) /* FS */
+		{
+			if (!strstr(cmd->name, search_filter))
+				continue;
+
+			if ((args > 2) && (strncmp(cmd->name, search_filter, search_filter_len)))
+				continue;
+
+			j++;
+		}
+
+		Com_Printf("     %s\n", cmd->name); /* FS: Make it look consistent with cvarlist */
 	}
-	Com_Printf ("%i commands\n", i);
+
+	Com_Printf("%d commands\n", search_filter ? j: i);
+
+	free(sorted_cmds);
+	sorted_cmds = NULL;
+
+	cmd_functions = (cmd_function_t *)head;
 }
 
 /*
@@ -957,137 +996,32 @@ void Cmd_Init (void)
 	Cmd_AddCommand ("flushlog", Cmd_Flushlog_f); /* FS: Added */
 }
 
-
-#define RETRY_INITIAL	0
-#define RETRY_ONCE		1
-#define RETRY_MULTIPLE	2
-
-/* FS: Merged from Cmd_CompleteCommand and Cvar_CompleteVariable */
-/* FS: Inspired from KMQ2 with 100% in house code. */
-char *Sort_Possible_Cmds (char *partial)
+void Cmd_Shutdown(void)
 {
-	cmd_function_t	*cmd;
-	cvar_t			*cvar;
-	int				len;
-	cmdalias_t		*a;
-	int	foundExactCount = 0;
-	int foundPartialCount = 0;
-	int retryPartialFlag = RETRY_INITIAL;
+	cmdalias_t *alias, *aNext;
+	cmd_function_t	*cmd, *next;
 
-	len = strlen(partial);
-
-	if (!len)
-		return NULL;
-
-// check for exact match
-	foundExactCount = 0;
-	for (cmd=cmd_functions ; cmd ; cmd=cmd->next)
+	for (alias=cmd_alias; alias; alias = aNext)
 	{
-		if (!strcmp (partial,cmd->name))
+		aNext = alias->next;
+
+		if (alias->value)
 		{
-			foundExactCount++;
-			return cmd->name;
-		}
-	}
-	for (a=cmd_alias ; a ; a=a->next)
-	{
-		if (!strcmp (partial, a->name))
-		{
-			foundExactCount++;
-			return a->name;
-		}
-	}
-
-// check exact match
-	for (cvar=cvar_vars ; cvar ; cvar=cvar->next)
-	{
-		if (!strcmp (partial,cvar->name))
-		{
-			foundExactCount++;
-			return cvar->name;
-		}
-	}
-
-// check for partial match
-retryPartial:
-	foundPartialCount = 0;
-	for (cmd=cmd_functions ; cmd ; cmd=cmd->next)
-	{
-		if (Sort_Possible_Strtolower(partial, cmd->name))
-		{
-			foundPartialCount++;
-
-			if(retryPartialFlag == RETRY_MULTIPLE)
-				Com_Printf("  %s [C]\n", cmd->name);
-			else if (retryPartialFlag == RETRY_ONCE)
-				return cmd->name;
-		}
-	}
-	for (a=cmd_alias ; a ; a=a->next)
-	{
-		if (Sort_Possible_Strtolower(partial, a->name))
-		{
-			foundPartialCount++;
-
-			if(retryPartialFlag == RETRY_MULTIPLE)
-				Com_Printf("  %s [A]\n", a->name);
-			else if (retryPartialFlag == RETRY_ONCE)
-				return a->name;
-		}
-	}
-	for (cvar=cvar_vars ; cvar ; cvar=cvar->next)
-	{
-		if (Sort_Possible_Strtolower(partial, cvar->name))
-		{
-			foundPartialCount++;
-
-			if(retryPartialFlag == RETRY_MULTIPLE)
-				Com_Printf("  %s [V]\n", cvar->name);
-			else if (retryPartialFlag == RETRY_ONCE)
-				return cvar->name;
-		}
-	}
-
-	if(foundPartialCount == 1)
-	{
-		retryPartialFlag = RETRY_ONCE;
-		goto retryPartial;
-	}
-	else if (foundPartialCount == 0)
-	{
-		return NULL;
-	}
-	else if (retryPartialFlag == RETRY_INITIAL)
-	{
-		retryPartialFlag = RETRY_MULTIPLE;
-		Com_Printf("Listing matches for '%s'...\n", partial);
-		goto retryPartial;
-	}
-	else if (foundExactCount+foundPartialCount > 0)
-		Com_Printf("Found %i matches.\n", foundExactCount+foundPartialCount);
-
-	return NULL;
-}
-
-/* FS: This is needed because cmds, aliases, and cvars are case sensitive. */
-qboolean	Sort_Possible_Strtolower (char *partial, char *complete)
-{
-	int partialLength = 0;
-	int x = 0;
-
-	partialLength = strlen(partial);
-
-	while(x < partialLength)
-	{
-		if(Q_tolower(partial[x]) != Q_tolower(complete[x]))
-		{
-			return false;
+			Z_Free(alias->value);
+			alias->value = NULL;
 		}
 
-		x++;
+		Z_Free(alias);
+		alias = NULL;
 	}
 
-	return true;
+	for (cmd = cmd_functions; cmd; cmd = next)
+	{
+		next = cmd->next;
+
+		Z_Free(cmd);
+		cmd = NULL;
+	}
 }
 
 void Cmd_Flushlog_f (void) /* FS: clear the logfile */
@@ -1097,13 +1031,13 @@ void Cmd_Flushlog_f (void) /* FS: clear the logfile */
 	extern cvar_t	*logfile_active;
 	extern FILE		*logfile;
 
-	if(!logfile_name->string[0])
+	if (!logfile_name->string[0])
 	{
 		Com_Printf("Error: logfile_name not set.  Aborting flushlog.\n");
 		return;
 	}
 
-	if(!logfile_active->value)
+	if (!logfile_active->intValue)
 	{
 		Com_Printf("Warning: logfile disabled but logfile_name set; continuing with flushlog.\n");
 	}

@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{c39cf301-1310-4610-8ce9-485ad81f102a}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;for;f90</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{6fa5ee2b-3a64-4768-bb07-2dc80d179116}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;fi;fd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{2408ba0a-54a0-46af-a197-b63ff361d17b}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\coop\tsmod\g_main.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\coop\tsmod\md4.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\coop\tsmod\q_shared.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\coop\tsmod\regex.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\coop\tsmod\zb_ban.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\coop\tsmod\zb_checkvar.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\coop\tsmod\zb_clib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\coop\tsmod\zb_cmd.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\coop\tsmod\zb_disable.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\coop\tsmod\zb_flood.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\coop\tsmod\zb_init.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\coop\tsmod\zb_log.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\coop\tsmod\zb_lrcon.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\coop\tsmod\zb_msgqueue.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\coop\tsmod\zb_spawn.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\coop\tsmod\zb_util.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\coop\tsmod\zb_vote.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\coop\tsmod\zb_zbot.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\coop\tsmod\zb_zbotcheck.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\coop\tsmod\game.def">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\coop\tsmod\g_local.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\coop\tsmod\game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\coop\tsmod\q_shared.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\coop\tsmod\regex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

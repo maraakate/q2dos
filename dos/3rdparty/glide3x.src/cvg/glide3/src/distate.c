@@ -17,8 +17,6 @@
  ** 
  ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
  **
- ** $Header: /cvsroot/glide/glide3x/cvg/glide3/src/distate.c,v 1.1.1.1.8.4 2007/09/29 13:59:34 koolsmoky Exp $
- ** $Log: distate.c,v $
  ** Revision 1.1.1.1.8.4  2007/09/29 13:59:34  koolsmoky
  ** completed grStippleMode and grStipplePattern
  **
@@ -411,11 +409,6 @@ GR_DIENTRY(grChromaRange, void , (GrColor_t color, GrColor_t range, GrChromaRang
 {
 #define FN_NAME "grChromaRange"
   GR_BEGIN_NOFIFOCHECK("grChromaRange\n",85);
-
-  GR_CHECK_F(myName,
-             ((_GlideRoot.hwConfig.SSTs[_GlideRoot.current_sst].type != GR_SSTTYPE_Voodoo2) &&
-              (_GlideRoot.hwConfig.SSTs[_GlideRoot.current_sst].type != GR_SSTTYPE_Banshee)),
-             "grChromaRange not supported.");
 
   INVALIDATE(chromaKey);
   INVALIDATE(chromaRange);

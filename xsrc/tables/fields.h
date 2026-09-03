@@ -86,4 +86,4 @@
 {"minpitch", STOFS(minpitch), F_FLOAT, FFL_SPAWNTEMP},
 {"maxpitch", STOFS(maxpitch), F_FLOAT, FFL_SPAWNTEMP},
 {"nextmap", STOFS(nextmap), F_LSTRING, FFL_SPAWNTEMP},
-{0, 0, 0, 0}
+{NULL, 0, 0, 0}

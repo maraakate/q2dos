@@ -557,7 +557,8 @@ supertank_pain(edict_t *self, edict_t *other /* unused */, float kick, int damag
 
 	if (self->health < (self->max_health / 2))
 	{
-		self->s.skinnum = 1;
+		self->s.skinnum |= 1;
+		self->blood_type = 3;	// Knightmare- sparks and blood
 	}
 
 	if (level.time < self->pain_debounce_time)
@@ -575,7 +576,7 @@ supertank_pain(edict_t *self, edict_t *other /* unused */, float kick, int damag
 	}
 
 	/* Don't go into pain if he's firing his rockets */
-	if (skill->value >= 2)
+	if (skill->intValue >= 2)
 	{
 		if ((self->s.frame >= FRAME_attak2_1) &&
 			(self->s.frame <= FRAME_attak2_14))
@@ -586,7 +587,7 @@ supertank_pain(edict_t *self, edict_t *other /* unused */, float kick, int damag
 
 	self->pain_debounce_time = level.time + 3;
 
-	if (skill->value == 3)
+	if (skill->intValue == 3)
 	{
 		return; /* no pain anims in nightmare */
 	}
@@ -827,6 +828,9 @@ supertank_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker 
 	self->deadflag = DEAD_DEAD;
 	self->takedamage = DAMAGE_NO;
 	self->count = 0;
+	self->s.skinnum |= 1;	// Knightmare- make sure pain skin is set if we got one-shotted
+	self->blood_type = 3;	// Knightmare- sparks and blood
+
 	self->monsterinfo.currentmove = &supertank_move_death;
 }
 
@@ -838,7 +842,7 @@ supertank_blocked(edict_t *self, float dist) /* FS: Coop: Rogue specific */
 		return false;
 	}
 
-	if (blocked_checkshot(self, 0.25 + (0.05 * skill->value)))
+	if (blocked_checkshot(self, 0.25 + (0.05 * skill->intValue)))
 	{
 		return true;
 	}
@@ -862,7 +866,7 @@ SP_monster_supertank(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;
@@ -902,6 +906,8 @@ SP_monster_supertank(edict_t *self)
 	{
 		self->monsterinfo.blocked = supertank_blocked;
 	}
+
+	self->blood_type = 2; // Knightmare- use sparks blood type
 
 	gi.linkentity(self);
 

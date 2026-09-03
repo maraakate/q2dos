@@ -1,0 +1,92 @@
+CC = gcc
+NASM = nasm
+
+# asm optimizations (shouldn't be needed)
+USE_ASM=0
+# use nasm or gas as assembler:
+USE_NASM=0
+
+CFLAGS = -Wall -O2 -fPIC
+CFLAGS+= -fomit-frame-pointer
+CFLAGS+= -ffast-math
+CPPFLAGS+= -DNDEBUG
+CPPFLAGS+= -I../client -I../qcommon -I../game
+CPPFLAGS+= -I../ref_gl
+CPPFLAGS+= -I../macosx
+LDFLAGS = -dynamiclib
+LDFLAGS+= -Wl,-single_module
+# export only the relevant functions:
+LDFLAGS+= -Wl,-exported_symbols_list,ref.export
+LDLIBS =
+
+ifeq ($(USE_ASM),1)
+CPPFLAGS+= -Did386=1
+# enable text relocs in 'slidable image' :
+LDFLAGS+= -Wl,-read_only_relocs,suppress
+else
+CPPFLAGS+= -Did386=0
+endif
+ifeq ($(USE_NASM),1)
+ASMDIR=../nasm
+else
+ASMDIR=../gas
+endif
+
+CPPFLAGS+= -DGLIMP_SDL
+SDL_FRAMEWORK_PATH=../macosx
+SDL_LIBS  =-F$(SDL_FRAMEWORK_PATH)
+SDL_CFLAGS=-F$(SDL_FRAMEWORK_PATH)
+SDL_LIBS +=-Wl,-framework,SDL -Wl,-framework,Cocoa
+CFLAGS+= $(SDL_CFLAGS)
+LDLIBS+= $(SDL_LIBS)
+
+REFSOFT = ../game/q_shared.o \
+	../qcommon/crc.o \
+	../linux/glob.o \
+	../linux/q_shlinux.o \
+	../linux/qgl_linux.o \
+	../linux/gl_sdl.o \
+	gl_draw.o \
+	gl_image.o \
+	gl_light.o \
+	gl_mesh.o \
+	gl_model.o \
+	gl_rmain.o \
+	gl_rmisc.o \
+	gl_rsurf.o \
+	gl_warp.o
+
+ifeq ($(USE_ASM),1)
+REFASM = $(ASMDIR)/math_ref.o \
+	$(ASMDIR)/math.o \
+	$(ASMDIR)/sys_dosa.o
+endif
+
+.PHONY: all clean
+#
+
+OBJECTS = $(REFSOFT) $(REFASM)
+
+all: ref_gl.dylib
+
+ref_gl.dylib: $(OBJECTS)
+	$(CC) -o $@ $(LDFLAGS) $(OBJECTS) $(LDLIBS)
+
+clean:
+	rm -f *.o
+	rm -f ../linux/*.o
+	rm -f ../game/*.o
+	rm -f ../qcommon/*.o
+	rm -f ../gas/*.o
+	rm -f ../nasm/*.o
+
+DO_AS=$(CC) -x assembler-with-cpp
+
+%.o: %.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+
+%.o: %.s
+	$(DO_AS) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+
+%.o: %.asm
+	$(NASM) -I../nasm/ -f macho -o $@ $<

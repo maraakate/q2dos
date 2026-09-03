@@ -49,14 +49,14 @@ unsigned _stklen = 1048576; /* FS: Up minimum stack space.  Ggorts reports he ha
 #include "../qcommon/qcommon.h"
 #include "../client/keys.h"
 
+float			fptest_temp;
+
+extern char	start_of_memory __asm__("start");
+
 #define	KEYBUF_SIZE	256
 static unsigned char	keybuf[KEYBUF_SIZE];
 static int	keybuf_head = 0;
 static int	keybuf_tail = 0;
-
-float			fptest_temp;
-
-extern char	start_of_memory __asm__("start");
 
 static byte scantokey[128] =
 {
@@ -122,6 +122,7 @@ static void Sys_DetectLFN (void)
 
 static qboolean Sys_DetectWinNT (void) /* FS: Wisdom from Gisle Vanem */
 {
+	/* FS: Might sound crazy, but you could use that swsvpkt driver in NTVDM... */
 	if(_get_dos_version(1) == 0x0532)
 		return true;
 	return false;
@@ -241,7 +242,7 @@ static void Sys_SetTextMode (void) /* FS: This was used twice, let's make it a l
 	__dpmi_int(0x10, &r);
 }
 
-void Sys_Error (char *error, ...)
+void Sys_Error (const char *error, ...)
 {
 	va_list		argptr;
 
@@ -274,6 +275,8 @@ void Sys_Quit (void)
 {
 	if(!dedicated || !dedicated->value)
 		dos_restoreintr(9); /* FS: Give back the keyboard */
+
+	Cvar_Shutdown(); /* FS: Free our CVAR memory too */
 
 	if (unlockmem)
 	{

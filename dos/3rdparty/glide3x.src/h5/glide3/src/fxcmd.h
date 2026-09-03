@@ -18,8 +18,6 @@
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
 **
-** $Revision: 1.3.4.8 $ 
-** $Date: 2007/05/13 09:00:55 $ 
 ** $Log:
 **  7    3dfx      1.4.1.0.1.0 10/11/00 Brent           Forced check in to enforce
 **       branching.

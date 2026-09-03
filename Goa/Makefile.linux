@@ -1,0 +1,32 @@
+CC = gcc
+CFLAGS = -Wall -O2 -ffast-math
+CPPFLAGS = -Did386=1 -DGAMESPY -DNDEBUG
+LDFLAGS = -shared -Wl,--no-undefined
+# export only the relevant functions:
+LDFLAGS+= -Wl,--version-script=gspy.version
+LDLIBS =
+
+GAMESPY = CEngine/darray.o \
+	CEngine/gserver.o \
+	CEngine/gserverlist.o \
+	CEngine/gutil.o \
+	CEngine/hashtable.o \
+	nonport.o
+
+.PHONY: all test clean
+#
+
+OBJECTS =  $(GAMESPY)
+
+all: gamespy.so
+
+gamespy.so:	$(OBJECTS)
+	$(CC) -o gamespy.so $(LDFLAGS) $(OBJECTS) $(LDLIBS)
+
+clean:
+	rm -f *.o
+	rm -f CEngine/*.o
+	rm -f Sdk/*.o
+
+%.o : %.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@

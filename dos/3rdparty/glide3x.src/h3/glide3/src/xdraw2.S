@@ -19,9 +19,6 @@
 */
 
 /*
- *  $Header: /cvsroot/glide/glide3x/h3/glide3/src/xdraw2.S,v 1.2.8.5 2004/10/05 14:39:55 dborca Exp $
- *  $Revision: 1.2.8.5 $
- *  $Log: xdraw2.S,v $
  *  Revision 1.2.8.5  2004/10/05 14:39:55  dborca
  *  removed detritus
  *

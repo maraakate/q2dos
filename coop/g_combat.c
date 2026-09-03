@@ -158,7 +158,8 @@ char *GetProperMonsterName (char *monsterName) /* FS: Coop: Get proper name for 
 		return "Hornet";
 	else if(!strcmp("monster_jorg", monsterName))
 		return "Jorg";
-	else if(!strcmp("makron", monsterName))
+	/* Knightmare- use correct monster classname */
+	else if(!strcmp("monster_makron", monsterName))
 		return "Makron";
 	else if(!strcmp("misc_insane", monsterName))
 		return "Prisoner";
@@ -488,7 +489,7 @@ Killed(edict_t *targ, edict_t *inflictor, edict_t *attacker,
 		{
 			level.killed_monsters++;
 
-			if (coop->value && attacker->client)
+			if (coop->intValue && attacker->client)
 			{
 				attacker->client->resp.score++;
 			}
@@ -514,9 +515,9 @@ Killed(edict_t *targ, edict_t *inflictor, edict_t *attacker,
 			if((targ->svflags & SVF_MONSTER) &&
 				attacker &&
 				attacker->client &&
-				attacker->client->pers.netname &&
+				attacker->client->pers.netname[0] &&
 				targ->classname &&
-				!stricmp(targ->classname, "monster_turret")) /* FS: Coop: monster_turrets have MOVETYPE_NONE so they stop here. */
+				!Q_stricmp(targ->classname, "monster_turret")) /* FS: Coop: monster_turrets have MOVETYPE_NONE so they stop here. */
 			{
 				GetCoopMeansOfDeath(targ->classname, attacker->client->pers.netname);
 			}
@@ -528,7 +529,7 @@ Killed(edict_t *targ, edict_t *inflictor, edict_t *attacker,
 	if ((targ->svflags & SVF_MONSTER) && (targ->deadflag != DEAD_DEAD))
 	{
 		targ->touch = NULL;
-		if(attacker && attacker->client && attacker->client->pers.netname && targ && targ->classname) /* FS: Coop: Announce who we killed */
+		if(attacker && attacker->client && attacker->client->pers.netname[0] && targ && targ->classname) /* FS: Coop: Announce who we killed */
 		{
 			GetCoopMeansOfDeath(targ->classname, attacker->client->pers.netname);
 		}
@@ -1046,14 +1047,14 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 	/* friendly fire avoidance. If enabled you can't
 	   hurt teammates (but you can hurt yourself)
 	   knockback still occurs */
-	if ((targ != attacker) && ((deathmatch->value &&
-		 ((int)(dmflags->value) & (DF_MODELTEAMS | DF_SKINTEAMS))) ||
-		 coop->value))
+	if ((targ != attacker) && ((deathmatch->intValue &&
+		 (dmflags->intValue & (DF_MODELTEAMS | DF_SKINTEAMS))) ||
+		 coop->intValue))
 	{
 		if (OnSameTeam(targ, attacker))
 		{
 			/* nukes kill everyone */
-			if ((((int)(dmflags->value) & DF_NO_FRIENDLY_FIRE) || coop->intValue) && (mod != MOD_TELEFRAG) && /* FS: Coop: No friendly fire in Coop, except for telefrags */
+			if (((dmflags->intValue & DF_NO_FRIENDLY_FIRE) || coop->intValue) && (mod != MOD_TELEFRAG) && /* FS: Coop: No friendly fire in Coop, except for telefrags */
 				(mod != MOD_NUKE)) /* FS: Coop: Rogue specific */
 			{
 				damage = 0;
@@ -1070,7 +1071,7 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 	/* allow the deathmatch game to change values */
 	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		if (deathmatch->value && gamerules && gamerules->value)
+		if (deathmatch->intValue && gamerules && gamerules->intValue)
 		{
 			if (DMGame.ChangeDamage)
 			{
@@ -1090,7 +1091,7 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 	}
 
 	/* easy mode takes half damage */
-	if ((skill->value == 0) && (deathmatch->value == 0) && targ->client)
+	if ((skill->intValue == 0) && (deathmatch->intValue == 0) && targ->client)
 	{
 		damage *= 0.5;
 
@@ -1294,14 +1295,37 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 		}
 		else if ((targ->svflags & SVF_MONSTER) || (client))
 		{
-			if ((game.gametype == rogue_coop) && (mod == MOD_CHAINFIST)) /* FS: Coop: Rogue specific */
+			/* Knightmare- enumerated blood types */
+			if (targ->blood_type == 1)
+			{
+				SpawnDamage (TE_GREENBLOOD, point, normal);
+			}
+			else if (targ->blood_type == 2)
+			{
+				SpawnDamage (TE_SPARKS, point, normal);
+				SpawnDamage (TE_SPARKS, point, normal);
+			}
+			else if (targ->blood_type == 3)
+			{
+				SpawnDamage (TE_SPARKS, point, normal);
+				SpawnDamage (TE_SPARKS, point, normal);
+				SpawnDamage (TE_BLOOD, point, normal);
+			}			
+			else if (targ->blood_type == 4)
+			{
+				SpawnDamage (TE_ELECTRIC_SPARKS, point, normal);
+			}
+			/* end Knightmare */
+			else if ((game.gametype == rogue_coop) && (mod == MOD_CHAINFIST)) /* FS: Coop: Rogue specific */
 			{
 				SpawnDamage(TE_MOREBLOOD, point, normal);
 			}
-			else if ((game.gametype == xatrix_coop) && (targ->classname) && (strcmp(targ->classname, "monster_gekk") == 0)) /* FS: Coop: Xatrix specific */
+			/*	Knightmare- this is now redundant due to using blood_type field */
+			/* FS: Coop: Xatrix specific */
+		/*	else if ((game.gametype == xatrix_coop) && (targ->classname) && (strcmp(targ->classname, "monster_gekk") == 0))
 			{
 				SpawnDamage(TE_GREENBLOOD, point, normal);
-			}
+			} */
 			else
 			{
 				SpawnDamage(TE_BLOOD, point, normal);
@@ -1373,12 +1397,18 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 
 		if (!(targ->monsterinfo.aiflags & AI_DUCKED) && (take))
 		{
-			targ->pain(targ, attacker, knockback, take);
+			if (targ->pain)
+			{
+				targ->pain(targ, attacker, knockback, take);
+			}
 
 			/* nightmare mode monsters don't go into pain frames often */
-			if (skill->value == 3)
+			if (skill->intValue == 3)
 			{
-				targ->pain_debounce_time = level.time + 5;
+				if (targ->pain)
+				{
+					targ->pain_debounce_time = level.time + 5;
+				}
 			}
 		}
 	}
@@ -1386,7 +1416,10 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 	{
 		if (!(targ->flags & FL_GODMODE) && (take))
 		{
-			targ->pain(targ, attacker, knockback, take);
+			if (targ->pain)
+			{
+				targ->pain(targ, attacker, knockback, take);
+			}
 		}
 	}
 	else if (take)

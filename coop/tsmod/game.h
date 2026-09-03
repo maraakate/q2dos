@@ -30,7 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #ifndef TSMOD_H
 #define TSMOD_H
-#define GAME_API_VERSION 3
+#define GAME_API_VERSION 4
 
 // edict->svflags
 
@@ -114,7 +114,7 @@ typedef struct
 	{
 		// special messages
 	void	(*bprintf) (int printlevel, char *fmt, ...) __fp_attribute__((__format__(__printf__,2,3)));
-	void	(*dprintf) (unsigned long developerFlags, char *fmt, ...) __fp_attribute__((__format__(__printf__,2,3))); /* FS: Added developer flags */
+	void	(*dprintf) (unsigned int developerFlags, char *fmt, ...) __fp_attribute__((__format__(__printf__,2,3))); /* FS: Added developer flags */
 	void	(*cprintf) (edict_t *ent, int printlevel, char *fmt, ...) __fp_attribute__((__format__(__printf__,3,4)));
 	void	(*centerprintf) (edict_t *ent, char *fmt, ...) __fp_attribute__((__format__(__printf__,2,3)));
 		void (*sound) (edict_t *ent, int channel, int soundindex, float volume, float attenuation, float timeofs);
@@ -173,7 +173,8 @@ typedef struct
 		cvar_t *(*cvar) (char *var_name, char *value, int flags);
 		cvar_t *(*cvar_set) (char *var_name, char *value);
 		cvar_t *(*cvar_forceset) (char *var_name, char *value);
-		
+		void	(*cvar_setdescription) (char *var_name, const char *description); /* FS */
+
 		// ClientCommand and ServerCommand parameter access
 		int  (*argc) (void);
 		char *(*argv) (int n);

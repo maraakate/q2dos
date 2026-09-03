@@ -17,8 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/h3/minihwc/minihwc.h,v 1.1.1.1.6.2 2005/05/25 08:56:24 jwrdegoede Exp $
-** $Log: minihwc.h,v $
 ** Revision 1.1.1.1.6.2  2005/05/25 08:56:24  jwrdegoede
 ** Make h5 and h3 tree 64 bit clean. This is ported over from the non-devel branch so this might be incomplete
 **
@@ -498,7 +496,7 @@ hwcInitVideo(hwcBoardInfo *bInfo, FxBool tiled, FxVideoTimingInfo
 FxBool
 hwcRestoreVideo(hwcBoardInfo *bInfo);
 
-char *
+const char *
 hwcGetErrorString(void);
 
 FxBool

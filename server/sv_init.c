@@ -25,6 +25,8 @@ void SV_CheckSkillCvar(void); /* FS: Valid skill values are 0, 1, 2 and 3. */
 server_static_t	svs;				// persistant server info
 server_t		sv;					// local server
 
+extern int num_sz_getspace_overflows;
+
 /*
 ================
 SV_FindIndex
@@ -134,10 +136,10 @@ void SV_CheckForSavegame (void)
 	FILE		*f;
 	int			i;
 
-	if (sv_noreload->value)
+	if (sv_noreload->intValue)
 		return;
 
-	if (Cvar_VariableValue ("deathmatch"))
+	if (Cvar_VariableValueInt("deathmatch"))
 		return;
 
 	Com_sprintf (name, sizeof(name), "%s/save/doscursv/%s.sav", FS_Gamedir(), sv.name);
@@ -204,11 +206,12 @@ void SV_SpawnServer (char *server, char *spawnpoint, server_state_t serverstate,
 	svs.realtime = 0;
 	sv.loadgame = loadgame;
 	sv.attractloop = attractloop;
+	num_sz_getspace_overflows = 0; /* FS: Bullshit coop hack. */
 
 	// save name for levels that don't set message
 //	strncpy (sv.configstrings[CS_NAME], server);
 	Q_strncpyz (sv.configstrings[CS_NAME], server, sizeof(sv.configstrings[CS_NAME]));
-	if (Cvar_VariableValue ("deathmatch"))
+	if (Cvar_VariableValueInt("deathmatch"))
 	{
 		Com_sprintf(sv.configstrings[CS_AIRACCEL], sizeof(sv.configstrings[CS_AIRACCEL]), "%g", sv_airaccelerate->value);
 		pm_airaccelerate = sv_airaccelerate->value;
@@ -328,7 +331,7 @@ void SV_InitGame (void)
 
 	svs.initialized = true;
 
-	if (Cvar_VariableValue ("coop") && Cvar_VariableValue ("deathmatch"))
+	if (Cvar_VariableValueInt("coop") && Cvar_VariableValueInt("deathmatch"))
 	{
 		Com_Printf("Deathmatch and Coop both set, disabling Coop\n");
 		Cvar_FullSet ("coop", "0",  CVAR_SERVERINFO | CVAR_LATCH);
@@ -338,25 +341,25 @@ void SV_InitGame (void)
 
 	// dedicated servers are can't be single player and are usually DM
 	// so unless they explicity set coop, force it to deathmatch
-	if (dedicated->value)
+	if (dedicated->intValue)
 	{
-		if (!Cvar_VariableValue ("coop"))
+		if (!Cvar_VariableValueInt("coop"))
 			Cvar_FullSet ("deathmatch", "1",  CVAR_SERVERINFO | CVAR_LATCH);
 	}
 
 	// init clients
-	if (Cvar_VariableValue ("deathmatch"))
+	if (Cvar_VariableValueInt("deathmatch"))
 	{
-		if (maxclients->value <= 1)
+		if (maxclients->intValue <= 1)
 			Cvar_FullSet ("maxclients", "8", CVAR_SERVERINFO | CVAR_LATCH);
-		else if (maxclients->value > MAX_CLIENTS)
+		else if (maxclients->intValue > MAX_CLIENTS)
 			Cvar_FullSet ("maxclients", va("%i", MAX_CLIENTS), CVAR_SERVERINFO | CVAR_LATCH);
 	}
-	else if (Cvar_VariableValue ("coop"))
+	else if (Cvar_VariableValueInt("coop"))
 	{
-		if (maxclients->value <= 1) /* FS: Hard limit was 4. */
+		if (maxclients->intValue <= 1) /* FS: Hard limit was 4. */
 			Cvar_FullSet ("maxclients", "4", CVAR_SERVERINFO | CVAR_LATCH);
-		else if (maxclients->value > MAX_CLIENTS)
+		else if (maxclients->intValue > MAX_CLIENTS)
 			Cvar_FullSet ("maxclients", va("%i", MAX_CLIENTS), CVAR_SERVERINFO | CVAR_LATCH);
 #ifdef COPYPROTECT
 		if (!sv.attractloop && !dedicated->value)
@@ -373,12 +376,12 @@ void SV_InitGame (void)
 	}
 
 	svs.spawncount = rand();
-	svs.clients = Z_Malloc (sizeof(client_t)*maxclients->value);
+	svs.clients = Z_Malloc (sizeof(client_t)*maxclients->intValue);
 	svs.num_client_entities = maxclients->value*UPDATE_BACKUP*64;
 	svs.client_entities = Z_Malloc (sizeof(entity_state_t)*svs.num_client_entities);
 
 	// init network stuff
-	NET_Config ( (maxclients->value > 1) );
+	NET_Config ( (maxclients->intValue > 1) );
 
 	// heartbeats will always be sent to the id master
 	svs.last_heartbeat = -99999;		// send immediately
@@ -387,7 +390,7 @@ void SV_InitGame (void)
 
 	// init game
 	SV_InitGameProgs ();
-	for (i=0 ; i<maxclients->value ; i++)
+	for (i=0 ; i<maxclients->intValue; i++)
 	{
 		ent = EDICT_NUM(i+1);
 		ent->s.number = i+1;
@@ -434,7 +437,7 @@ void SV_Map (qboolean attractloop, char *levelstring, qboolean loadgame)
 		Q_strncpyz (level, levelstring, sizeof(level));
 
 	// if there is a + in the map, set nextserver to the remainder
-	ch = strstr(level, "+");
+	ch = strchr(level, '+');
 	if (ch)
 	{
 		*ch = 0;
@@ -448,7 +451,7 @@ void SV_Map (qboolean attractloop, char *levelstring, qboolean loadgame)
 		Cvar_Set ("nextserver", "gamemap \"*base1\"");
 
 	// if there is a $, use the remainder as a spawnpoint
-	ch = strstr(level, "$");
+	ch = strchr(level, '$');
 	if (ch)
 	{
 		*ch = 0;
@@ -468,7 +471,7 @@ void SV_Map (qboolean attractloop, char *levelstring, qboolean loadgame)
 
 	if (l > 4 && !strcmp (level+l-4, ".cin") )
 	{
-		if (!dedicated->value)
+		if (!dedicated->intValue)
 			SCR_BeginLoadingPlaque ();			// for local system
 
 		SV_BroadcastCommand ("changing\n");
@@ -484,22 +487,28 @@ void SV_Map (qboolean attractloop, char *levelstring, qboolean loadgame)
 	}
 	else if (l > 4 && !strcmp (level+l-4, ".dm2") )
 	{
-		if (!dedicated->value)
-		SCR_BeginLoadingPlaque ();			// for local system
+		if (!dedicated->intValue)
+		{
+			SCR_BeginLoadingPlaque ();			// for local system
+		}
 		SV_BroadcastCommand ("changing\n");
 		SV_SpawnServer (level, spawnpoint, ss_demo, attractloop, loadgame);
 	}
 	else if (l > 4 && !strcmp (level+l-4, ".pcx") )
 	{
-		if (!dedicated->value)
-		SCR_BeginLoadingPlaque ();			// for local system
+		if (!dedicated->intValue)
+		{
+			SCR_BeginLoadingPlaque ();			// for local system
+		}
 		SV_BroadcastCommand ("changing\n");
 		SV_SpawnServer (level, spawnpoint, ss_pic, attractloop, loadgame);
 	}
 	else
 	{
-		if (!dedicated->value)
-		SCR_BeginLoadingPlaque ();			// for local system
+		if (!dedicated->intValue)
+		{
+			SCR_BeginLoadingPlaque ();			// for local system
+		}
 		SV_BroadcastCommand ("changing\n");
 		SV_SendClientMessages ();
 		SV_SpawnServer (level, spawnpoint, ss_game, attractloop, loadgame);
@@ -512,12 +521,12 @@ void SV_Map (qboolean attractloop, char *levelstring, qboolean loadgame)
 /* FS: Valid skill values are 0, 1, 2 and 3. */
 void SV_CheckSkillCvar(void)
 {
-	if (Cvar_VariableValue("skill") > 3.0f)
+	if (Cvar_VariableValueInt("skill") > 3)
 	{
 		Com_Printf("Skill value greater than 3.  Valid values are 0, 1, 2 and 3.\nSetting skill to 3 (nightmare).\n");
 		Cvar_FullSet("skill", "3", CVAR_SERVERINFO | CVAR_LATCH);
 	}
-	else if (Cvar_VariableValue("skill") < 0.0f) /* FS: Someone being funny */
+	else if (Cvar_VariableValueInt("skill") < 0) /* FS: Someone being funny */
 	{
 		Com_Printf("Skill value less than 0.  Valid values are 0, 1, 2, and 3.\nSetting skill to 0 (easy).\n");
 		Cvar_FullSet("skill", "0", CVAR_SERVERINFO | CVAR_LATCH);

@@ -16,9 +16,6 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-** $Revision: 1.2 $
-** $Date: 2000/06/15 00:11:40 $
 */
 #ifndef _FX_MEMMAP_H_
 #define _FX_MEMMAP_H_

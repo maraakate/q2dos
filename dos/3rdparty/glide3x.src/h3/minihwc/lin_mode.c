@@ -16,8 +16,6 @@
 ** THE UNITED STATES. 
 **
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVE
-**
-** $Header: /cvsroot/glide/glide3x/h3/minihwc/Attic/lin_mode.c,v 1.1.2.2 2004/03/02 07:30:57 dborca Exp $
 */
 
 #include <stdio.h>
@@ -208,6 +206,7 @@ static void loadEnvFile (void)
        item->next = first;
        first = item;
  }
+ fclose(file);
 }
 
 

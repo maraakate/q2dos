@@ -30,7 +30,7 @@ static int sound_pain3;
 static int sound_search1;
 static int sound_rail;
 
-static unsigned long shotsfired;
+static unsigned int shotsfired;
 
 static vec3_t spawnpoints[] = {
 	{30, 100, 16},

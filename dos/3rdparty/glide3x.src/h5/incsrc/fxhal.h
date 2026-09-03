@@ -19,9 +19,6 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-** $Revision: 1.3.4.1 $
-** $Date: 2003/04/06 18:23:10 $
 */
 
 #if defined(BUILD_HAL)
@@ -31,9 +28,6 @@
 #include <fxpci.h>
 
 #include <h3info.h>
-
-// Allow SourceSafe to track Revision values
-#define HAL_H_REV "$Revision: 1.3.4.1 $"
 
 /*
  * Just to confuse you:

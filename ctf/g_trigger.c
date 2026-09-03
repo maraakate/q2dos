@@ -673,7 +673,7 @@ trigger_gravity_touch(edict_t *self, edict_t *other, cplane_t *plane,
 void
 SP_trigger_gravity(edict_t *self)
 {
-	if (st.gravity == 0)
+	if (st.gravity == NULL)
 	{
 		gi.dprintf(DEVELOPER_MSG_GAME, "trigger_gravity without gravity set at %s\n", vtos(self->s.origin));
 		G_FreeEdict(self);

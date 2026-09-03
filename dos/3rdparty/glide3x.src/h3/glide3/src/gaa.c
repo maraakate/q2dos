@@ -17,8 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/h3/glide3/src/gaa.c,v 1.1.1.1.6.7 2006/01/16 21:22:42 jwrdegoede Exp $
-** $Log: gaa.c,v $
 ** Revision 1.1.1.1.6.7  2006/01/16 21:22:42  jwrdegoede
 ** Fix gcc 4.1 new type-punned ptr breaks antialias. warnings
 **
@@ -386,6 +384,7 @@ aaVpDrawArrayEdgeSense(float *a, float *b, float *c, float oowa, float oowb)
     break;
 
   case aaEdgeSenseRight:
+  default: /* silence warnings */
     TRI_SETF(fax + _GlideRoot.pool.f1);
     v2x = fbx + _GlideRoot.pool.f1;
     TRI_SETF(fay);
@@ -1261,6 +1260,7 @@ aaDrawArrayEdgeSense(float *a, float *b, float *c)
     break;
 
   case aaEdgeSenseRight:
+  default: /* silence warnings */
     TRI_SETF(FARRAY(a, gc->state.vData.vertexInfo.offset) + _GlideRoot.pool.f1);
     v2x = FARRAY(b, gc->state.vData.vertexInfo.offset) + _GlideRoot.pool.f1;
     TRI_SETF(FARRAY(a, gc->state.vData.vertexInfo.offset+4));

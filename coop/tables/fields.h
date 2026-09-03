@@ -143,4 +143,4 @@
 {"unduck", FOFS(monsterinfo.unduck), F_FUNCTION, FFL_NOSPAWN}, /* FS: Coop: Rogue specific */
 {"sidestep", FOFS(monsterinfo.sidestep), F_FUNCTION, FFL_NOSPAWN}, /* FS: Coop: Rogue specific */
 
-{0, 0, 0, 0} 
+{NULL, 0, 0, 0} 

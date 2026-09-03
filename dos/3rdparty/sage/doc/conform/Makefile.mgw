@@ -33,7 +33,7 @@ CFLAGS += -I. -I../include
 LD = $(CC)
 LDFLAGS = -s
 LDFLAGS = -L../lib
-LDLIBS = -lglut32 -lglu32 -lopengl32 -lglide3x -lm
+LDLIBS = -lglut32 -lglu32 -lopengl32 -lglide3x
 RM = del
 
 CORE_SOURCES = \

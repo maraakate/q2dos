@@ -57,9 +57,9 @@ void ServerParsePlayerCount(GServer server, char *savedkeyvals)
 	GKeyValuePair kvpair;
 
 	numplayers = 0;
-	test = strtok_r(savedkeyvals, playerSeperators, &p);
+	test = gs_strtok(savedkeyvals, playerSeperators, &p);
 	if (test) {
-		test = strtok_r(NULL, playerSeperators, &p);
+		test = gs_strtok(NULL, playerSeperators, &p);
 	}
 
 	while (test != NULL)
@@ -71,7 +71,7 @@ void ServerParsePlayerCount(GServer server, char *savedkeyvals)
 			numplayers++;
 		}
 
-		test = strtok_r(NULL, playerSeperators, &p);
+		test = gs_strtok(NULL, playerSeperators, &p);
 	}
 
 	kvpair.key = _strdup("numplayers");
@@ -109,11 +109,11 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 	strncpy(savedkeyvals, keyvals, sizeof(savedkeyvals));
 	savedkeyvals[sizeof(savedkeyvals) - 1] = '\0';
 
-	k = strtok_r(keyvals, tokenSeperators, &kPtr);
+	k = gs_strtok(keyvals, tokenSeperators, &kPtr);
 
 	while (k != NULL)
 	{
-		v = strtok_r(NULL, tokenSeperators, &kPtr);
+		v = gs_strtok(NULL, tokenSeperators, &kPtr);
 
 		if (v != NULL)
 		{
@@ -131,7 +131,7 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 			}
 		}
 
-		k = strtok_r(NULL, tokenSeperators, &kPtr);
+		k = gs_strtok(NULL, tokenSeperators, &kPtr);
 	}
 
 	ServerParsePlayerCount(server, savedkeyvals);
@@ -311,3 +311,4 @@ static void KeyValFree(void *elem)
 	free(((GKeyValuePair *)elem)->key);
 	free(((GKeyValuePair *)elem)->value);
 }
+

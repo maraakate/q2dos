@@ -40,7 +40,7 @@ int sl_Logging( game_import_t  *gi,
 
         sl_LogDate( gi );
         sl_LogTime( gi );
-        sl_LogDeathFlags( gi, (unsigned long)deathflags->value );
+        sl_LogDeathFlags( gi, (unsigned int)deathflags->value );
 
         fWasAlreadyOpen = fFileOpen;
     }

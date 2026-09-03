@@ -557,12 +557,17 @@ HuntTarget(edict_t *self)
 
 	if (self->monsterinfo.aiflags & AI_STAND_GROUND)
 	{
-		self->monsterinfo.stand(self);
+		if (self->monsterinfo.stand)
+		{
+			self->monsterinfo.stand(self);
+		}
 	}
 	else
 	{
-		if ((game.gametype == rogue_coop && self->monsterinfo.run) || (game.gametype != rogue_coop)) /* FS: Coop: Rogue specific */
+		if (self->monsterinfo.run) /* FS: Coop: Rogue patch, check run func ptr. */
+		{
 			self->monsterinfo.run(self);
+		}
 	}
 
 	if(visible(self, self->enemy))
@@ -757,7 +762,7 @@ FindTarget(edict_t *self)
 		return true;
 	}
 
-	if ((game.gametype == rogue_coop) && (self->monsterinfo.aiflags & AI_HINT_PATH) && (coop) && (coop->value)) /* FS: Coop: Rogue specific */
+	if ((game.gametype == rogue_coop) && (self->monsterinfo.aiflags & AI_HINT_PATH) && (coop) && (coop->intValue)) /* FS: Coop: Rogue specific */
 	{
 		heardit = false;
 	}
@@ -1030,7 +1035,7 @@ M_CheckAttack(edict_t *self)
 	if (enemy_range == RANGE_MELEE)
 	{
 		/* don't always melee in easy mode */
-		if ((skill->value == 0) && (rand() & 3))
+		if ((skill->intValue == 0) && (rand() & 3))
 		{
 			if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 			{
@@ -1094,17 +1099,17 @@ M_CheckAttack(edict_t *self)
 		return false;
 	}
 
-	if (skill->value == 0)
+	if (skill->intValue == 0)
 	{
 		chance *= 0.5;
 	}
-	else if (skill->value >= 2)
+	else if (skill->intValue >= 2)
 	{
 		chance *= 2;
 	}
 
 	/* go ahead and shoot every time if it's a info_notnull */
-	if ((random() < chance) || ((game.gametype == rogue_coop) && (self->enemy->solid == SOLID_NOT)) ) /* FS: Coop: Rogue specific */
+	if ((random() < chance) || ((game.gametype == rogue_coop) && (self->enemy) && (self->enemy->solid == SOLID_NOT)) ) /* FS: Coop: Rogue specific */
 	{
 		self->monsterinfo.attack_state = AS_MISSILE;
 		self->monsterinfo.attack_finished = level.time + 2 * random();
@@ -1291,7 +1296,7 @@ ai_run_slide_rogue (edict_t *self, float distance) /* FS: Coop: Rogue specific *
 	}
 
 	/* clamp maximum sideways move for non flyers to make them look less jerky */
-	if (!self->flags & FL_FLY)
+	if (!(self->flags & FL_FLY))
 	{
 		distance = min(distance, 0.8);
 	}
@@ -1547,7 +1552,7 @@ ai_checkattack(edict_t *self, float dist)
 		}
 	}
 	
-	if (coop && coop->value && (self->monsterinfo.search_time < level.time))
+	if (coop && coop->intValue && (self->monsterinfo.search_time < level.time))
 	{
 		if (FindTarget(self))
 		{
@@ -1958,7 +1963,7 @@ ai_run_rogue(edict_t *self, float dist) /* FS: Coop: Rogue specific */
 			return;
 		}
 
-		if (coop && coop->value)
+		if (coop && coop->intValue)
 		{
 			/* if we're in coop, check my real enemy first..
 			   if I SEE him, set gotcha to true */

@@ -1,4 +1,3 @@
-/*-*-c++-*-*/
 /*
 ** THIS SOFTWARE IS SUBJECT TO COPYRIGHT PROTECTION AND IS OFFERED ONLY
 ** PURSUANT TO THE 3DFX GLIDE GENERAL PUBLIC LICENSE. THERE IS NO RIGHT
@@ -18,14 +17,13 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-**
-** $Revision: 1.2.8.4 $ 
-** $Date: 2005/08/13 21:07:02 $ 
-**
 ** Utility routines for SST-1 Initialization code
 **
 */
-#ifdef __WIN32__
+
+#undef FX_DLL_ENABLE /* so that we don't dllexport the symbols */
+
+#ifdef _MSC_VER
 #pragma optimize ("",off)
 #endif
 #include <stdio.h>
@@ -479,7 +477,7 @@ FX_EXPORT FxBool FX_CSTYLE sst1InitResetTmus(FxU32 *sstbase)
 
    // Fix problem where first Texture downloads to TMU weren't being
    //  received properly
-   ISET(*(int *) (0xf00000 + (long) sstbase), 0xdeadbeef);
+   ISET(*(FxI32 *) (0xf00000 + (long) sstbase), 0xdeadbeef);
    sst1InitIdle(sstbase);
 
    return(FXTRUE);
@@ -692,7 +690,7 @@ FX_ENTRY FxBool FX_CALL sst1InitCmdFifo(FxU32 *sstbase, FxBool enable,
       INIT_PRINTF(("sst1InitCmdFifo(): sst1InitCmdFifoDirect() failed...\n"));
       return(FXFALSE);
     }
-    
+
     if(sst1CurrentBoard->sliSlaveVirtAddr) {
       if(!sst1InitCmdFifoDirect(sst1CurrentBoard->sliSlaveVirtAddr, 0,
                                fifoStart, fifoSize, 
@@ -971,6 +969,7 @@ FX_EXPORT void FX_CSTYLE sst1InitPrintInitRegs(FxU32 *sstbase)
 */
 FX_EXPORT FxU32 FX_CSTYLE sst1InitMeasureSiProcess(FxU32 *sstbase, FxU32 which)
 {
+    const char *envp;
     FxU32 n, siProcess, nandOsc, norOsc;
     FxU32 pciCntrLoad = 0xfff;
     FxU32 cntr;
@@ -979,8 +978,8 @@ FX_EXPORT FxU32 FX_CSTYLE sst1InitMeasureSiProcess(FxU32 *sstbase, FxU32 which)
     if(sst1InitCheckBoard(sstbase) == FXFALSE)
         return(FXFALSE);
 
-    if(GETENV(("SSTV2_SIPROCESS_CNTR")) &&
-       (SSCANF(GETENV(("SSTV2_SIPROCESS_CNTR")), "%i", &i) == 1) ) {
+    envp = GETENV(("SSTV2_SIPROCESS_CNTR"));
+    if(envp && (SSCANF(envp, "%i", &i) == 1) ) {
         pciCntrLoad = i;
         INIT_PRINTF(("sst1InitMeasureSiProcess(): Using PCI Counter preload value of 0x%x...\n", pciCntrLoad));
     }
@@ -992,20 +991,20 @@ FX_EXPORT FxU32 FX_CSTYLE sst1InitMeasureSiProcess(FxU32 *sstbase, FxU32 which)
        PCICFG_WR(SST1_PCI_SIPROCESS,
         (pciCntrLoad<<SST_SIPROCESS_PCI_CNTR_SHIFT) |
          SST_SIPROCESS_OSC_CNTR_RESET_N | SST_SIPROCESS_OSC_NAND_SEL);
-   
+
        // Allow oscillator to run...
        PCICFG_RD(SST1_PCI_SIPROCESS, siProcess);
        PCICFG_WR(SST1_PCI_SIPROCESS,
         (pciCntrLoad<<SST_SIPROCESS_PCI_CNTR_SHIFT) |
          SST_SIPROCESS_OSC_CNTR_RUN | SST_SIPROCESS_OSC_NAND_SEL);
-   
+
        // Loop until PCI counter decrements to 0
        cntr = 0 ;
        do {
           ++cntr;
           PCICFG_RD(SST1_PCI_SIPROCESS, siProcess);
        } while(siProcess & SST_SIPROCESS_PCI_CNTR);
-   
+
        PCICFG_RD(SST1_PCI_SIPROCESS, siProcess);
        siProcess &= SST_SIPROCESS_OSC_CNTR;
        nandOsc = siProcess;
@@ -1021,20 +1020,20 @@ FX_EXPORT FxU32 FX_CSTYLE sst1InitMeasureSiProcess(FxU32 *sstbase, FxU32 which)
        PCICFG_WR(SST1_PCI_SIPROCESS,
         (pciCntrLoad<<SST_SIPROCESS_PCI_CNTR_SHIFT) |
          SST_SIPROCESS_OSC_CNTR_RESET_N | SST_SIPROCESS_OSC_NOR_SEL);
-   
+
        // Allow oscillator to run...
        PCICFG_RD(SST1_PCI_SIPROCESS, siProcess);
        PCICFG_WR(SST1_PCI_SIPROCESS,
        (pciCntrLoad<<SST_SIPROCESS_PCI_CNTR_SHIFT) |
          SST_SIPROCESS_OSC_CNTR_RUN | SST_SIPROCESS_OSC_NOR_SEL);
-   
+
        // Loop until PCI counter decrements to 0
        cntr = 0 ;
        do {
           ++cntr;
           PCICFG_RD(SST1_PCI_SIPROCESS, siProcess);
        } while(siProcess & SST_SIPROCESS_PCI_CNTR);
-   
+
        PCICFG_RD(SST1_PCI_SIPROCESS, siProcess);
        siProcess &= SST_SIPROCESS_OSC_CNTR;
        norOsc = siProcess;
@@ -1182,6 +1181,6 @@ void sst1InitDrawRectUsingTris(FxU32 *sstbase, FxU32 x, FxU32 y, FxU32 tSize)
    ISET(sst->triangleCMD, 0xFFFFFFFF);
 }
 
-#ifdef __WIN32__
+#ifdef _MSC_VER
 #pragma optimize ("",on)
 #endif

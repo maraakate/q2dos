@@ -97,7 +97,8 @@ static struct __extensions__   ext[] = {
    { (fxMesaProc)glGetColorTableParameterivEXT,	"glGetColorTableParameterivEXT"	},
    { (fxMesaProc)glPointParameterfEXT,		"glPointParameterfEXT"		},
    { (fxMesaProc)glPointParameterfvEXT,		"glPointParameterfvEXT"		},
-/* { (fxMesaProc)glBlendFuncSeparateINGR,		"glBlendFuncSeparateINGR"	},*/
+   { (fxMesaProc)glBlendFuncSeparateEXT,		"glBlendFuncSeparateINGR"	},
+   { (fxMesaProc)glBlendFuncSeparateEXT,		"glBlendFuncSeparateEXT"	},
    { (fxMesaProc)glActiveTextureARB,                  "glActiveTextureARB"		},
    { (fxMesaProc)glClientActiveTextureARB,            "glClientActiveTextureARB"	},
    { (fxMesaProc)glMultiTexCoord1dARB,                "glMultiTexCoord1dARB"		},

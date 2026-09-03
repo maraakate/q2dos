@@ -1,0 +1,5 @@
+# Export file for game.so
+game.so {
+	global: GetGameAPI;
+	local: *;
+};

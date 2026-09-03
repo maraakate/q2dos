@@ -74,7 +74,7 @@
  * in tables/ are changed, otherwise
  * strange things may happen.
  */
-#define SAVEGAMEVER "YQ2-2"
+#define SAVEGAMEVER "YQ2-3"
 
 /*
  * This macros are used to

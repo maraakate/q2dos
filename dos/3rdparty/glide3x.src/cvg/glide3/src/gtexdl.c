@@ -17,8 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/cvg/glide3/src/gtexdl.c,v 1.1.1.1.8.5 2005/08/13 21:06:57 jwrdegoede Exp $
-** $Log: gtexdl.c,v $
 ** Revision 1.1.1.1.8.5  2005/08/13 21:06:57  jwrdegoede
 ** Last needed 64 bit fixes for h5/h3, complete 64 bit support for cvg
 **
@@ -905,7 +903,7 @@ GR_ENTRY(grTexDownloadMipMapLevelPartial,
                         ? 1   /* 16-bit texture */
                         : 2); /* 8-bit texture */
 
-    if (max_s <= 0) max_s = 1;
+    if (max_s < 1) max_s = 1;
     if (widthSel > 2) widthSel = 3;
     
     _GlideRoot.stats.texBytes += max_s * (max_t - t + 1) * 4;

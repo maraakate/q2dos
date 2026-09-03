@@ -16,12 +16,6 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-** $Header: /cvsroot/glide/glide3x/cvg/glide3/src/glidesys.h,v 1.1.1.1 1999/12/07 21:42:33 joseph Exp $
-** $Log: glidesys.h,v $
-** Revision 1.1.1.1  1999/12/07 21:42:33  joseph
-** Initial checkin into SourceForge.
-**
 ** 
 ** 1     10/08/98 11:30a Brent
 ** 
@@ -102,7 +96,7 @@ n** -----------------------------------------------------------------------
 /* Check for OS */
 #if defined(__IRIX__) || defined(__sparc__) || defined(__linux__)
 #  define GLIDE_OS        GLIDE_OS_UNIX
-#elif defined(__DOS__)
+#elif defined(__DOS__) || defined(__MSDOS__)
 #  define GLIDE_OS        GLIDE_OS_DOS32
 #elif defined(__WIN32__)
 #  define GLIDE_OS        GLIDE_OS_WIN32

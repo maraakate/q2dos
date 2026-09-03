@@ -950,7 +950,7 @@ SpawnEntities(const char *mapname, char *entities, const char *spawnpoint)
 		   different skill levels or deathmatch */
 		if (ent != g_edicts)
 		{
-			if (deathmatch->value)
+			if (deathmatch->intValue)
 			{
 				if (ent->spawnflags & SPAWNFLAG_NOT_DEATHMATCH)
 				{
@@ -959,7 +959,7 @@ SpawnEntities(const char *mapname, char *entities, const char *spawnpoint)
 					continue;
 				}
 			}
-			else if (coop->value)
+			else if (coop->intValue)
 			{
 				if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 				{
@@ -975,9 +975,9 @@ SpawnEntities(const char *mapname, char *entities, const char *spawnpoint)
 						  (ent->spawnflags & SPAWNFLAG_NOT_MEDIUM) &&
 						  (ent->spawnflags & SPAWNFLAG_NOT_HARD)))
 					{
-						if (((skill->value == 0) && (ent->spawnflags & SPAWNFLAG_NOT_EASY)) ||
-							((skill->value == 1) && (ent->spawnflags & SPAWNFLAG_NOT_MEDIUM)) ||
-							(((skill->value == 2) || (skill->value == 3)) && (ent->spawnflags & SPAWNFLAG_NOT_HARD)))
+						if (((skill->intValue == 0) && (ent->spawnflags & SPAWNFLAG_NOT_EASY)) ||
+							((skill->intValue == 1) && (ent->spawnflags & SPAWNFLAG_NOT_MEDIUM)) ||
+							(((skill->intValue == 2) || (skill->intValue == 3)) && (ent->spawnflags & SPAWNFLAG_NOT_HARD)))
 						{
 							G_FreeEdict(ent);
 							inhibit++;
@@ -994,9 +994,9 @@ SpawnEntities(const char *mapname, char *entities, const char *spawnpoint)
 						continue;
 					}
 
-					if (((skill->value == 0) && (ent->spawnflags & SPAWNFLAG_NOT_EASY)) ||
-						((skill->value == 1) && (ent->spawnflags & SPAWNFLAG_NOT_MEDIUM)) ||
-						(((skill->value == 2) || (skill->value == 3)) && (ent->spawnflags & SPAWNFLAG_NOT_HARD)))
+					if (((skill->intValue == 0) && (ent->spawnflags & SPAWNFLAG_NOT_EASY)) ||
+						((skill->intValue == 1) && (ent->spawnflags & SPAWNFLAG_NOT_MEDIUM)) ||
+						(((skill->intValue == 2) || (skill->intValue == 3)) && (ent->spawnflags & SPAWNFLAG_NOT_HARD)))
 					{
 						G_FreeEdict(ent);
 						inhibit++;
@@ -1006,9 +1006,9 @@ SpawnEntities(const char *mapname, char *entities, const char *spawnpoint)
 			}
 			else /* FS: Coop: Single player */
 			{
-				if (((skill->value == 0) && (ent->spawnflags & SPAWNFLAG_NOT_EASY)) ||
-					((skill->value == 1) && (ent->spawnflags & SPAWNFLAG_NOT_MEDIUM)) ||
-					(((skill->value == 2) || (skill->value == 3)) && (ent->spawnflags & SPAWNFLAG_NOT_HARD)))
+				if (((skill->intValue == 0) && (ent->spawnflags & SPAWNFLAG_NOT_EASY)) ||
+					((skill->intValue == 1) && (ent->spawnflags & SPAWNFLAG_NOT_MEDIUM)) ||
+					(((skill->intValue == 2) || (skill->intValue == 3)) && (ent->spawnflags & SPAWNFLAG_NOT_HARD)))
 				{
 					G_FreeEdict(ent);
 					inhibit++;
@@ -1045,9 +1045,9 @@ SpawnEntities(const char *mapname, char *entities, const char *spawnpoint)
 
 	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		if (deathmatch->value)
+		if (deathmatch->intValue)
 		{
-			if (randomrespawn && randomrespawn->value)
+			if (randomrespawn && randomrespawn->intValue)
 			{
 				PrecacheForRandomRespawn();
 			}
@@ -1057,7 +1057,7 @@ SpawnEntities(const char *mapname, char *entities, const char *spawnpoint)
 			InitHintPaths();
 		}
 
-		if (deathmatch->value && gamerules && gamerules->value)
+		if (deathmatch->intValue && gamerules && gamerules->intValue)
 		{
 			if (DMGame.PostInitSetup)
 			{
@@ -1082,7 +1082,7 @@ SpawnEntities(const char *mapname, char *entities, const char *spawnpoint)
 		/* sexed models: THIS ORDER MUST MATCH THE DEFINES IN g_local.h
 		   you can add more, max 19 (pete change)these models are only
 		   loaded in coop or deathmatch. not singleplayer. */
-		if ((coop->value) || deathmatch->value)
+		if ((coop->intValue) || deathmatch->intValue)
 		{
 			gi.modelindex("#w_blaster.md2");
 			gi.modelindex("#w_shotgun.md2");
@@ -1349,10 +1349,10 @@ SP_worldspawn(edict_t *ent)
 	gi.configstring(CS_SKYROTATE, va("%f", st.skyrotate));
 	gi.configstring(CS_SKYAXIS, va("%f %f %f", st.skyaxis[0], st.skyaxis[1], st.skyaxis[2]));
 	SP_SetCDTrack(ent->sounds); /* FS: Coop: Moved here to get it right for all game modes */
-	gi.configstring(CS_MAXCLIENTS, va("%i", (int)(maxclients->value)));
+	gi.configstring(CS_MAXCLIENTS, va("%i", maxclients->intValue));
 
 	/* status bar program */
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		gi.configstring(CS_STATUSBAR, dm_statusbar);
 	}
@@ -2163,7 +2163,7 @@ int G_SpawnCheckpoints (edict_t *ent)
 		gi.cprintf(NULL, PRINT_CHAT, "G_SpawnCheckpoints: cannot read file '%s' into memory!\n", fileName);
 		if(fileBuffer)
 		{
-			free(fileBuffer);
+			gi.TagFree(fileBuffer);
 		}
 		return false;
 	}
@@ -2234,9 +2234,10 @@ int G_SpawnCheckpoints (edict_t *ent)
 	return inhibit;
 }
 
-void G_CheckCoopVictory (void) /* FS: Coop: Check if victory.pcx is the current map, workaround the "gamemap" crap in sv_init.c */
+//QW// Generalized to detect .pcx used as a map.
+void G_CheckCoopVictory (void) /* FS: Coop: Check if a pcx is the current map, workaround the "gamemap" crap in sv_init.c */
 {
-	if(!Q_stricmp("victory.pcx", level.mapname))
+	if (strstr(level.mapname, ".pcx"))
 	{
 		switch (game.gametype)
 		{

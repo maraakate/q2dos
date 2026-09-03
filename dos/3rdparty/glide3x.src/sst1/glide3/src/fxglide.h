@@ -17,8 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/sst1/glide3/src/Attic/fxglide.h,v 1.1.2.7 2006/01/16 21:22:45 jwrdegoede Exp $
-** $Log: fxglide.h,v $
 ** Revision 1.1.2.7  2006/01/16 21:22:45  jwrdegoede
 ** Fix gcc 4.1 new type-punned ptr breaks antialias. warnings
 **

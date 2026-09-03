@@ -20,7 +20,7 @@ CFLAGS += -I. -Iinclude -Idrivers
 #CFLAGS += -DFX_RESCALEHACK=0
 LD = $(CC)
 LDFLAGS = -m32 -Wl,--enable-auto-image-base -Wl,--no-undefined -Wl,-k
-LDLIBS = -lm
+LDLIBS =
 AS = nasm
 ASFLAGS = -O2 -fwin32 -D__WIN32__ -Ix86/ -Imain/ --prefix _
 RC = windres

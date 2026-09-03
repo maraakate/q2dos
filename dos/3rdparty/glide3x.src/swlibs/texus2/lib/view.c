@@ -13,9 +13,6 @@
 ** and Computer Software clause at DFARS 252.227-7013, and/or in similar or
 ** successor clauses in the FAR, DOD or NASA FAR Supplement. Unpublished  -
 ** rights reserved under the Copyright Laws of the United States.
-**
-** $Revision: 1.1.1.1 $
-** $Date: 2000/08/03 00:27:21 $
 */
 
 #include <stdio.h>
@@ -27,4 +24,3 @@
 
 void    txMipView(TxMip *txMip, char *filename, int wait, int bgcolor) { }
 void    txViewClose() { }
-

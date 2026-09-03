@@ -49,6 +49,11 @@ typedef struct
 ipfilter_t	ipfilters[MAX_IPFILTERS];
 int			numipfilters;
 
+#define MAX_NAMEFILTERS 1024
+
+char		namefilters[MAX_NAMEFILTERS][256];
+int			numnamefilters;
+
 /*
 =================
 StringToFilter
@@ -150,11 +155,11 @@ SV_FilterPacket(char *from)
 	{
 		if ((in & ipfilters[i].mask) == ipfilters[i].compare)
 		{
-			return (int)filterban->value;
+			return filterban->intValue;
 		}
 	}
 
-	return (int)!filterban->value;
+	return !filterban->intValue;
 }
 
 void
@@ -274,7 +279,7 @@ SVCmd_WriteIP_f(void)
 		return;
 	}
 
-	fprintf(f, "set filterban %d\n", (int)filterban->value);
+	fprintf(f, "set filterban %d\n", filterban->intValue);
 
 	for (i = 0; i < numipfilters; i++)
 	{
@@ -329,9 +334,9 @@ void SVCmd_SayPerson_f (void)
 	Com_strcat (msg, sizeof(msg), p);
 
 	/* don't let text be too long for malicious reasons */
-	if (strlen(msg) > 2000) /* FS: This is unfortunate, but this is what TSAdmin uses and wallfly can hit about 512 sometimes... */
+	if (strlen(msg) > sizeof(msg)-1) /* FS: This is unfortunate, but this is what TSAdmin uses and wallfly can hit about 512 sometimes... */
 	{
-		msg[2000] = 0;
+		msg[sizeof(msg)-1] = '\0';
 	}
 
 	Com_strcat (msg, sizeof(msg), "\n");
@@ -344,7 +349,7 @@ void SVCmd_StuffCmd_f (void)
 	char cmd[2000]; /* FS: Q2Admin magic limit */
 	char *p = NULL;
 	edict_t	*client = NULL;
-	int playernum;
+	int playernum = 0;
 	size_t messageLen;
 	qboolean bIsCL = false;
 
@@ -372,7 +377,7 @@ void SVCmd_StuffCmd_f (void)
 		{
 			client = &g_edicts[i];
 
-			if(!client || !client->inuse || !client->client /* || !client->client->pers.connected */ || !client->client->pers.netname) /* FS: FIXME: Unreliable check */
+			if(!client || !client->inuse || !client->client /* || !client->client->pers.connected */ || !client->client->pers.netname[0]) /* FS: FIXME: Unreliable check */
 			{
 				continue;
 			}
@@ -489,6 +494,122 @@ SVCmd_Coop_Gamemode_f(void)
 	}
 }
 
+/* FS: Ban by name BEGIN */
+void SVCmd_AddName_f (void)
+{
+	int i;
+
+	if (gi.argc() < 3)
+	{
+		gi.cprintf(NULL, PRINT_HIGH, "Usage:  addname <name>\n");
+		return;
+	}
+
+	for (i = 0; i < numnamefilters; i++)
+	{
+		if (!Q_stricmp(namefilters[i], gi.argv(2)))
+		{
+			return;
+		}
+	}
+
+	Q_strncpyz(namefilters[i], gi.argv(2), sizeof(namefilters[i]));
+	numnamefilters++;
+}
+
+void SVCmd_RemoveName_f (void)
+{
+	int i;
+
+	if (gi.argc() < 3)
+	{
+		gi.cprintf(NULL, PRINT_HIGH, "Usage:  removename <name>\n");
+		return;
+	}
+
+	for (i = 0; i < numnamefilters; i++)
+	{
+		if (!Q_stricmp(namefilters[i], gi.argv(2)))
+		{
+			namefilters[i][0] = '\0';
+			numnamefilters--;
+			break;
+		}
+	}
+}
+
+qboolean SV_FilterName (char *from)
+{
+	int i;
+
+	if (!from)
+	{
+		return false;
+	}
+
+	for (i = 0; i < numnamefilters; i++)
+	{
+		if (!Q_stricmp(namefilters[i], from))
+		{
+			return filterban->intValue;
+		}
+	}
+
+	return !filterban->intValue;
+}
+
+void SVCmd_ListName_f (void)
+{
+	int i;
+
+	gi.cprintf(NULL, PRINT_HIGH, "Filter list:\n");
+
+	for (i = 0; i < numnamefilters; i++)
+	{
+		gi.cprintf(NULL, PRINT_HIGH, "%s\n", namefilters[i]);
+	}
+}
+
+void SVCmd_WriteName_f (void)
+{
+	FILE *f;
+	char name[MAX_OSPATH];
+	int i;
+	cvar_t *game;
+
+	game = gi.cvar("game", "", 0);
+
+	if (!*game->string)
+	{
+		sprintf(name, "%s/listname.cfg", GAMEVERSION);
+	}
+	else
+	{
+		sprintf(name, "%s/listname.cfg", game->string);
+	}
+
+	gi.cprintf(NULL, PRINT_HIGH, "Writing %s.\n", name);
+
+	f = fopen(name, "wb");
+
+	if (!f)
+	{
+		gi.cprintf(NULL, PRINT_HIGH, "Couldn't open %s\n", name);
+		return;
+	}
+
+	fprintf(f, "set filterban %d\n", filterban->intValue);
+
+	for (i = 0; i < numnamefilters; i++)
+	{
+		fprintf(f, "sv addname %s\n", namefilters[i]);
+	}
+
+	fclose(f);
+}
+
+/* FS: Ban by name END */
+
 /*
  * ServerCommand will be called when an "sv" command is issued.
  * The game can issue gi.argc() / gi.argv() commands to get the
@@ -532,6 +653,22 @@ ServerCommand(void)
 	else if (Q_stricmp(cmd, "gamemode") == 0) /* FS: Coop: Added */
 	{
 		SVCmd_Coop_Gamemode_f();
+	}
+	else if (Q_stricmp(cmd, "addname") == 0)
+	{
+		SVCmd_AddName_f();
+	}
+	else if (Q_stricmp(cmd, "removename") == 0)
+	{
+		SVCmd_RemoveName_f();
+	}
+	else if (Q_stricmp(cmd, "listname") == 0)
+	{
+		SVCmd_ListName_f();
+	}
+	else if (Q_stricmp(cmd, "writename") == 0)
+	{
+		SVCmd_WriteName_f();
 	}
 	else
 	{

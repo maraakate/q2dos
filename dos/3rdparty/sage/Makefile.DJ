@@ -2,7 +2,6 @@
 .SUFFIXES: .asm .o
 .INTERMEDIATE: x86/x86gen.exe
 
-LIBNAME = "SAGE_GL 0.9.x"
 DRIVER ?= glide
 
 all: lib/libgl.a lib/gl.dxe
@@ -23,7 +22,6 @@ CFLAGS += -DFX_RESCALEHACK=0
 #CFLAGS += -DUSE_EXTERNAL_DXTN_LIB=1
 LD = $(CC)
 LDFLAGS =
-LDLIBS = -lm
 AS = nasm
 ASFLAGS = -O2 -fcoff -D__DJGPP__ -Ix86/ -Imain/ --prefix _
 # workaround the sse issue in DXE builds: note that this
@@ -113,7 +111,7 @@ lib/libgl.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $@ $^
 
 lib/gl.dxe: $(OBJECTS)
-	-$(DXE3GEN) -o $@ -Y lib/libigl.a -D $(LIBNAME) $(DXE3FLAGS) -U $(OBJECTS)
+	-$(DXE3GEN) -o $@ -Y lib/libigl.a $(DXE3FLAGS) -U $(OBJECTS)
 
 $(X86_SOURCES:.asm=.o): x86/x86.inc
 

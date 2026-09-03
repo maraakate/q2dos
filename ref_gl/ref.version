@@ -1,0 +1,6 @@
+# Export file for ref_gl.so
+ref_gl.so {
+	global: GetRefAPI;
+		RW_*;
+	local: *;
+};

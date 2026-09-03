@@ -769,7 +769,7 @@ SP_trigger_gravity(edict_t *self)
 		return;
 	}
 
-	if (st.gravity == 0)
+	if (st.gravity == NULL)
 	{
 		gi.dprintf(DEVELOPER_MSG_GAME, "trigger_gravity without gravity set at %s\n",
 				vtos(self->s.origin));

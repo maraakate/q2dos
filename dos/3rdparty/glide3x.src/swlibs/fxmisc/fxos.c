@@ -16,9 +16,6 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-** $Revision: 1.4.4.2 $
-** $Date: 2005/05/25 08:56:28 $
 */
 
 #include <stdio.h>
@@ -35,9 +32,9 @@ void sleep(int secs)
     Sleep(secs * 1000);
 }
 
-int fxGethostname(char *name, int n)
+int fxGethostname(char *name, unsigned long n)
 {
-    return (int)GetComputerName((LPTSTR)name,(LPDWORD)&n);
+    return (int) GetComputerNameA((LPTSTR)name, &n);
 }
 #else
 #include <fxos.h>

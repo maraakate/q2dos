@@ -1,4 +1,3 @@
-/*-*-c++-*-*/
 /*
 ** THIS SOFTWARE IS SUBJECT TO COPYRIGHT PROTECTION AND IS OFFERED ONLY
 ** PURSUANT TO THE 3DFX GLIDE GENERAL PUBLIC LICENSE. THERE IS NO RIGHT
@@ -18,13 +17,9 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-**
-** $Revision: 1.2.8.1 $ 
-** $Date: 2005/04/25 22:08:47 $ 
-**
 ** Print functions for SST-1 Initialization routines
 */
-#ifdef __WIN32__
+#ifdef _MSC_VER
 #pragma optimize ("",off)
 #endif
 #include <stdio.h>
@@ -54,15 +49,17 @@ FX_ENTRY void FX_CALL sst1InitPrintf(const char *format, ...)
     static FxBool printIt = FXFALSE;
 
     if(firstPass == FXTRUE) {
+        const char *envf;
         sst1InitMsgFile = stdout;
         firstPass = FXFALSE;
         if(GETENV(("SSTV2_INITDEBUG")) || GDBG_GET_DEBUGLEVEL(5))
             printIt = FXTRUE;
-        if(GETENV(("SSTV2_INITDEBUG_FILE"))) {
-          printIt = ((sst1InitMsgFile = fopen(GETENV(("SSTV2_INITDEBUG_FILE")), "w")) != NULL);
+        envf = GETENV(("SSTV2_INITDEBUG_FILE"));
+        if(envf) {
+          printIt = ((sst1InitMsgFile = fopen(envf, "w")) != NULL);
           if (!printIt) {
             fprintf(stderr, "sst1InitPrintf(): Could not open file '%s' for logging...\n", 
-                    GETENV(("SSTV2_INITDEBUG_FILE")));
+                    envf);
           }
         }
     }
@@ -83,6 +80,6 @@ FX_ENTRY void FX_CALL sst1InitVPrintf(const char *format, va_list args)
 
 #endif
 
-#ifdef __WIN32__
+#ifdef _MSC_VER
 #pragma optimize ("",on)
 #endif

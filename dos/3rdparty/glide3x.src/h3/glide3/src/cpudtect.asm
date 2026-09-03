@@ -17,8 +17,6 @@
 ;; 
 ;; COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 ;;
-;; $Header: /cvsroot/glide/glide3x/h3/glide3/src/cpudtect.asm,v 1.1.1.1.8.1 2003/11/07 13:38:38 dborca Exp $
-;; $Log: cpudtect.asm,v $
 ;; Revision 1.1.1.1.8.1  2003/11/07 13:38:38  dborca
 ;; unite the clans
 ;;
@@ -66,7 +64,7 @@ CPUTypeP6       equ 6h
         
 ;;; References to external data:
     
-segment		TEXT
+segment		SEG_TEXT
 ;;
 ;;  _cpu_detect_asm - detect the type of CPU 
 ;; 
@@ -276,7 +274,6 @@ UnknownVendor:
     mov  eax, 0ffffffffh
     jmp  DoneCpu
 
-        
 endp
 
 

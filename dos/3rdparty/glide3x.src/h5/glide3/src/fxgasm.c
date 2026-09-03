@@ -16,11 +16,6 @@
 ** THE UNITED STATES. 
 **
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVE
-**
-** $Revision: 1.3.4.13 $
-** $Date: 2007/09/29 14:17:14 $
-** 
-** $Log:
 */
 
 #include <stddef.h>
@@ -73,7 +68,7 @@ main (int argc, char **argv)
 
     if (argc > 1) {
       if (strcmp("-inline", argv[1]) == 0) {
-        SstRegs dummyRegs  = { 0x00UL }; /* required shutup VC6 */
+        SstRegs dummyRegs = { 0x00UL }; /* silence VC6 */
 
         printf("#ifndef __FX_INLINE_H__\n");
         printf("#define __FX_INLINE_H__\n");
@@ -81,7 +76,7 @@ main (int argc, char **argv)
 
         printf("#define kTriProcOffset 0x%lXUL\n",
                (unsigned long)offsetof(struct GrGC_s, triSetupProc));
-        
+
         printf("/* The # of 2-byte entries in the hw fog table */\n");
         printf("#define kInternalFogTableEntryCount 0x%X\n",
                (unsigned int)sizeof(dummyRegs.fogTable) >> 1);
@@ -138,6 +133,7 @@ main (int argc, char **argv)
 
     OFFSET (gc, cmdTransportInfo.lfbLockCount, "lfbLockCount");
 
+    OFFSET (gc, triSetupProc, "kTriProcOffset");
     OFFSET (gc, archDispatchProcs.triSetupProc, "triSetupProc");
     OFFSET (gc, archDispatchProcs.drawTrianglesProc, "drawTrianglesProc");
     OFFSET (gc, archDispatchProcs.triSetupProc, "drawVertexList");

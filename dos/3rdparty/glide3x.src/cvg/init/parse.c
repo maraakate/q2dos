@@ -1,4 +1,3 @@
-/*-*-c++-*-*/
 /*
 ** THIS SOFTWARE IS SUBJECT TO COPYRIGHT PROTECTION AND IS OFFERED ONLY
 ** PURSUANT TO THE 3DFX GLIDE GENERAL PUBLIC LICENSE. THERE IS NO RIGHT
@@ -18,14 +17,11 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-**
-** $Revision: 1.2.8.3 $ 
-** $Date: 2005/06/09 18:32:27 $ 
-**
 ** Parsing code for grabbing information from "voodoo2.ini" initialization file
 **
 */
-#ifdef __WIN32__
+#undef FX_DLL_ENABLE /* so that we don't dllexport the symbols */
+#ifdef _MSC_VER
 #pragma optimize ("",off)
 #endif
 #include <stdio.h>
@@ -251,23 +247,23 @@ FX_ENTRY FxBool FX_CALL sst1InitVoodooFile()
 
     if(inCfg) {
       if(!sst1InitParseFieldCfg(buffer)) {
-        if(helper) INIT_PRINTF(("sst1InitVoodooFile(): ERROR in [CFG] section of .ini file...\n"));
+        if(helper) INIT_PRINTF(("ERROR in %s section of .ini file.\n", "[CFG]"));
         retVal = FXFALSE;
         break;
       }
     } else if(inDac) {
       if(!sst1InitParseFieldDac(buffer)) {
-        if(helper) INIT_PRINTF(("sst1InitVoodooFile(): ERROR in [DAC] section of .ini file...\n"));
+        if(helper) INIT_PRINTF(("ERROR in %s section of .ini file.\n", "[DAC]"));
         retVal = FXFALSE;
         break;
       }
     }
   }
-  if (file != NULL) fclose(file);
-  INIT_PRINTF(("sst1Init Routines(): Using Initialization file '%s'\n", filename));
+  fclose(file);
+  INIT_PRINTF(("INIT: Using .ini file '%s'\n", filename));
 
 __errExit:
-	checkedFileP = FXTRUE;
+  checkedFileP = FXTRUE;
 #endif /* !DIRECTX */
 
   return retVal;
@@ -340,7 +336,7 @@ FX_ENTRY FxBool FX_CALL sst1InitVoodooFile() {
       break;
     }
   }
-  INIT_PRINTF(("sst1Init Routines(): Using Initialization file '%s'\n", filename));
+  INIT_PRINTF(("INIT: Using .ini file '%s'\n", filename));
 
 __errExit:
   if (file) fclose(file);
@@ -1028,6 +1024,7 @@ static void sst1InitToLower(char *string)
 }
 
 #if __WIN32__
+static
 FxBool GetRegistryKey(HKEY hKey, const char* keyName, 
                       char* regValBuf, FxU32 bufSize)
 {
@@ -1041,7 +1038,7 @@ FxBool GetRegistryKey(HKEY hKey, const char* keyName,
     case REG_DWORD:
     {
       DWORD dValue = *(DWORD*)regValBuf;
-      sprintf(regValBuf, "%d", dValue);
+      sprintf(regValBuf, "%lu", dValue);
     }
     /* Fall through */
 
@@ -1165,6 +1162,6 @@ FX_ENTRY char* FX_CALL sst1InitGetenv(char *string)
 }
 #endif  /* INIT_DOS */
 
-#ifdef __WIN32__
+#ifdef _MSC_VER
 #pragma optimize ("",on)
 #endif

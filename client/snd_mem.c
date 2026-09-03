@@ -48,7 +48,7 @@ static void ResampleSfx (sfx_t *sfx, int inrate, int inwidth, byte *data)
 		sc->loopstart = sc->loopstart / stepscale;
 
 	sc->speed = dma.speed;
-	if (s_loadas8bit->value)
+	if (s_loadas8bit->intValue)
 		sc->width = 1;
 	else
 		sc->width = inwidth;
@@ -361,13 +361,14 @@ wavinfo_t GetWavinfo (char *name, byte *wav, int wavlength)
 
 	data_p += 4;
 	samples = GetLittleLong () / info.width;
-
+#if 0 /* FS: This code does nothing. */
 	if (info.samples)
 	{
 		if (samples < info.samples)
 			Com_Error (ERR_DROP, "%s has a bad loop length", name);
 	}
 	else
+#endif
 		info.samples = samples;
 
 	info.dataofs = data_p - wav;

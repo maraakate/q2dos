@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../qcommon/qcommon.h"
 #include "resource.h"
 #include "winquake.h"
-
+#include "service.h"
 
 #ifdef NEW_DED_CONSOLE
 
@@ -74,6 +74,9 @@ typedef struct {
 
 static sysConsole_t	sys_console;
 
+static char dedWindowName[255];
+extern cvar_t *hostname;
+extern cvar_t *win_close_on_error;
 
 /*
 =================
@@ -103,6 +106,11 @@ void Sys_ConsoleOutput (char *text)
 {
 	char	buffer[MAX_PRINTMSG];
 	int		len = 0;
+
+#ifdef DEDICATED_ONLY
+	if (bRunningAsService)
+		return;
+#endif
 
 	// Change \n to \r\n so it displays properly in the edit box and
 	// remove color escapes
@@ -145,50 +153,64 @@ void Sys_ConsoleOutput (char *text)
 Sys_Error
 =================
 */
-void Sys_Error (char *error, ...)
+void Sys_Error (const char *error, ...)
 {
 	char	string[1024];
 	va_list	argPtr;
 	MSG		msg;
 
-	// Make sure all subsystems are down
-	CL_Shutdown ();
-	Qcommon_Shutdown();
-
-	va_start(argPtr, error);
-	Q_vsnprintf (string, sizeof(string), error, argPtr);
-	va_end(argPtr);
-
-	// Echo to console
-	Sys_ConsoleOutput("\n");
-	Sys_ConsoleOutput(string);
-	Sys_ConsoleOutput("\n");
-
-	// Display the message and set a timer so we can flash the text
-	SetWindowText(sys_console.hWndMsg, string);
-	SetTimer(sys_console.hWnd, 1, 1000, NULL);
-
-	sys_console.timerActive = true;
-
-	// Show/hide everything we need
-	ShowWindow(sys_console.hWndMsg, SW_SHOW);
-	ShowWindow(sys_console.hWndInput, SW_HIDE);
-
-	Sys_ShowConsole(true);
-
-	// Wait for the user to quit
-	while (1)
+#ifdef DEDICATED_ONLY
+	if (bRunningAsService || win_close_on_error->intValue)
+#else
+	if (win_close_on_error->intValue)
+#endif
 	{
-		while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
-		{
-			if (!GetMessage(&msg, NULL, 0, 0))
-				Sys_Quit();
+		va_start (argPtr, error);
+		Q_vsnprintf(string, sizeof(string), error, argPtr);
+		Com_Printf("*** ERROR *** %s\n", string);
+		Com_Quit();
+	}
+	else
+	{
+		// Make sure all subsystems are down
+		CL_Shutdown ();
+		Qcommon_Shutdown();
 
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
+		va_start(argPtr, error);
+		Q_vsnprintf (string, sizeof(string), error, argPtr);
+		va_end(argPtr);
+
+		// Echo to console
+		Sys_ConsoleOutput("\n");
+		Sys_ConsoleOutput(string);
+		Sys_ConsoleOutput("\n");
+
+		// Display the message and set a timer so we can flash the text
+		SetWindowText(sys_console.hWndMsg, string);
+		SetTimer(sys_console.hWnd, 1, 1000, NULL);
+
+		sys_console.timerActive = true;
+
+		// Show/hide everything we need
+		ShowWindow(sys_console.hWndMsg, SW_SHOW);
+		ShowWindow(sys_console.hWndInput, SW_HIDE);
+
+		Sys_ShowConsole(true);
+
+		// Wait for the user to quit
+		while (1)
+		{
+			while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
+			{
+				if (!GetMessage(&msg, NULL, 0, 0))
+					Sys_Quit();
+
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
+			// Don't hog the CPU
+			Sleep(25);
 		}
-		// Don't hog the CPU
-		Sleep(25);
 	}
 }
 
@@ -200,6 +222,11 @@ Sys_ShowConsole
 */
 void Sys_ShowConsole (qboolean show)
 {
+#ifdef DEDICATED_ONLY
+	if (bRunningAsService)
+		return;
+#endif
+
 	if (!show)
 	{
 		ShowWindow(sys_console.hWnd, SW_HIDE);
@@ -354,6 +381,11 @@ Sys_ShutdownConsole
 */
 void Sys_ShutdownConsole (void)
 {
+#ifdef DEDICATED_ONLY
+	if (bRunningAsService)
+		return;
+#endif
+
 	if (sys_console.timerActive)
 		KillTimer(sys_console.hWnd, 1);
 
@@ -395,11 +427,16 @@ void Sys_InitDedConsole (void)
 	RECT		r;
 	int			x, y, w, h;
 
+#ifdef DEDICATED_ONLY
+	if (bRunningAsService)
+		return;
+#endif
+
 	// Center the window in the desktop
 	hDC = GetDC(0);
 	w = GetDeviceCaps(hDC, HORZRES);
 	h = GetDeviceCaps(hDC, VERTRES);
-	ReleaseDC(0, hDC);
+	ReleaseDC(NULL, hDC);
 	
 	r.left = (w - 540) / 2;
 	r.top = (h - 455) / 2; 
@@ -428,7 +465,7 @@ void Sys_InitDedConsole (void)
 
 	if (!RegisterClassEx(&wc))
 	{
-		MessageBox(NULL, "Could not register console window class", "ERROR", MB_OK | MB_ICONERROR | MB_TASKMODAL);
+		MessageBoxA(NULL, "Could not register console window class", "ERROR", MB_OK | MB_ICONERROR | MB_TASKMODAL);
 		exit(0);
 	}
 
@@ -437,7 +474,7 @@ void Sys_InitDedConsole (void)
 	{
 		UnregisterClass(CONSOLE_WINDOW_CLASS_NAME, global_hInstance);
 
-		MessageBox(NULL, "Could not create console window", "ERROR", MB_OK | MB_ICONERROR | MB_TASKMODAL);
+		MessageBoxA(NULL, "Could not create console window", "ERROR", MB_OK | MB_ICONERROR | MB_TASKMODAL);
 		exit(0);
 	}
 
@@ -482,4 +519,17 @@ void Sys_InitDedConsole (void)
 	Sys_ShowConsole(true);
 }
 
+void Sys_DedConsoleCheckHostname (void)
+{
+#ifdef DEDICATED_ONLY
+	if (bRunningAsService)
+		return;
+#endif
+	if (hostname && hostname->modified && hostname->string[0])
+	{
+		Com_sprintf(dedWindowName, sizeof(dedWindowName), "%s - %s", CONSOLE_WINDOW_NAME, hostname->string);
+		SetWindowText(sys_console.hWnd, dedWindowName);
+		hostname->modified = false;
+	}
+}
 #endif // NEW_DED_CONSOLE

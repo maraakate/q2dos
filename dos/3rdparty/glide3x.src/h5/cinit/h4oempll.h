@@ -1,5 +1,3 @@
-/* -*-c++-*- */
-/* $Header: /cvsroot/glide/glide3x/h5/cinit/Attic/h4oempll.h,v 1.1.2.1 2003/08/21 08:32:12 dborca Exp $ */
 /*
 ** Copyright (c) 1995-1999, 3Dfx Interactive, Inc.
 ** All Rights Reserved.
@@ -19,9 +17,6 @@
 ** File name:   h4oempll.h
 **
 ** Description: Avenger OEM PLL table and values.
-**
-** $Revision: 1.1.2.1 $
-** $Date: 2003/08/21 08:32:12 $
 **
 ** $History: h4oempll.h $
 ** 

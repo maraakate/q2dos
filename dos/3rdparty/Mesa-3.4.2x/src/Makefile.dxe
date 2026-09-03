@@ -1,14 +1,17 @@
 # Mesa 3-D graphics library
-# Version:  3.4
+# Version:  3.4.2
 # Copyright (C) 1995-2000  Brian Paul
-
+#
 # Makefile for fxMesa gl.dxe (DJGPP 2.04 and newer)
-
-.INTERMEDIATE: glide3x.dxe
 
 INCDIR = ../include
 LIBDIR = ../lib
-G3DIR  = ../glide3
+G2DIR  = ../3dfx/glide
+G2LIB  = glide2x.dxe
+G3DIR  = ../3dfx/glide3
+G3LIB  = glide3x.dxe
+#build for glide3x :
+GLIDE3 = 1
 
 GL_LIB = libgl.a
 GL_DXE = gl.dxe
@@ -16,14 +19,24 @@ GL_IMP = libigl.a
 LIBNAME="fxMesa-v3.4"
 DXE_EXPORTS= -E _gl -X _gl_ -X _glb
 DXE_EXPORTS+= -E _fxMesa -E _fxQueryHardware -E _fxCloseHardware -E _fxGetScreenGeometry
-DXE_DEPS= -P glide3x.dxe
 
 CC = gcc
 AR = ar
 
-CFLAGS = -O2 -mtune=i586 -ffast-math -fomit-frame-pointer \
-	-DFX -DUSE_X86_ASM -DUSE_MMX_ASM -DUSE_3DNOW_ASM -DUSE_KATMAI_ASM -IFX/X86 \
-	-DFX_GLIDE3 -I$(G3DIR)/include -I. -I$(INCDIR)
+CFLAGS = -DFX
+ifneq ($(GLIDE3),1)
+GLIDEDIR=$(G2DIR)
+GLIDELIB=$(G2LIB)
+else
+GLIDEDIR=$(G3DIR)
+GLIDELIB=$(G3LIB)
+CFLAGS+= -DFX_GLIDE3
+endif
+DXE_DEPS= -P $(GLIDELIB)
+
+CFLAGS+= -O2 -mtune=i586 -ffast-math -fomit-frame-pointer \
+	-DUSE_X86_ASM -DUSE_MMX_ASM -DUSE_3DNOW_ASM -DUSE_KATMAI_ASM -IFX/X86 \
+	-I$(GLIDEDIR)/include -I. -I$(INCDIR)
 CFLAGS+= -DNDEBUG
 
 ARFLAGS = rus
@@ -169,7 +182,7 @@ all: $(LIBDIR)/$(GL_LIB) $(LIBDIR)/$(GL_DXE) $(LIBDIR)/$(GL_IMP)
 clean:
 	rm -f *.o X86/*.o FX/*.o FX/X86/*.o
 realclean: clean
-	rm -f $(LIBDIR)/*.a $(LIBDIR)/*.dxe
+	rm -f $(LIBDIR)/*.a $(LIBDIR)/*.dxe $(G2LIB) $(G3LIB)
 
 $(LIBDIR):
 	-mkdir $(LIBDIR)
@@ -178,13 +191,17 @@ $(LIBDIR)/$(GL_LIB): $(LIBDIR) $(OBJECTS)
 	$(AR) $(ARFLAGS) $@  $(OBJECTS)
 
 $(LIBDIR)/$(GL_DXE) $(LIBDIR)/$(GL_IMP): $(LIBDIR) $(OBJECTS)
-$(LIBDIR)/$(GL_DXE) $(LIBDIR)/$(GL_IMP): glide3x.dxe
+$(LIBDIR)/$(GL_DXE) $(LIBDIR)/$(GL_IMP): $(GLIDELIB)
 	-dxe3gen -o $(LIBDIR)/$(GL_DXE) -Y $(LIBDIR)/$(GL_IMP) -D $(LIBNAME) $(DXE_EXPORTS) $(DXE_DEPS) -U $(OBJECTS)
 
 # dxe3gen needs glide3x.dxe when generating the import lib libigl.a.
 # so we generate a dummy glide3x.dxe to cover common glide3x exports
 # and all possible libc dependencies:
+FX/glide2x_dxe.o: FX/glide2x_dxe.c
+	$(CC) -O0 -Wall -o $@ -c $<
 FX/glide3x_dxe.o: FX/glide3x_dxe.c
 	$(CC) -O0 -Wall -o $@ -c $<
-glide3x.dxe: FX/glide3x_dxe.o
-	-dxe3gen -o glide3x.dxe -E _gr -E _gu -U $<
+$(G2LIB): FX/glide2x_dxe.o
+	-dxe3gen -o $(G2LIB) -E _gr -E _gu -E _ConvertAndDownloadRle -U $<
+$(G3LIB): FX/glide3x_dxe.o
+	-dxe3gen -o $(G3LIB) -E _gr -E _gu -U $<

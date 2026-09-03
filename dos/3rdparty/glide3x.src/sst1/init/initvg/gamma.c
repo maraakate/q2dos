@@ -17,14 +17,11 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-**
-** $Revision: 1.1.2.2 $ 
-** $Date: 2005/06/09 18:32:38 $ 
-**
 ** Initialization code for loading SST-1 gamma tables
 **
 */
-#ifndef __GNUC__
+#undef FX_DLL_ENABLE /* so that we don't dllexport the symbols */
+#ifdef _MSC_VER
 #pragma optimize ("",off)
 #endif
 #include <stdio.h>
@@ -67,24 +64,29 @@ FX_EXPORT FxBool FX_CSTYLE sst1InitGamma(FxU32 *sstbase, double gamma)
         gammaB = gamma;
 
     if(calledBefore == FXFALSE) {
+        const char *envp;
         calledBefore = FXTRUE;
-        if(GETENV(("SST_RGAMMA"))) {
+        envp = GETENV(("SST_RGAMMA"));
+        if(envp) {
             overRideR = FXTRUE;
-            gammaR = (double) ATOF(GETENV(("SST_RGAMMA")));
+            gammaR = (double) ATOF(envp);
         }
-        if(GETENV(("SST_GGAMMA"))) {
+        envp = GETENV(("SST_GGAMMA"));
+        if(envp) {
             overRideG = FXTRUE;
-            gammaG = (double) ATOF(GETENV(("SST_GGAMMA")));
+            gammaG = (double) ATOF(envp);
         }
-        if(GETENV(("SST_BGAMMA"))) {
+        envp = GETENV(("SST_BGAMMA"));
+        if(envp) {
             overRideB = FXTRUE;
-            gammaB = (double) ATOF(GETENV(("SST_BGAMMA")));
+            gammaB = (double) ATOF(envp);
         }
-        if(GETENV(("SST_GAMMA"))) {
+        envp = GETENV(("SST_GAMMA"));
+        if(envp) {
             overRideR = FXTRUE;
             overRideG = FXTRUE;
             overRideB = FXTRUE;
-            gammaR = (double) ATOF(GETENV(("SST_GAMMA")));
+            gammaR = (double) ATOF(envp);
             gammaG = gammaR;
             gammaB = gammaR;
         }
@@ -133,7 +135,7 @@ FX_EXPORT FxBool FX_CSTYLE sst1InitGammaRGB(FxU32 *sstbase, double gammaR,
             sstVideoIsReset = FXTRUE;
         else
             sstVideoIsReset = FXFALSE;
-   
+
         ISET(sst->fbiInit1, IGET(sst->fbiInit1) & ~SST_VIDEO_RESET);
         /* wait for video reset to be deasserted */
         sst1InitIdleFBINoNOP(sstbase);
@@ -214,7 +216,7 @@ FxU32 *r, FxU32 *g, FxU32 *b)
             sstVideoIsReset = FXTRUE;
         else
             sstVideoIsReset = FXFALSE;
-   
+
         ISET(sst->fbiInit1, IGET(sst->fbiInit1) & ~SST_VIDEO_RESET);
         /* wait for video reset to be deasserted */
         sst1InitIdleFBINoNOP(sstbase);
@@ -255,6 +257,6 @@ FxU32 *r, FxU32 *g, FxU32 *b)
     return(FXTRUE);
 }
 
-#ifndef __GNUC__
+#ifdef _MSC_VER
 #pragma optimize ("",on)
 #endif

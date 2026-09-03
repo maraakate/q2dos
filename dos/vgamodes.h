@@ -17,9 +17,11 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
-//
+
 // vgamodes.h: VGA mode set tables
-//
+
+#ifndef __VGAMODES_H
+#define __VGAMODES_H
 
 #include "vregset.h"
 
@@ -519,3 +521,5 @@ vmode_t	vgavidmodes[] = {
 },
 };
 #endif
+
+#endif // __VGAMODES_H

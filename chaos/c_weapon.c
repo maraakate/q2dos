@@ -12,6 +12,11 @@ void FakeDeath(edict_t *self);
 void fire_lead (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick, int te_impact, int hspread, int vspread, int mod);
 int Valid_Target( edict_t *ent, edict_t *blip );
 
+int vortexstate = 0;
+
+qboolean is_quad = false;
+byte is_silenced = 0;
+
 /*
  * Chainsaw
  */

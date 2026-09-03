@@ -17,8 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/sst1/glide3/src/Attic/gtexdl.c,v 1.1.2.3 2005/06/09 18:32:35 jwrdegoede Exp $
-** $Log: gtexdl.c,v $
 ** Revision 1.1.2.3  2005/06/09 18:32:35  jwrdegoede
 ** Fixed all warnings with gcc4 -Wall -W -Wno-unused-parameter, except for a couple I believe to be a gcc bug. This has been reported to gcc.
 **
@@ -111,7 +109,7 @@ extern const int _grMipMapHostWH[G3_ASPECT_TRANSLATE(GR_ASPECT_LOG2_1x8)+1][G3_L
 GR_DDFUNC(_grTexDownloadNccTable, void, ( GrChipID_t tmu, FxU32 which, const GuNccTable *table, int start, int end ))
 {
   int i;
-  unsigned long *hwNCC;
+  FxU32 *hwNCC;
   
   GR_BEGIN_NOFIFOCHECK("_grTexDownloadNccTable",89);
   GDBG_INFO_MORE((gc->myLevel,"(%d,%d, 0x%x, %d,%d)\n",tmu,which,table,start,end));
@@ -299,12 +297,12 @@ GR_ENTRY(grTexDownloadMipMapLevelPartial, FxBool, ( GrChipID_t tmu, FxU32 startA
   if ( format < GR_TEXFMT_16BIT ) { /* 8-bit texture */
     bytesPerTexel = 1;
     max_s = width >> 2;
-    if ( max_s <= 0 )
+    if (max_s < 1)
       max_s = 1;
   } else { /* 16-bit texture */
     bytesPerTexel = 2;
     max_s = width >> 1;
-    if ( max_s <= 0 )
+    if (max_s < 1)
       max_s = 1;
   }
   /* assume max_s is a power of two */

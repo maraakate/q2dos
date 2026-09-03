@@ -17,10 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-**
-** $Revision: 1.1.1.1 $ 
-** $Date: 1999/11/24 21:45:04 $ 
-**
 */
 
 #ifndef _INITVGA_H_

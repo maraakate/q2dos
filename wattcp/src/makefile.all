@@ -1123,7 +1123,7 @@ doxygen:
 $(OBJDIR)/pcpkt.o: asmpkt.nas
 
 $(PKT_STUB): asmpkt.nas
-	../util/nasm32 -f bin -l asmpkt.lst -o asmpkt.bin asmpkt.nas
+	../util/nasm32 -O0 -f bin -l asmpkt.lst -o asmpkt.bin asmpkt.nas
 	../util/bin2c asmpkt.bin > $@
 
 @elifndef WIN32
@@ -1131,7 +1131,7 @@ $(PKT_STUB): asmpkt.nas
 $(OBJDIR)\pcpkt.obj: asmpkt.nas
 
 $(PKT_STUB): asmpkt.nas
-        ..\util\nasm32 -f bin -l asmpkt.lst -o asmpkt.bin asmpkt.nas
+        ..\util\nasm32 -O0 -f bin -l asmpkt.lst -o asmpkt.bin asmpkt.nas
         ..\util\bin2c asmpkt.bin > $@
 
 @endif
@@ -1145,7 +1145,7 @@ visualc\debug\watt-32.res: watt-32.rc
 	rc -DDEBUG=1 -Fo visualc\debug\watt-32.res watt-32.rc
 
 watcom\win32\watt-32.res: watt-32.rc
-	wrc -dDEBUG=0 -q -r -zm -fo=watcom\win32\watt-32.res watt-32.rc
+	wrc -dDEBUG=0 -q -bt=nt -r -zm -fo=watcom\win32\watt-32.res watt-32.rc
 
 digmars\win32\watt-32.res: watt-32.rc
 	rcc -DDEBUG=0 -32 -r -odigmars\win32\watt-32.res watt-32.rc

@@ -1,5 +1,3 @@
-/* -*-c++-*- */
-/* $Header: /cvsroot/glide/glide3x/h5/incsrc/h3cinit.h,v 1.3.4.2 2003/06/19 08:38:28 dborca Exp $ */
 /*
 ** THIS SOFTWARE IS SUBJECT TO COPYRIGHT PROTECTION AND IS OFFERED ONLY
 ** PURSUANT TO THE 3DFX GLIDE GENERAL PUBLIC LICENSE. THERE IS NO RIGHT
@@ -18,10 +16,6 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-**
-** $Revision: 1.3.4.2 $
-** $Date: 2003/06/19 08:38:28 $
 */
 
 

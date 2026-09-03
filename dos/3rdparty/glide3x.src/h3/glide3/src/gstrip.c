@@ -17,8 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/h3/glide3/src/gstrip.c,v 1.1.1.1.6.2 2005/08/13 21:07:02 jwrdegoede Exp $
-** $Log: gstrip.c,v $
 ** Revision 1.1.1.1.6.2  2005/08/13 21:07:02  jwrdegoede
 ** Last needed 64 bit fixes for h5/h3, complete 64 bit support for cvg
 **

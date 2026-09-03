@@ -12,6 +12,11 @@ USE_OGG=1
 USE_TREMOR=0
 # abrash's asm optimizations:
 USE_ASM=1
+# dynamic refresh (video) modules:
+REF_DLL=1
+# compile which renderer if REF_DXE=0 : enable ONLY ONE!
+REF_STATIC_SOFT=1
+REF_STATIC_GL=0
 # new q3 style dedicated server console
 NEW_DED_CONSOLE=0
 
@@ -19,16 +24,22 @@ CC = gcc
 RC = windres
 ifeq ($(DEBUG),1)
 CFLAGS = -m32 -Wall -g -fno-strict-aliasing
+CPPFLAGS =
 else
 CFLAGS = -m32 -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
+CPPFLAGS = -DNDEBUG
 endif
-CPPFLAGS = -DCLIENT_SPLIT_NETFRAME
+CPPFLAGS+= -DCLIENT_SPLIT_NETFRAME
 LDFLAGS = -m32 -mwindows
 LDLIBS = -lwinmm -lws2_32
 # for doing -march= targets.  Mostly for my own fooling around.
 MARCHFLAGS =
 EXE = q2.exe
 
+
+ifneq ($(REF_DLL),1)
+CPPFLAGS+= -DREF_HARD_LINKED
+endif
 ifeq ($(USE_ASM),1)
 CPPFLAGS+= -Did386=1
 endif
@@ -108,6 +119,7 @@ endif
 endif
 
 QCOMMON = qcommon/cmd.o \
+	qcommon/cmd_auto.o \
 	qcommon/cmodel.o \
 	qcommon/common.o \
 	qcommon/crc.o \
@@ -128,12 +140,53 @@ SERVER = server/sv_ccmds.o \
 	server/sv_user.o \
 	server/sv_world.o
 
+ifneq ($(REF_DLL),1)
+ifeq ($(REF_STATIC_SOFT),1)
+REFSOFT = ref_soft/r_alias.o \
+	ref_soft/r_main.o \
+	ref_soft/r_light.o \
+	ref_soft/r_misc.o \
+	ref_soft/r_model.o \
+	ref_soft/r_part.o \
+	ref_soft/r_poly.o \
+	ref_soft/r_polyse.o \
+	ref_soft/r_rast.o \
+	ref_soft/r_scan.o \
+	ref_soft/r_sprite.o \
+	ref_soft/r_surf.o \
+	ref_soft/r_aclip.o \
+	ref_soft/r_bsp.o \
+	ref_soft/r_draw.o \
+	ref_soft/r_edge.o \
+	ref_soft/r_image.o \
+	win32/rw_imp.o \
+	win32/rw_ddraw.o \
+	win32/rw_dib.o
+endif
+endif
 ifeq ($(USE_ASM),1)
 COMMONASM = gas/math.o
 CLIENTASM = gas/snd_mixa.o
+ifneq ($(REF_DLL),1)
+COMMONREFASM = gas/math_ref.o \
+	gas/sys_dosa.o
+ifeq ($(REF_STATIC_SOFT),1)
+REFASM = gas/r_aclipa.o \
+	gas/r_aliasa.o \
+	gas/r_draw16.o \
+	gas/r_drawa.o \
+	gas/r_edgea.o \
+	gas/r_parta.o \
+	gas/r_polysa.o \
+	gas/r_scana.o \
+	gas/r_spr8.o \
+	gas/r_surf8.o \
+	gas/r_varsa.o
+endif
+endif
 endif
 
-OBJECTS = $(CLIENT) $(CLIENTASM) $(QCOMMON) $(COMMONASM) $(SERVER) $(GAMESPY) $(WIN32) $(WIN32RES)
+OBJECTS = $(CLIENT) $(CLIENTASM) $(QCOMMON) $(COMMONASM) $(COMMONREFASM) $(SERVER) $(GAMESPY) $(REFSOFT) $(REFASM) $(WIN32) $(WIN32RES)
 
 
 .PHONY: clean
@@ -147,6 +200,7 @@ clean:
 	rm -f qcommon/*.o
 	rm -f client/*.o
 	rm -f server/*.o
+	rm -f ref_soft/*.o
 	rm -f win32/*.o
 	rm -f win32/*.res
 	rm -f gas/*.o

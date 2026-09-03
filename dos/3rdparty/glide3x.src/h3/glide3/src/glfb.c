@@ -17,8 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/h3/glide3/src/Attic/glfb.c,v 1.1.2.2 2005/05/25 08:56:23 jwrdegoede Exp $
-** $Log: glfb.c,v $
 ** Revision 1.1.2.2  2005/05/25 08:56:23  jwrdegoede
 ** Make h5 and h3 tree 64 bit clean. This is ported over from the non-devel branch so this might be incomplete
 **
@@ -437,7 +435,7 @@ GR_ENTRY(grLfbLock, FxBool,(GrLock_t type, GrBuffer_t buffer,
     /* Get the current lfb buffer */
     {
       /* FixMe: Is this true if we're triple buffering? */
-      FxU32 colBufferIndex;
+      FxU32 colBufferIndex = 0;
       
       switch(buffer) {
       case GR_BUFFER_FRONTBUFFER:
@@ -849,12 +847,14 @@ GR_ENTRY(grLfbWriteRegion, FxBool, (GrBuffer_t dst_buffer,
                  src_stride, src_data);
   
 #if defined(GLIDE3) && defined(GLIDE3_ALPHA)
+  /*
   if ((_GlideRoot.hwConfig.SSTs[_GlideRoot.current_sst].type == GR_SSTTYPE_SST96) && (pixelPipeline == FXTRUE))
     rv = FXFALSE;
   else
-    rv = _grLfbWriteRegion(pixelPipeline, dst_buffer, dst_x, dst_y,
-                           src_format, src_width, src_height,
-                           src_stride, src_data);
+  */
+  rv = _grLfbWriteRegion(pixelPipeline, dst_buffer, dst_x, dst_y,
+                         src_format, src_width, src_height,
+                         src_stride, src_data);
 #else
   rv = _grLfbWriteRegion(FXFALSE, dst_buffer, dst_x, dst_y,
                          src_format, src_width, src_height,

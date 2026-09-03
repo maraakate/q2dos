@@ -17,8 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/sst1/glide3/src/Attic/diget.c,v 1.1.2.3 2004/10/04 09:35:59 dborca Exp $
-** $Log: diget.c,v $
 ** Revision 1.1.2.3  2004/10/04 09:35:59  dborca
 ** second cut at Glide3x for Voodoo1/Rush (massive update):
 ** delayed validation, vertex snapping, clip coordinates, strip/fan_continue, bugfixes.
@@ -177,7 +175,7 @@
 
 #include "fxinline.h"
 
-const FxU32 _grMemOffset[16] = 
+static const FxU32 _grMemOffset[16] = 
 {
   65536,                        /* 320x200 */
   65536,                        /* 320x240 */
@@ -197,7 +195,7 @@ const FxU32 _grMemOffset[16] =
   65536                         /* 400x300 */
 };
 
-const FxU32 _grResolutionRefresh[16][9] = 
+static const FxU32 _grResolutionRefresh[16][9] = 
 {
   {                             /* 320x200 */
     0,                          /* 60 Hz */
@@ -500,7 +498,6 @@ GR_DIENTRY(grGet, FxU32, (FxU32 pname, FxU32 plength, FxI32 *params))
     if ((hwc) && (plength == 4)) {
       switch(hwc->SSTs[_GlideRoot.current_sst].type) {
       case GR_SSTTYPE_VOODOO:
-      case GR_SSTTYPE_Voodoo2:
         *params = hwc->SSTs[_GlideRoot.current_sst].sstBoard.VoodooConfig.fbRam << 20;
         break;
       case GR_SSTTYPE_SST96:
@@ -517,7 +514,6 @@ GR_DIENTRY(grGet, FxU32, (FxU32 pname, FxU32 plength, FxI32 *params))
     if ((hwc) && (plength == 4)) {
       switch(hwc->SSTs[_GlideRoot.current_sst].type) {
       case GR_SSTTYPE_VOODOO:
-      case GR_SSTTYPE_Voodoo2:
         *params = hwc->SSTs[_GlideRoot.current_sst].sstBoard.VoodooConfig.tmuConfig[0].tmuRam << 20;
         break;
       case GR_SSTTYPE_SST96:
@@ -532,16 +528,7 @@ GR_DIENTRY(grGet, FxU32, (FxU32 pname, FxU32 plength, FxI32 *params))
     break;
   case GR_MEMORY_UMA:
     if ((hwc) && (plength == 4)) {
-      switch(hwc->SSTs[_GlideRoot.current_sst].type) {
-      case GR_SSTTYPE_VOODOO:
-      case GR_SSTTYPE_Voodoo2:
-      case GR_SSTTYPE_SST96:
-        *params = 0;    /* XXX non-UMA architecture */
-        break;
-      default:
-        retVal = FXFALSE; /* XXX TBD */
-        break;
-      }
+      *params = 0;    /* XXX non-UMA architecture */
       retVal = plength;
     }
     break;

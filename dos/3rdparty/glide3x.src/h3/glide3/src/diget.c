@@ -17,8 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/h3/glide3/src/diget.c,v 1.1.1.1.6.5 2005/06/09 18:32:28 jwrdegoede Exp $
-** $Log: diget.c,v $
 ** Revision 1.1.1.1.6.5  2005/06/09 18:32:28  jwrdegoede
 ** Fixed all warnings with gcc4 -Wall -W -Wno-unused-parameter, except for a couple I believe to be a gcc bug. This has been reported to gcc.
 **
@@ -375,7 +373,7 @@ GR_DIENTRY(grGet, FxU32, (FxU32 pname, FxU32 plength, FxI32 *params))
     break;
   case GR_LFB_PIXEL_PIPE:
     if (plength == 4) {
-      *params = (_GlideRoot.hwConfig.SSTs[_GlideRoot.current_sst].type != GR_SSTTYPE_SST96);
+      *params = FXTRUE;
       retVal = plength;
     }
     break;
@@ -991,7 +989,9 @@ GR_DIENTRY(grQueryResolutions, FxI32, (const GlideResolution *resTemplate, Glide
   }
 
   for (i = min_res; i <= max_res; i++) {
+#if GDBG_INFO_ON
     GDBG_INFO(80, FN_NAME "Resolution = %s\n", resNames[i]);
+#endif
     for (j = min_ref; j <= max_ref; j++) {
       FxBool resSuported;
       GDBG_INFO(80, FN_NAME ":  _grResolutionRefresh passed\n");

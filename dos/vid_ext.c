@@ -254,7 +254,7 @@ static qboolean VID_ExtraGetModeInfo(int modenum)
 	__dpmi_regs	r;
 	cvar_t		*var;
 
-	infobuf = dos_getmemory(256);
+	infobuf = (char *) dos_getmemory(256);
 
 	r.x.ax = 0x4f01;
 	r.x.cx = modenum;
@@ -380,7 +380,7 @@ static qboolean VID_ExtraGetModeInfo(int modenum)
 
 			vga_modes[vga_nummodes].address = real2ptr (phys_mem_info.address);
 
-			 /* FS: FIXME, just add all modes for banked */
+			/* FS: FIXME, just add all modes for banked */
 			var = ri.Cvar_Get("vid_bankedvga", "0", 0);
 			vga_modes[vga_nummodes].type = (var->intValue)? VGA_BANKED : VGA_VESALFB;
 

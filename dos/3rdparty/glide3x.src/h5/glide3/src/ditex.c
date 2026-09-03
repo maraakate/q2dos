@@ -17,7 +17,6 @@
 **
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVE
 **
-** $Header: /cvsroot/glide/glide3x/h5/glide3/src/ditex.c,v 1.3.4.14 2007/06/23 09:22:41 koolsmoky Exp $
 ** $Log
 **  10   3dfx      1.4.1.3.1.0 10/11/00 Brent           Forced check in to enforce
 **       branching.

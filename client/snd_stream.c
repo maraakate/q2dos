@@ -189,20 +189,19 @@ void S_StreamBackgroundTrack (void)
 	int		samples, maxSamples;
 	int		read, maxRead, total, dummy;
 	float	scale;
-	byte	data[MAX_RAW_SAMPLES];
 
-	if (!s_bgTrack.file || !s_musicvolume->value || !cl_ogg_music->intValue)
+	if (!s_bgTrack.file || !s_musicvolume->value || !s_mastervolume->value|| !cl_ogg_music->intValue)
 		return;
 
 	if (s_rawend < paintedtime)
 		s_rawend = paintedtime;
 
 	scale = (float)s_bgTrack.rate / dma.speed;
-	maxSamples = sizeof(data) / s_bgTrack.channels / s_bgTrack.width;
+	maxSamples = (sizeof(byte) * s_rawsamples_size) / s_bgTrack.channels / s_bgTrack.width;
 
 	while (1)
 	{
-		samples = (paintedtime + MAX_RAW_SAMPLES - s_rawend) * scale;
+		samples = (paintedtime + s_rawsamples_size - s_rawend) * scale;
 		if (samples <= 0)
 			return;
 		if (samples > maxSamples)
@@ -219,7 +218,7 @@ void S_StreamBackgroundTrack (void)
 			 * # For both of the libraries, if the audio is multichannel,
 			 *   the channels are interleaved in the output buffer.
 			 */
-			read = ov_read(s_bgTrack.vorbisFile, (char *)(data + total), maxRead - total,
+			read = ov_read(s_bgTrack.vorbisFile, (char *)(s_streamDataPtr + total), maxRead - total,
 #if !defined(VORBIS_USE_TREMOR)
 											bigendien,
 											VORBIS_SAMPLEWIDTH,
@@ -263,7 +262,7 @@ void S_StreamBackgroundTrack (void)
 
 			total += read;
 		}
-		S_RawSamples (samples, s_bgTrack.rate, s_bgTrack.width, s_bgTrack.channels, data, true);
+		S_RawSamples (samples, s_bgTrack.rate, s_bgTrack.width, s_bgTrack.channels, s_streamDataPtr, true);
 	}
 }
 
@@ -431,6 +430,11 @@ static void S_OGG_LoadFileList (void)
 	int		i, numfiles = 0;
 
 	ogg_filelist = malloc(sizeof(char *) * MAX_OGGLIST);
+	if (!ogg_filelist)
+	{
+		Sys_Error("S_OGG_LoadFileList:  Failed to allocate memory\n");
+		return;
+	}
 	memset( ogg_filelist, 0, sizeof( char * ) * MAX_OGGLIST );
 	lastPath[0] = 0;	// Knightmare added
 
@@ -439,7 +443,7 @@ static void S_OGG_LoadFileList (void)
 	while (path)
 	{
 		// Knightmare- catch repeated paths
-		if ( strlen(lastPath) > 0 && !strcmp (path, lastPath) ) {
+		if ( lastPath[0] != '\0' && !strcmp (path, lastPath) ) {
 			path = FS_NextPath( path );
 			continue;
 		}

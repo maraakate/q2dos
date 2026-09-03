@@ -17,8 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/sst1/glide3/src/Attic/glidesys.h,v 1.1.2.2 2004/10/04 09:36:00 dborca Exp $
-** $Log: glidesys.h,v $
 ** Revision 1.1.2.2  2004/10/04 09:36:00  dborca
 ** second cut at Glide3x for Voodoo1/Rush (massive update):
 ** delayed validation, vertex snapping, clip coordinates, strip/fan_continue, bugfixes.
@@ -86,7 +84,7 @@ n** -----------------------------------------------------------------------
 /* Check for OS */
 #if defined(__IRIX__) || defined(__sparc__) || defined(__linux__)
 #  define GLIDE_OS        GLIDE_OS_UNIX
-#elif defined(__DOS__)
+#elif defined(__DOS__) || defined(__MSDOS__)
 #  define GLIDE_OS        GLIDE_OS_DOS32
 #elif defined(__WIN32__)
 #  define GLIDE_OS        GLIDE_OS_WIN32

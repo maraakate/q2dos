@@ -56,7 +56,7 @@
 #pragma stack_size_warn (16000)    /* ~3*MAX_SOCKETS */
 #endif
 
-int poll (struct pollfd *p, int num, int timeout)
+int W32_CALL poll (struct pollfd *p, int num, int timeout)
 {
   struct timeval tv;
   fd_set read  [NUM_SOCK_FDSETS];

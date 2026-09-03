@@ -21,7 +21,7 @@ void CameraThink(edict_t *ent, usercmd_t *ucmd);
 
 // Weapon banning console variables
 
-cvar_t	*ban_sword, *ban_chainsaw, *ban_supershotgun,
+extern cvar_t	*ban_sword, *ban_chainsaw, *ban_supershotgun,
 		*ban_crossbow,*ban_airgun, *ban_grenadelauncher,
 		*ban_proxylauncher, *ban_rocketlauncher, *ban_hyperblaster,
 		*ban_railgun, *ban_buzzsaw, *ban_vortex, *ban_defenceturret,
@@ -29,7 +29,7 @@ cvar_t	*ban_sword, *ban_chainsaw, *ban_supershotgun,
 
 // Item banning console variables
 
-cvar_t	*ban_grapple, *ban_bodyarmor, *ban_combatarmor, *ban_jacketarmor, 
+extern cvar_t	*ban_grapple, *ban_bodyarmor, *ban_combatarmor, *ban_jacketarmor, 
 		*ban_armorshard, *ban_powerscreen, *ban_powershield,
 		*ban_ammo_grenades, *ban_ammo_flashgrenades,
 		*ban_ammo_lasergrenades, *ban_ammo_poisongrenades,
@@ -45,14 +45,14 @@ cvar_t	*ban_grapple, *ban_bodyarmor, *ban_combatarmor, *ban_jacketarmor,
 
 // Startup weapon console variables
 
-cvar_t	*start_sword, *start_chainsaw, *start_supershotgun, *start_crossbow,
+extern cvar_t	*start_sword, *start_chainsaw, *start_supershotgun, *start_crossbow,
 		*start_airgun, *start_grenadelauncher, *start_proxylauncher,
 		*start_rocketlauncher, *start_hyperblaster, *start_railgun,
 		*start_buzzsaw, *start_bfg;
 
 // Startup item console variables
 
-cvar_t	*start_grapple, *start_defenceturret, *start_rocketturret, 
+extern cvar_t	*start_grapple, *start_defenceturret, *start_rocketturret, 
 		*start_autosentry, *start_gravityvortex, *start_bodyarmor,
 		*start_combatarmor, *start_jacketarmor, *start_armorshard,
 		*start_powerscreen, *start_powershield, *start_ammo_grenades,
@@ -68,7 +68,7 @@ cvar_t	*start_grapple, *start_defenceturret, *start_rocketturret,
 
 // Item definitions
 
-gitem_t	*it_shells, *it_eshells, *it_cells, *it_arrows, *it_rockets, 
+extern gitem_t	*it_shells, *it_eshells, *it_cells, *it_arrows, *it_rockets, 
 		*it_homings, *it_slugs, *it_buzzes, *it_grenades,
 		*it_flashgrenades, *it_lasermines, *it_poisongrenades,
 		*it_proxymines, *it_ak42, *it_shotgun, *it_supershotgun,

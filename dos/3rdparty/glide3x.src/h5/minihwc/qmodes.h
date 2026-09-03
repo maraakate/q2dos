@@ -1,4 +1,3 @@
-/* $Header: /cvsroot/glide/glide3x/h5/minihwc/qmodes.h,v 1.3.4.2 2003/06/05 08:24:00 koolsmoky Exp $ */
 /*
 ** THIS SOFTWARE IS SUBJECT TO COPYRIGHT PROTECTION AND IS OFFERED ONLY
 ** PURSUANT TO THE 3DFX GLIDE GENERAL PUBLIC LICENSE. THERE IS NO RIGHT
@@ -23,9 +22,6 @@
 ** File name:   qmodes.h
 **
 ** Description: Structures, macros, etc to support query mode.
-**
-** $Revision: 1.3.4.2 $ 
-** $Date: 2003/06/05 08:24:00 $
 **
 ** $History: qmodes.h $
 ** 

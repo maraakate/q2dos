@@ -1,0 +1,5 @@
+# Export file for gamespy.so
+gamespy.so {
+	global: GetGameSpyAPI;
+	local: *;
+};

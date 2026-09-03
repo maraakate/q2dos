@@ -17,8 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/sst1/glide3/src/Attic/glideutl.h,v 1.1.2.2 2004/10/04 09:36:00 dborca Exp $
-** $Log: glideutl.h,v $
 ** Revision 1.1.2.2  2004/10/04 09:36:00  dborca
 ** second cut at Glide3x for Voodoo1/Rush (massive update):
 ** delayed validation, vertex snapping, clip coordinates, strip/fan_continue, bugfixes.

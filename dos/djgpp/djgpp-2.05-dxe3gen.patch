@@ -1,0 +1,128 @@
+dxe3gen.c: handle extended relocations. bump version to 1.0.4.
+
+dxe3gen.c: replace memcmp with strncmp in dxe3gen
+
+Index: src/docs/kb/wc206.txi
+===================================================================
+RCS file: /cvs/djgpp/djgpp/src/docs/kb/wc206.txi,v
+retrieving revision 1.3
+retrieving revision 1.4
+diff -u -p -r1.3 -r1.4 wc206.txi
+--- src/docs/kb/wc206.txi	26 Apr 2017 11:46:19 -0000	1.3
++++ src/docs/kb/wc206.txi	30 Apr 2017 08:03:04 -0000	1.4
+@@ -3,6 +3,9 @@
+ 
+ Here is a list of changes from DJGPP V2.05 to DJGPP V2.06
+ 
++@cindex dxe3gen and extended coff relocations
++dxe3gen now handles extended coff relocations (more than 65535 relocs.)
++
+ @cindex Update of DXE linker script
+ The dxe linker script, dxe.ld, now handles @code{.gnu.linkonce.b.*} and
+ @code{.bss.*} sections.
+Index: src/dxe/dxe3gen.c
+===================================================================
+RCS file: /cvs/djgpp/djgpp/src/dxe/dxe3gen.c,v
+retrieving revision 1.23
+retrieving revision 1.25
+diff -u -p -r1.23 -r1.25 dxe3gen.c
+--- src/dxe/dxe3gen.c	4 Oct 2015 10:27:26 -0000	1.23
++++ src/dxe/dxe3gen.c	16 May 2017 18:47:12 -0000	1.25
+@@ -193,7 +193,7 @@
+ #include "../../include/sys/dxe.h"
+ #include "../../include/coff.h"
+ 
+-#define VERSION  "1.0.3"
++#define VERSION  "1.0.4"
+ 
+ #define TEMP_BASE    "dxe_tmp"       /* 7 chars, 1 char suffix */
+ #define TEMP_O_FILE  TEMP_BASE".o"
+@@ -937,6 +937,7 @@ static int write_dxe(FILE *inf, FILE *ou
+   char *strings;
+   RELOC *relocs;
+   unsigned int i, j, errcount;
++  ULONG32 real_nrelocs;
+   size_t hdrsize;
+ 
+   /* Exported symbols table */
+@@ -985,9 +986,23 @@ static int write_dxe(FILE *inf, FILE *ou
+   strings[0] = 0;
+ 
+   /* Read the relocation table */
+-  relocs = (RELOC *)malloc(sc.s_nreloc * sizeof(RELOC));
+   fseek(inf, sc.s_relptr, SEEK_SET);
+-  fread(relocs, RELSZ, sc.s_nreloc, inf);
++  if (sc.s_flags & STYP_NRELOC_OVFL)
++  {
++    fread(&real_nrelocs, 4, 1, inf); /* read r_vaddr */
++    fseek(inf, RELSZ - 4, SEEK_CUR); /* skip the rest */
++    dh.nrelocs = --real_nrelocs;
++#if 0
++    if (opt.verbose)
++      printf("%s: found extended relocations, nrelocs = %lu\n", progname, (unsigned long)real_nrelocs);
++#endif
++  }
++  else
++  {
++    real_nrelocs = dh.nrelocs;
++  }
++  relocs = (RELOC *)malloc(real_nrelocs * sizeof(RELOC));
++  fread(relocs, RELSZ, real_nrelocs, inf);
+ 
+   /* Close input file */
+   fclose(inf);
+@@ -1042,7 +1057,7 @@ static int write_dxe(FILE *inf, FILE *ou
+       int n_abs_relocs = 0, n_rel_relocs = 0;
+ 
+       /* count the amount of relocations pointing to this symbol */
+-      for (j = 0; j < sc.s_nreloc; j++)
++      for (j = 0; j < real_nrelocs; j++)
+       {
+         if (relocs[j].r_symndx == i)
+         {
+@@ -1101,7 +1116,7 @@ static int write_dxe(FILE *inf, FILE *ou
+ 
+       unres_size = newsize;
+ 
+-      for (j = 0; j < sc.s_nreloc; j++)
++      for (j = 0; j < real_nrelocs; j++)
+       {
+         if (relocs[j].r_symndx == i)
+         {
+@@ -1145,7 +1160,7 @@ static int write_dxe(FILE *inf, FILE *ou
+         BOOL ok = FALSE;
+         for (j = 0; j < opt.num_excl; j++)
+         {
+-          if (memcmp(opt.excl_prefix[j], name, strlen(opt.excl_prefix[j])) == 0)
++          if (strncmp(opt.excl_prefix[j], name, strlen(opt.excl_prefix[j])) == 0)
+           {
+             ok = TRUE;
+             break;
+@@ -1160,7 +1175,7 @@ static int write_dxe(FILE *inf, FILE *ou
+         BOOL ok = FALSE;
+         for (j = 0; j < opt.num_prefix; j++)
+         {
+-          if (memcmp(opt.export_prefix[j], name, strlen(opt.export_prefix[j])) == 0)
++          if (strncmp(opt.export_prefix[j], name, strlen(opt.export_prefix[j])) == 0)
+           {
+             ok = TRUE;
+             break;
+@@ -1202,7 +1217,7 @@ static int write_dxe(FILE *inf, FILE *ou
+ 
+   /* Compute the amount of valid relocations */
+   DEBUG_PRINT_RELOCATION_DIRECTIVE_PROLOG();
+-  for (i = 0; i < sc.s_nreloc; i++)
++  for (i = 0; i < real_nrelocs; i++)
+   {
+     DEBUG_PRINT_RELOCATION_DIRECTIVE(i, relocs);
+     if (!VALID_RELOC(relocs[i]))
+@@ -1278,7 +1293,7 @@ static int write_dxe(FILE *inf, FILE *ou
+   free(data);
+ 
+   /* Output the relocations */
+-  for (i = 0; i < sc.s_nreloc; i++)
++  for (i = 0; i < real_nrelocs; i++)
+   {
+     if (VALID_RELOC(relocs[i]))
+       fwrite(&relocs[i].r_vaddr, 1, sizeof(relocs[0].r_vaddr), outf);
+

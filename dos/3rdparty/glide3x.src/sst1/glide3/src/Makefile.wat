@@ -1,19 +1,18 @@
 # OpenWatcom makefile for Glide3/SST1 and Texus2
 # This makefile MUST be processed by GNU make!!!
+# Building under native DOS is not supported:
+#		only tested under Win32 or Linux
 #
 #  Copyright (c) 2004 - Daniel Borca
 #  Email : dborca@users.sourceforge.net
 #  Web   : http://www.geocities.com/dborca
 #
-# $Header: /cvsroot/glide/glide3x/sst1/glide3/src/Attic/Makefile.wat,v 1.1.2.3 2005/05/25 08:49:29 jwrdegoede Exp $
-#
-
 
 #
 #  Available options:
 #
 #    Environment variables:
-#	FX_GLIDE_HW	build for the given ASIC (sst1, sst96).
+#	FX_GLIDE_HW	build for the given ASIC (either sst1, or sst96).
 #			default = sst1
 #	OPTFLAGS	pass given optimization flags to compiler
 #			default = -ox -5s (Pentium, stack)
@@ -31,8 +30,6 @@
 #	realclean:	remove all generated files
 #
 
-
-
 .PHONY: all glide3x clean realclean
 .INTERMEDIATE: fxgasm.exe wlib.lbc
 .SUFFIXES: .c .obj
@@ -46,7 +43,7 @@ TEXUS_EXE = texus2.exe
 
 FX_GLIDE_HW ?= sst1
 FX_GLIDE_SW = ../../../swlibs
-GLIDE_LIBDIR = ../../lib
+GLIDE_LIBDIR = ../../lib/$(FX_GLIDE_HW)
 TEXUS_EXEDIR = $(FX_GLIDE_SW)/bin
 
 ###############################################################################
@@ -57,10 +54,15 @@ CC = wcl386
 AS = nasm
 AR = wlib
 
-ifeq ($(wildcard $(addsuffix /rm.exe,$(subst ;, ,$(PATH)))),)
+# detect if running under unix by finding 'rm' in $PATH :
+ifeq ($(wildcard $(addsuffix /rm,$(subst :, ,$(PATH)))),)
+DOSMODE= 1
 UNLINK = del $(subst /,\,$(1))
+FIXPATH= $(subst /,\,$1)
 else
+DOSMODE= 0
 UNLINK = $(RM) $(1)
+FIXPATH= $1
 endif
 
 ###############################################################################
@@ -81,8 +83,11 @@ ifeq ($(FX_GLIDE_HW),sst96)
 CDEFS += -DSST96
 CDEFS += -DSST96_FIFO
 #CDEFS += -DSST96_ALT_FIFO_WRAP
-#CDEFS += -DINIT96VGASWAP -DINIT_ACCESS_DIRECT
+#CDEFS += -DINIT96VGASWAP
+CDEFS += -DINIT_ACCESS_DIRECT
 CDEFS += -DGLIDE_USE_ALT_REGMAP
+else
+$(error Invalid FX_GLIDE_HW setting)
 endif
 endif
 
@@ -91,8 +96,8 @@ ifdef DEBUG
 CDEFS += -DGDBG_INFO_ON -DGLIDE_DEBUG -DGLIDE_SANITY_ASSERT -DGLIDE_SANITY_SIZE
 endif
 
-# other
-CDEFS += -DGLIDE_PLUG -DGLIDE_SPLASH
+# shameless plug and splash screen
+#CDEFS += -DGLIDE_PLUG -DGLIDE_SPLASH
 
 ifeq ($(TEXUS2),1)
 CDEFS += -DHAVE_TEXUS2
@@ -105,27 +110,35 @@ endif
 # librarian
 ARFLAGS = -c -fo -n -t -q
 
+# linker
+# pick either of causeway, dos4g, dos32a or stub32a as link target
+LDFLAGS = -zq -k16384 -l=dos32a
+
 # assembler
 ASFLAGS = -O6 -fobj -D__WATCOMD__ --prefix _
 ASFLAGS += $(CDEFS)
 
 # compiler
-CFLAGS = -wx
-CFLAGS += -I. -I../../incsrc -I../../init -I../../init/initvg -I../../init/init96
-CFLAGS += -I$(FX_GLIDE_SW)/fxmisc -I$(FX_GLIDE_SW)/newpci/pcilib -I$(FX_GLIDE_SW)/fxmemmap
-CFLAGS += -I$(FX_GLIDE_SW)/texus2/lib
+CFLAGS = -bt=dos -wx -zq
+# newer OpenWatcom versions enable W303 by default
+CFLAGS += -wcd=303
+INCPATH = -I. -I../../incsrc -I../../init
+ifeq ($(FX_GLIDE_HW),sst1)
+INCPATH += -I../../init/initvg
+else
+INCPATH += -I../../init/init96
+endif
+INCPATH += -I$(FX_GLIDE_SW)/fxmisc -I$(FX_GLIDE_SW)/newpci/pcilib -I$(FX_GLIDE_SW)/fxmemmap
+INCPATH += -I$(FX_GLIDE_SW)/texus2/lib
 OPTFLAGS ?= -ox -5s
 CFLAGS += $(CDEFS) $(OPTFLAGS)
+CFLAGS += $(call FIXPATH,$(INCPATH))
 
 ifeq ($(USE_X86),1)
 CFLAGS += -DGL_X86
 else
 CFLAGS += -DGLIDE_USE_C_TRISETUP
 endif
-
-# Watcom woes: pass parameters through environment vars
-export WCC386 = $(subst /,\,$(CFLAGS))
-export WCL386 = -zq
 
 ###############################################################################
 #	objects
@@ -156,7 +169,7 @@ GLIDE_OBJECTS = \
 
 ifeq ($(USE_X86),1)
 GLIDE_OBJECTS += \
-	cpuid.o
+	cpuid.obj
 ifeq ($(FX_GLIDE_HW),sst1)
 GLIDE_OBJECTS += \
 	xdraw.obj
@@ -166,19 +179,22 @@ GLIDE_OBJECTS += \
 endif
 endif
 
+INIT_OBJECTS = \
+	../../init/init.obj \
+	../../init/gdebug.obj
+
 ifeq ($(FX_GLIDE_HW),sst96)
 GLIDE_OBJECTS += \
-	sst96.obj \
+	sst96.obj
+INIT_OBJECTS += \
+	../../init/vg96drvr.obj \
 	../../init/init96/init96.obj \
 	../../init/init96/dxdrvr.obj \
 	../../init/init96/initat3d.obj \
 	../../init/init96/initmcrx.obj
-endif
-
-GLIDE_OBJECTS += \
-	../../init/init.obj \
+else
+INIT_OBJECTS += \
 	../../init/vgdrvr.obj \
-	../../init/vg96drvr.obj \
 	../../init/initvg/gamma.obj \
 	../../init/initvg/dac.obj \
 	../../init/initvg/video.obj \
@@ -187,8 +203,11 @@ GLIDE_OBJECTS += \
 	../../init/initvg/util.obj \
 	../../init/initvg/info.obj \
 	../../init/initvg/print.obj \
-	../../init/initvg/gdebug.obj \
-	../../init/initvg/sst1init.obj \
+	../../init/initvg/sst1init.obj
+endif
+
+GLIDE_OBJECTS += \
+	$(INIT_OBJECTS) \
 	$(FX_GLIDE_SW)/newpci/pcilib/sst1_pci.obj \
 	$(FX_GLIDE_SW)/newpci/pcilib/fxmsr.obj \
 	$(FX_GLIDE_SW)/newpci/pcilib/fxpci.obj \
@@ -228,7 +247,7 @@ endif
 ###############################################################################
 
 .c.obj:
-	$(CC) -fo=$@ -c $<
+	$(CC) $(CFLAGS) -fo=$@ -c $<
 
 ###############################################################################
 #	main
@@ -238,11 +257,11 @@ all: glide3x $(TEXUS_EXEDIR)/$(TEXUS_EXE)
 glide3x: $(GLIDE_LIBDIR)/$(GLIDE_LIB)
 
 $(GLIDE_LIBDIR)/$(GLIDE_LIB): wlib.lbc
-	$(AR) $(ARFLAGS) -o $(subst /,\,$@) @wlib
+	$(AR) $(ARFLAGS) -o $(call FIXPATH,$@) @wlib.lbc
 
 $(TEXUS_EXEDIR)/$(TEXUS_EXE): $(FX_GLIDE_SW)/texus2/cmd/cmd.c $(GLIDE_LIBDIR)/$(GLIDE_LIB)
 ifeq ($(TEXUS2),1)
-	$(CC) -fe=$(subst /,\,$@) $(subst /,\,$^)
+	$(CC) $(CFLAGS) -fe=$(call FIXPATH,$@) $(LDFLAGS) $(call FIXPATH,$^)
 else
 	$(warning Texus2 not enabled... Skipping $(TEXUS_EXE))
 endif
@@ -258,41 +277,19 @@ xdraw.obj: xdraw.asm
 xdraw96.obj: xdraw96.asm
 	$(AS) -o $@ $(ASFLAGS) $<
 
-ifeq ($(FX_GLIDE_HW),sst96)
-..\..\init\initvg\gamma.obj: ..\..\init\initvg\gamma.c
-	$(CC) -fo=$@ -USST96 -c $<
-..\..\init\initvg\dac.obj: ..\..\init\initvg\dac.c
-	$(CC) -fo=$@ -USST96 -c $<
-..\..\init\initvg\video.obj: ..\..\init\initvg\video.c
-	$(CC) -fo=$@ -USST96 -c $<
-..\..\init\initvg\parse.obj: ..\..\init\initvg\parse.c
-	$(CC) -fo=$@ -USST96 -c $<
-..\..\init\initvg\sli.obj: ..\..\init\initvg\sli.c
-	$(CC) -fo=$@ -USST96 -c $<
-..\..\init\initvg\util.obj: ..\..\init\initvg\util.c
-	$(CC) -fo=$@ -USST96 -c $<
-..\..\init\initvg\info.obj: ..\..\init\initvg\info.c
-	$(CC) -fo=$@ -USST96 -c $<
-..\..\init\initvg\print.obj: ..\..\init\initvg\print.c
-	$(CC) -fo=$@ -USST96 -c $<
-..\..\init\initvg\gdebug.obj: ..\..\init\initvg\gdebug.c
-	$(CC) -fo=$@ -USST96 -c $<
-..\..\init\initvg\sst1init.obj: ..\..\init\initvg\sst1init.c
-	$(CC) -fo=$@ -USST96 -c $<
-endif
-
 $(GLIDE_OBJECTS): fxinline.h fxgasm.h
 
 fxinline.h: fxgasm.exe
-	$< -inline > $@
+	$(call FIXPATH,./$<) -inline > $@
 
 fxgasm.h: fxgasm.exe
-	$< -hex > $@
+	$(call FIXPATH,./$<) -hex > $@
 
+# -bt without args resets build target to host OS.
 fxgasm.exe: fxgasm.c
-	$(CC) -fe=$@ $<
+	$(CC) $(CFLAGS) -bt -fe=$@ $<
 
-wlib.lbc: $(subst /,\,$(GLIDE_OBJECTS))
+wlib.lbc: $(call FIXPATH,$(GLIDE_OBJECTS))
 	@echo $(addprefix +,$^) > wlib.lbc
 
 ###############################################################################
@@ -301,6 +298,7 @@ wlib.lbc: $(subst /,\,$(GLIDE_OBJECTS))
 
 clean:
 	-$(call UNLINK,*.obj)
+	-$(call UNLINK,*.o)
 	-$(call UNLINK,../../init/*.obj)
 	-$(call UNLINK,../../init/initvg/*.obj)
 	-$(call UNLINK,../../init/init96/*.obj)

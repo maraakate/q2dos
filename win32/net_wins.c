@@ -46,8 +46,6 @@ loopback_t	loopbacks[2];
 SOCKET			ip_sockets[2];
 SOCKET			ipx_sockets[2];
 
-char *NET_ErrorString (void);
-
 //=============================================================================
 
 void NetadrToSockadr (netadr_t *a, struct sockaddr *s)
@@ -63,7 +61,8 @@ void NetadrToSockadr (netadr_t *a, struct sockaddr *s)
 	else if (a->type == NA_IP)
 	{
 		((struct sockaddr_in *)s)->sin_family = AF_INET;
-		((struct sockaddr_in *)s)->sin_addr.s_addr = *(int *)&a->ip;
+	//	((struct sockaddr_in *)s)->sin_addr.s_addr = *(int *)&a->ip;
+		memcpy (& ((struct sockaddr_in *)s)->sin_addr, a->ip, 4);
 		((struct sockaddr_in *)s)->sin_port = a->port;
 	}
 	else if (a->type == NA_IPX)
@@ -87,7 +86,8 @@ void SockadrToNetadr (struct sockaddr *s, netadr_t *a)
 	if (s->sa_family == AF_INET)
 	{
 		a->type = NA_IP;
-		*(int *)&a->ip = ((struct sockaddr_in *)s)->sin_addr.s_addr;
+	//	*(int *)&a->ip = ((struct sockaddr_in *)s)->sin_addr.s_addr;
+		memcpy (a->ip, & ((struct sockaddr_in *)s)->sin_addr, 4);
 		a->port = ((struct sockaddr_in *)s)->sin_port;
 	}
 	else if (s->sa_family == AF_IPX)
@@ -98,7 +98,6 @@ void SockadrToNetadr (struct sockaddr *s, netadr_t *a)
 		a->port = ((struct sockaddr_ipx *)s)->sa_socket;
 	}
 }
-
 
 qboolean	NET_CompareAdr (netadr_t a, netadr_t b)
 {
@@ -114,14 +113,14 @@ qboolean	NET_CompareAdr (netadr_t a, netadr_t b)
 			return true;
 		return false;
 	}
-
 	if (a.type == NA_IPX)
 	{
 		if ((memcmp(a.ipx, b.ipx, 10) == 0) && a.port == b.port)
 			return true;
 		return false;
 	}
-	return false; // FS: Compiler warning
+
+	return false;
 }
 
 /*
@@ -137,7 +136,7 @@ qboolean	NET_CompareBaseAdr (netadr_t a, netadr_t b)
 		return false;
 
 	if (a.type == NA_LOOPBACK)
-		return TRUE;
+		return true;
 
 	if (a.type == NA_IP)
 	{
@@ -145,14 +144,14 @@ qboolean	NET_CompareBaseAdr (netadr_t a, netadr_t b)
 			return true;
 		return false;
 	}
-
 	if (a.type == NA_IPX)
 	{
 		if ((memcmp(a.ipx, b.ipx, 10) == 0))
 			return true;
 		return false;
 	}
-	return false; // FS: Compiler warning
+
+	return false;
 }
 
 char	*NET_AdrToString (netadr_t a)
@@ -168,7 +167,6 @@ char	*NET_AdrToString (netadr_t a)
 
 	return s;
 }
-
 
 /*
 =============
@@ -193,7 +191,7 @@ qboolean	NET_StringToSockaddr (char *s, struct sockaddr *sadr)
 	char	*colon;
 	int		val;
 	char	copy[128];
-	
+
 	memset (sadr, 0, sizeof(*sadr));
 
 	if ((strlen(s) >= 23) && (s[8] == ':') && (s[21] == ':'))	// check for an IPX address
@@ -216,7 +214,6 @@ qboolean	NET_StringToSockaddr (char *s, struct sockaddr *sadr)
 	else
 	{
 		((struct sockaddr_in *)sadr)->sin_family = AF_INET;
-		
 		((struct sockaddr_in *)sadr)->sin_port = 0;
 
 		strcpy (copy, s);
@@ -225,18 +222,18 @@ qboolean	NET_StringToSockaddr (char *s, struct sockaddr *sadr)
 			if (*colon == ':')
 			{
 				*colon = 0;
-				((struct sockaddr_in *)sadr)->sin_port = htons((short)atoi(colon+1));	
+				((struct sockaddr_in *)sadr)->sin_port = htons((short)atoi(colon+1));
 			}
 		
 		if (copy[0] >= '0' && copy[0] <= '9')
 		{
-			*(int *)&((struct sockaddr_in *)sadr)->sin_addr = inet_addr(copy);
+			((struct sockaddr_in *)sadr)->sin_addr.s_addr = inet_addr(copy);
 		}
 		else
 		{
 			if (! (h = gethostbyname(copy)) )
-				return 0;
-			*(int *)&((struct sockaddr_in *)sadr)->sin_addr = *(int *)h->h_addr_list[0];
+				return false;
+			((struct sockaddr_in *)sadr)->sin_addr.s_addr = *(u_long *) h->h_addr_list[0];
 		}
 	}
 	
@@ -275,7 +272,6 @@ qboolean	NET_StringToAdr (char *s, netadr_t *a)
 	return true;
 }
 
-
 qboolean	NET_IsLocalAddress (netadr_t adr)
 {
 	return adr.type == NA_LOOPBACK;
@@ -310,9 +306,7 @@ qboolean	NET_GetLoopPacket (netsrc_t sock, netadr_t *net_from, sizebuf_t *net_me
 	memset (net_from, 0, sizeof(*net_from));
 	net_from->type = NA_LOOPBACK;
 	return true;
-
 }
-
 
 void NET_SendLoopPacket (netsrc_t sock, int length, void *data, netadr_t to)
 {
@@ -348,7 +342,6 @@ qboolean	NET_GetPacket (netsrc_t sock, netadr_t *net_from, sizebuf_t *net_messag
 			net_socket = ip_sockets[sock];
 		else
 			net_socket = ipx_sockets[sock];
-
 		if (!net_socket)
 			continue;
 
@@ -361,7 +354,6 @@ qboolean	NET_GetPacket (netsrc_t sock, netadr_t *net_from, sizebuf_t *net_messag
 		if (ret == SOCKET_ERROR)
 		{
 			err = WSAGetLastError();
-
 			if (err == WSAEWOULDBLOCK)
 				continue;
 			if (err == WSAEMSGSIZE) {
@@ -370,22 +362,22 @@ qboolean	NET_GetPacket (netsrc_t sock, netadr_t *net_from, sizebuf_t *net_messag
 				continue;
 			}
 
-			if (dedicated->value)	// let dedicated servers continue after errors
+			if (dedicated->intValue)	// let dedicated servers continue after errors
 			{
 				if(err == WSAECONNRESET) /* FS: Don't need to see this spam from connecting to ourselves */
 				{
-					Com_DPrintf (DEVELOPER_MSG_NET, "NET_GetPacket: %s from %s\n", NET_ErrorString(),
-							NET_AdrToString(*net_from));
+					Com_DPrintf (DEVELOPER_MSG_NET, "NET_GetPacket: \"%s\" from %s\n",
+							NET_ErrorString(), NET_AdrToString(*net_from));
 				}
 				else
 				{
-					Com_Printf ("NET_GetPacket: %s from %s\n", NET_ErrorString(),
+					Com_Printf ("NET_GetPacket: \"%s\" from %s\n", NET_ErrorString(),
 							NET_AdrToString(*net_from));
 				}
 			}
 			else
 			{
-				Com_Error (ERR_DROP, "NET_GetPacket: %s from %s", 
+				Com_Error (ERR_DROP, "NET_GetPacket: \"%s\" from %s",
 						NET_ErrorString(), NET_AdrToString(*net_from));
 			}
 			continue;
@@ -463,27 +455,26 @@ void NET_SendPacket (netsrc_t sock, int length, void *data, netadr_t to)
 		if ((err == WSAEADDRNOTAVAIL) && ((to.type == NA_BROADCAST) || (to.type == NA_BROADCAST_IPX)))
 			return;
 
-		if (dedicated->value)	// let dedicated servers continue after errors
+		if (dedicated->intValue)	// let dedicated servers continue after errors
 		{
-			Com_Printf ("NET_SendPacket ERROR: %s to %s\n", NET_ErrorString(),
+			Com_Printf ("NET_SendPacket ERROR: \"%s\" to %s\n", NET_ErrorString(),
 				NET_AdrToString (to));
 		}
 		else
 		{
 			if (err == WSAEADDRNOTAVAIL)
 			{
-				Com_DPrintf (DEVELOPER_MSG_NET, "NET_SendPacket Warning: %s : %s\n", 
+				Com_DPrintf (DEVELOPER_MSG_NET, "NET_SendPacket Warning: %s : %s\n",
 						NET_ErrorString(), NET_AdrToString (to));
 			}
 			else
 			{
-				Com_Error (ERR_DROP, "NET_SendPacket ERROR: %s to %s\n", 
+				Com_Error (ERR_DROP, "NET_SendPacket ERROR: \"%s\" to %s\n",
 						NET_ErrorString(), NET_AdrToString (to));
 			}
 		}
 	}
 }
-
 
 //=============================================================================
 
@@ -545,7 +536,6 @@ SOCKET NET_IPSocket (char *net_interface, int port)
 	return newsocket;
 }
 
-
 /*
 ====================
 NET_OpenIP
@@ -596,7 +586,6 @@ void NET_OpenIP (void)
 			ip_sockets[NS_CLIENT] = NET_IPSocket (ip->string, PORT_ANY);
 	}
 }
-
 
 /*
 ====================
@@ -650,7 +639,6 @@ SOCKET NET_IPXSocket (int port)
 	return newsocket;
 }
 
-
 /*
 ====================
 NET_OpenIPX
@@ -696,7 +684,6 @@ void NET_OpenIPX (void)
 	}
 }
 
-
 /*
 ====================
 NET_Config
@@ -732,9 +719,9 @@ void	NET_Config (qboolean multiplayer)
 	}
 	else
 	{	// open sockets
-		if (! noudp->value)
+		if (!noudp->intValue)
 			NET_OpenIP ();
-		if (! noipx->value)
+		if (!noipx->intValue)
 			NET_OpenIPX ();
 	}
 }
@@ -811,55 +798,80 @@ NET_ErrorString
 */
 char *NET_ErrorString (void)
 {
-	int		code;
-
-	code = WSAGetLastError ();
+	int code = WSAGetLastError ();
 	switch (code)
 	{
-	case WSAEINTR: return "WSAEINTR";
-	case WSAEBADF: return "WSAEBADF";
-	case WSAEACCES: return "WSAEACCES";
-	case WSAEDISCON: return "WSAEDISCON";
-	case WSAEFAULT: return "WSAEFAULT";
-	case WSAEINVAL: return "WSAEINVAL";
-	case WSAEMFILE: return "WSAEMFILE";
-	case WSAEWOULDBLOCK: return "WSAEWOULDBLOCK";
-	case WSAEINPROGRESS: return "WSAEINPROGRESS";
-	case WSAEALREADY: return "WSAEALREADY";
-	case WSAENOTSOCK: return "WSAENOTSOCK";
-	case WSAEDESTADDRREQ: return "WSAEDESTADDRREQ";
-	case WSAEMSGSIZE: return "WSAEMSGSIZE";
-	case WSAEPROTOTYPE: return "WSAEPROTOTYPE";
-	case WSAENOPROTOOPT: return "WSAENOPROTOOPT";
-	case WSAEPROTONOSUPPORT: return "WSAEPROTONOSUPPORT";
-	case WSAESOCKTNOSUPPORT: return "WSAESOCKTNOSUPPORT";
-	case WSAEOPNOTSUPP: return "WSAEOPNOTSUPP";
-	case WSAEPFNOSUPPORT: return "WSAEPFNOSUPPORT";
-	case WSAEAFNOSUPPORT: return "WSAEAFNOSUPPORT";
-	case WSAEADDRINUSE: return "WSAEADDRINUSE";
-	case WSAEADDRNOTAVAIL: return "WSAEADDRNOTAVAIL";
-	case WSAENETDOWN: return "WSAENETDOWN";
-	case WSAENETUNREACH: return "WSAENETUNREACH";
-	case WSAENETRESET: return "WSAENETRESET";
-	case WSAECONNABORTED: return "WSWSAECONNABORTEDAEINTR";
-	case WSAECONNRESET: return "WSAECONNRESET";
-	case WSAENOBUFS: return "WSAENOBUFS";
-	case WSAEISCONN: return "WSAEISCONN";
-	case WSAENOTCONN: return "WSAENOTCONN";
-	case WSAESHUTDOWN: return "WSAESHUTDOWN";
-	case WSAETOOMANYREFS: return "WSAETOOMANYREFS";
-	case WSAETIMEDOUT: return "WSAETIMEDOUT";
-	case WSAECONNREFUSED: return "WSAECONNREFUSED";
-	case WSAELOOP: return "WSAELOOP";
-	case WSAENAMETOOLONG: return "WSAENAMETOOLONG";
-	case WSAEHOSTDOWN: return "WSAEHOSTDOWN";
-	case WSASYSNOTREADY: return "WSASYSNOTREADY";
-	case WSAVERNOTSUPPORTED: return "WSAVERNOTSUPPORTED";
-	case WSANOTINITIALISED: return "WSANOTINITIALISED";
-	case WSAHOST_NOT_FOUND: return "WSAHOST_NOT_FOUND";
-	case WSATRY_AGAIN: return "WSATRY_AGAIN";
-	case WSANO_RECOVERY: return "WSANO_RECOVERY";
-	case WSANO_DATA: return "WSANO_DATA";
-	default: return "NO ERROR";
+	case 0:			return "No error";
+	case WSAEINTR:		return "Interrupted system call";		/* 10004 */
+	case WSAEBADF:		return "Bad file number";			/* 10009 */
+	case WSAEACCES:		return "Permission denied";			/* 10013 */
+	case WSAEFAULT:		return "Bad address";				/* 10014 */
+	case WSAEINVAL:		return "Invalid argument (not bind)";		/* 10022 */
+	case WSAEMFILE:		return "Too many open files";			/* 10024 */
+	case WSAEWOULDBLOCK:	return "Operation would block";			/* 10035 */
+	case WSAEINPROGRESS:	return "Operation now in progress";		/* 10036 */
+	case WSAEALREADY:	return "Operation already in progress";		/* 10037 */
+	case WSAENOTSOCK:	return "Socket operation on non-socket";	/* 10038 */
+	case WSAEDESTADDRREQ:	return "Destination address required";		/* 10039 */
+	case WSAEMSGSIZE:	return "Message too long";			/* 10040 */
+	case WSAEPROTOTYPE:	return "Protocol wrong type for socket";	/* 10041 */
+	case WSAENOPROTOOPT:	return "Bad protocol option";			/* 10042 */
+	case WSAEPROTONOSUPPORT: return "Protocol not supported";		/* 10043 */
+	case WSAESOCKTNOSUPPORT: return "Socket type not supported";		/* 10044 */
+	case WSAEOPNOTSUPP:	return "Operation not supported on socket";	/* 10045 */
+	case WSAEPFNOSUPPORT:	return "Protocol family not supported";		/* 10046 */
+	case WSAEAFNOSUPPORT:	return "Address family not supported by protocol family"; /* 10047 */
+	case WSAEADDRINUSE:	return "Address already in use";		/* 10048 */
+	case WSAEADDRNOTAVAIL:	return "Can't assign requested address";	/* 10049 */
+	case WSAENETDOWN:	return "Network is down";			/* 10050 */
+	case WSAENETUNREACH:	return "Network is unreachable";		/* 10051 */
+	case WSAENETRESET:	return "Net dropped connection or reset";	/* 10052 */
+	case WSAECONNABORTED:	return "Software caused connection abort";	/* 10053 */
+	case WSAECONNRESET:	return "Connection reset by peer";		/* 10054 */
+	case WSAENOBUFS:	return "No buffer space available";		/* 10055 */
+	case WSAEISCONN:	return "Socket is already connected";		/* 10056 */
+	case WSAENOTCONN:	return "Socket is not connected";		/* 10057 */
+	case WSAESHUTDOWN:	return "Can't send after socket shutdown";	/* 10058 */
+	case WSAETOOMANYREFS:	return "Too many references, can't splice";	/* 10059 */
+	case WSAETIMEDOUT:	return "Connection timed out";			/* 10060 */
+	case WSAECONNREFUSED:	return "Connection refused";			/* 10061 */
+	case WSAELOOP:		return "Too many levels of symbolic links";	/* 10062 */
+	case WSAENAMETOOLONG:	return "File name too long";			/* 10063 */
+	case WSAEHOSTDOWN:	return "Host is down";				/* 10064 */
+	case WSAEHOSTUNREACH:	return "No Route to Host";			/* 10065 */
+	case WSAENOTEMPTY:	return "Directory not empty";			/* 10066 */
+	case WSAEPROCLIM:	return "Too many processes";			/* 10067 */
+	case WSAEUSERS:		return "Too many users";			/* 10068 */
+	case WSAEDQUOT:		return "Disc Quota Exceeded";			/* 10069 */
+	case WSAESTALE:		return "Stale NFS file handle";			/* 10070 */
+	case WSAEREMOTE:	return "Too many levels of remote in path";	/* 10071 */
+	case WSAEDISCON:	return "Graceful shutdown in progress";		/* 10101 */
+
+	case WSASYSNOTREADY:	return "Network SubSystem is unavailable";			/* 10091 */
+	case WSAVERNOTSUPPORTED: return "WINSOCK DLL Version out of range";			/* 10092 */
+	case WSANOTINITIALISED:	return "Successful WSASTARTUP not yet performed";		/* 10093 */
+	case WSAHOST_NOT_FOUND:	return "Authoritative answer: Host not found";			/* 11001 */
+	case WSATRY_AGAIN:	return "Non-Authoritative: Host not found or SERVERFAIL";	/* 11002 */
+	case WSANO_RECOVERY:	return "Non-Recoverable errors, FORMERR, REFUSED, NOTIMP";	/* 11003 */
+	case WSANO_DATA:	return "Valid name, no data record of requested type";		/* 11004 */
+
+	case WSAENOMORE:		return "10102: No more results";			/* 10102 */
+	case WSAECANCELLED:		return "10103: Call has been canceled";			/* 10103 */
+	case WSAEINVALIDPROCTABLE:	return "Procedure call table is invalid";		/* 10104 */
+	case WSAEINVALIDPROVIDER:	return "Service provider is invalid";			/* 10105 */
+	case WSAEPROVIDERFAILEDINIT:	return "Service provider failed to initialize";		/* 10106 */
+	case WSASYSCALLFAILURE:		return "System call failure";				/* 10107 */
+	case WSASERVICE_NOT_FOUND:	return "Service not found";				/* 10108 */
+	case WSATYPE_NOT_FOUND:		return "Class type not found";				/* 10109 */
+	case WSA_E_NO_MORE:		return "10110: No more results";			/* 10110 */
+	case WSA_E_CANCELLED:		return "10111: Call was canceled";			/* 10111 */
+	case WSAEREFUSED:		return "Database query was refused";			/* 10112 */
+
+	default:
+		{
+			static char _err_unknown[64];
+			sprintf(_err_unknown, "Unknown WSAE error (%d)", code);
+			return  _err_unknown;
+		}
 	}
 }

@@ -1,3 +1,18 @@
+//**************************************************************************
+//*                     This file is part of the                           *
+//*                      Mpxplay - audio player.                           *
+//*                  The source code of Mpxplay is                         *
+//*        (C) copyright 1998-2025 by PDSoft (Attila Padar)                *
+//*                http://mpxplay.sourceforge.net                          *
+//*                  email: mpxplay@hotmail.com                            *
+//**************************************************************************
+//*  This program is distributed in the hope that it will be useful,       *
+//*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+//*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *
+//*  Please contact with the author (with me) if you want to use           *
+//*  or modify this source.                                                *
+//**************************************************************************
+//function: definitions for SB Live card handling under DOS
 
 #ifndef SC_SBLIV_H
 #define SC_SBLIV_H
@@ -12,56 +27,56 @@
 
 #define EMU_CHIPS_24BIT (EMU_CHIPS_0106|EMU_CHIPS_0151)
 
-typedef struct emu_card_version_s
-{
-	const char *longname;
-	uint16_t device;
-	uint8_t  revision;
-	uint32_t subsystem;     // serial
-	uint8_t  chips;         // chips on the card
-	uint8_t  max_channels;
+typedef struct emu_card_version_s{
+ const char *longname;
+ uint16_t device;
+ uint8_t  revision;
+ uint32_t subsystem;     // serial
+ uint8_t  chips;         // chips on the card
+ uint8_t  max_channels;
 }emu_card_version_s;
+
+struct emu10k1_card;
+
+typedef struct emu_driver_func_s{
+ unsigned int (*selector)(struct emu10k1_card *card,struct mpxplay_audioout_info_s *aui);
+ void (*hw_init)(struct emu10k1_card *card);
+ void (*hw_close)(struct emu10k1_card *card);
+ unsigned int (*buffer_init)(struct emu10k1_card *card,struct mpxplay_audioout_info_s *aui);
+ void (*setrate)(struct emu10k1_card *card,struct mpxplay_audioout_info_s *aui);
+ void (*start_playback)(struct emu10k1_card *card);
+ void (*stop_playback)(struct emu10k1_card *card);
+ unsigned int (*pcm_pointer_playback)(struct emu10k1_card *card,struct mpxplay_audioout_info_s *aui);
+ void (*clear_cache)(struct emu10k1_card *card);
+ unsigned int (*mixer_read)(struct emu10k1_card *card,unsigned int reg);
+ void (*mixer_write)(struct emu10k1_card *card,unsigned int reg,unsigned int value);
+ aucards_allmixerchan_s *mixerset;
+}emu_driver_func_s;
 
 typedef struct emu10k1_card
 {
-	unsigned long   iobase;
-	unsigned int    irq;
-	unsigned short	 model;
-	unsigned char   chiprev;
-	unsigned long   serial;
-	unsigned char   chips;
-	unsigned char   chip_select;
-	struct pci_config_s  *pci_dev;
-	struct emu_card_version_s *card_capabilities;
-	struct emu_driver_func_s *driver_funcs;
+ unsigned long   iobase;
+ unsigned int    irq;
+ unsigned short	 model;
+ unsigned char   chiprev;
+ unsigned long   serial;
+ unsigned char   chips;
+ unsigned char   chip_select;
+ struct pci_config_s  *pci_dev;
+ struct emu_card_version_s *card_capabilities;
+ struct emu_driver_func_s *driver_funcs;
 
-	struct dosmem_t *dm;                     // now it's ca. 72k only
-//	char *cardbuf_mem;              // but later we should use DPMI memory
-	uint32_t *virtualpagetable;
-	void *silentpage;
-	unsigned long period_size;
-	char *pcmout_buffer;
-	long pcmout_bufsize;
-//	unsigned long pcmout_dmasize;
+ struct dosmem_t *dm;              // now it's ca. 72k only
+ //char *cardbuf_mem;              // but later we should use DPMI memory
+ uint32_t *virtualpagetable;
+ void *silentpage;
+ unsigned long period_size;
+ char *pcmout_buffer;
+ long pcmout_bufsize;
+ //unsigned long pcmout_dmasize;
 
-	unsigned int voice_initial_pitch;
-	unsigned int voice_pitch_target;
+ unsigned int voice_initial_pitch;
+ unsigned int voice_pitch_target;
 }emu10k1_card;
-
-typedef struct emu_driver_func_s
-{
-	unsigned int (*selector) (struct emu10k1_card *card,struct mpxplay_audioout_info_s *aui);
-	void (*hw_init) (struct emu10k1_card *card);
-	void (*hw_close) (struct emu10k1_card *card);
-	unsigned int (*buffer_init) (struct emu10k1_card *card,struct mpxplay_audioout_info_s *aui);
-	void (*setrate) (struct emu10k1_card *card,struct mpxplay_audioout_info_s *aui);
-	void (*start_playback) (struct emu10k1_card *card);
-	void (*stop_playback) (struct emu10k1_card *card);
-	unsigned int (*pcm_pointer_playback) (struct emu10k1_card *card,struct mpxplay_audioout_info_s *aui);
-	void (*clear_cache) (struct emu10k1_card *card);
-	unsigned int (*mixer_read) (struct emu10k1_card *card,unsigned int reg);
-	void (*mixer_write) (struct emu10k1_card *card,unsigned int reg,unsigned int value);
-	aucards_allmixerchan_s *mixerset;
-}emu_driver_func_s;
 
 #endif // SC_SBLIV_H

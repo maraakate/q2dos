@@ -1,11 +1,8 @@
 ;
 ; compulsory header for glide3/xdraw* assembly specializations (NASM)
 ;
-; $Header: /cvsroot/glide/glide3x/h5/glide3/src/Attic/xos.inc,v 1.1.2.6 2004/10/05 14:50:54 dborca Exp $
-; $Log: xos.inc,v $
 ; Revision 1.1.2.6  2004/10/05 14:50:54  dborca
 ; removed misplaced else
-;
 ;
 ; Revision 1.1.2.1  2003/06/07 09:53:25  dborca
 ; initial checkin for NASM sources
@@ -75,7 +72,7 @@
 
 %macro		endp	0
 	%ifnctx	proc
-		%error	Mismatched `endp'/`proc'
+		%error	Mismatched ENDP/PROC
 	%else
 		%pop
 	%endif
@@ -106,9 +103,9 @@
 ;---------------------------------------
 %if XOS == XOS_WIN32
 
-%define TEXT  .text   align=32
-%define DATA  .data   align=32
-%define CONST .rdata  align=32
+%define SEG_TEXT  .text   align=32
+%define SEG_DATA  .data   align=32
+%define SEG_CONST .rdata  align=32
 
 %if USE_STANDARD_TLS_FUNC == 1
 
@@ -148,9 +145,9 @@ extrn getThreadValue
 ;---------------------------------------
 %if XOS == XOS_DJGPP
 
-%define TEXT  .text
-%define DATA  .data
-%define CONST .rodata
+%define SEG_TEXT  .text
+%define SEG_DATA  .data
+%define SEG_CONST .rodata
 
 extrn threadValueDJGPP
 
@@ -171,9 +168,9 @@ extrn threadValueDJGPP
 ;---------------------------------------
 %if XOS == XOS_LINUX
 
-%define TEXT  .text   align=32
-%define DATA  .data   align=32
-%define CONST .rodata align=32
+%define SEG_TEXT  .text   align=32
+%define SEG_DATA  .data   align=32
+%define SEG_CONST .rodata align=32
 
 extrn threadValueLinux
 
@@ -194,9 +191,9 @@ extrn threadValueLinux
 ;---------------------------------------
 %if XOS == XOS_WATCD
 
-%define TEXT  _TEXT	align=1 public use32 class=CODE FLAT
-%define DATA  _DATA	align=4 public use32 class=DATA FLAT
-%define CONST CONST2	align=4 public use32 class=DATA FLAT
+%define SEG_TEXT   _TEXT	align=1 public use32 class=CODE FLAT
+%define SEG_DATA   _DATA	align=4 public use32 class=DATA FLAT
+%define SEG_CONST CONST2	align=4 public use32 class=DATA FLAT
 
 extrn threadValueDJGPP
 

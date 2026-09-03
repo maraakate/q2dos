@@ -16,9 +16,6 @@
 ;; 
 ;; COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 ;;
-;; $Header: /cvsroot/glide/glide3x/sst1/glide3/src/Attic/xdraw96.asm,v 1.1.2.4 2004/10/08 06:30:19 dborca Exp $
-;; $Revision: 1.1.2.4 $
-;; $Log: xdraw96.asm,v $
 ;; Revision 1.1.2.4  2004/10/08 06:30:19  dborca
 ;; save a round-trip with grDrawTriangle in SST1
 ;;
@@ -53,14 +50,13 @@ extrn   _grValidateState
 extrn   _grVpDrawTriangle, 12
 extrn   _trisetup, 12
 
-        
 ; some useful floating load and store macros <ala gmt>
 %define flds    fld  DWORD
 %define fadds   fadd DWORD
 %define fsubs   fsub DWORD
 %define fmuls   fmul DWORD
 
-segment		DATA
+segment		SEG_DATA
     One         DD  1.0
     Area        DD  0
     dxAB        DD  0
@@ -76,7 +72,7 @@ segment		DATA
     snap_xc     DD  0
     snap_yc     DD  0
 
-segment		CONST
+segment		SEG_CONST
     SNAP_BIAS   DD  786432.0
 
 ; Ugly, but seems to workaround the problem with locally defined
@@ -208,7 +204,7 @@ Y       equ 4
 %define i       edx       ; i = dlp->i
 %define tmpy    ebp       ; temp Y storage
 
-segment		TEXT
+segment		SEG_TEXT
 
 ;--------------------------------------------------------------------------        
 
@@ -216,7 +212,12 @@ segment		TEXT
 proc grDrawTriangle, 12
 endp
 %if XOS == XOS_WIN32
+%ifdef __MINGW32__
+; GNU LD fails with '_' prefix
+export  grDrawTriangle@12
+%else
 export _grDrawTriangle@12
+%endif
 %endif
 
 ; FALL THRU to _trisetup
@@ -227,7 +228,7 @@ export _grDrawTriangle@12
 ;;
 ;;  USAGE:
 ;;
-;;  
+;;
             align 4
 proc _trisetup_asm, 12
 ; 28
@@ -268,7 +269,6 @@ proc _trisetup_asm, 12
 ;       with lowest y value on the stack, this will be used later for 
 ;       loading parameter values into the SST regs.
 ;
-;;;;;;;;;;;;;;
 
     GET_GC
     mov     tmpy, [gc + coord_space]     ; load gc->state.invalid
@@ -284,7 +284,7 @@ proc _trisetup_asm, 12
     pop     ebx
     ret
 
-packed_color:   
+packed_color:
     mov     tmpy, [gc + color_type]     ; load gc->state.invalid
     test    tmpy, tmpy
     je      validate_state
@@ -297,8 +297,8 @@ packed_color:
     pop     esi
     pop     ebx
     ret
-        
-validate_state: 
+
+validate_state:
     GET_GC
     mov     tmpy, [gc + invalid]     ; load gc->state.invalid
     test   tmpy, tmpy
@@ -306,10 +306,9 @@ validate_state:
     call    _grValidateState
 
     align 4
-cull_test:      
+cull_test:
 
 ;--------------------------------------------------------------------------        
-
 
     mov     fa, [esp + _va$]    ; 1
      mov     fb, [esp + _vb$]
@@ -317,8 +316,7 @@ cull_test:
      mov     tmpy, [_GlideRoot + trisProcessed]    ; _GlideRoot.stats.trisProcessed++;
 ; 36-3
 vertex_y_load:
-
-;;; snap y coordinate to sort vertices
+ ;; snap y coordinate to sort vertices
     flds    [fa + Y]            ;
     fadds   [SNAP_BIAS]         ;
     fstp    dword [zsnap_ya]    ;
@@ -328,7 +326,7 @@ vertex_y_load:
     flds    [fc + Y]            ;
     fadds   [SNAP_BIAS]         ;
     fstp    dword [zsnap_yc]    ;
-        
+
     mov     fa, [zsnap_ya]      ; 2
      mov     fb, [zsnap_yb]
     cmp     fa, 0               ; 3
@@ -437,7 +435,7 @@ Area_Computation:
     flds    [fc + Y]            ;
     fadds   [SNAP_BIAS]         ;
     fstp    dword [zsnap_yc]    ;
-        
+
 ; 47-3
 ; jmp ret_pop0f
     flds    [zsnap_xa]          ;  xa
@@ -599,7 +597,6 @@ no_padding0:
     mov     eax, 1h                     ; return 1 (triangle drawn)
      ret
     
-
         align 4
 zero_area:
 backfaced:
@@ -746,7 +743,7 @@ endp
 ; we may not write to the PCI buffer without stalling.  This causes
 ; the amount of clocks the workaround adds to the loop to vary in the
 ; following way++:
-; 
+;
 ;    CPU          Bus/CPU Clock     Total Bus       Total Penalty
 ;                     Ratio*      Clocks Since   (add to later clocks)
 ;======================================================================  

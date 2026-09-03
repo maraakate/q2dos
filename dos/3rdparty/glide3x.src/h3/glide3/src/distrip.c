@@ -17,8 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/h3/glide3/src/distrip.c,v 1.1.1.1.6.2 2005/05/25 08:56:23 jwrdegoede Exp $
-** $Log: distrip.c,v $
 ** Revision 1.1.1.1.6.2  2005/05/25 08:56:23  jwrdegoede
 ** Make h5 and h3 tree 64 bit clean. This is ported over from the non-devel branch so this might be incomplete
 **

@@ -1,0 +1,179 @@
+# SDL client (use SDL for sound and cdaudio):
+USE_SDL=1
+# ogg/vorbis music:
+USE_OGG=1
+# use tremor library for ogg/vorbis:
+USE_TREMOR=0
+# gamespy/server browser:
+USE_GAMESPY=1
+# dynamically linked gamespy:
+GAMESPY_DLL=0
+# libcurl/http downloads:
+USE_CURL=1
+
+# build tools:
+CC = gcc
+
+# build flags:
+INCLUDES = -Iclient -Igame -Iqcommon -Iserver -Ilinux -IGoa -IGoa/CEngine
+CPPFLAGS =
+# comment this out to enable assertions:
+CPPFLAGS+= -DNDEBUG
+CPPFLAGS+= -Did386=0
+CPPFLAGS+= -DSPLIT_NETWORK_FRAME=1
+CPPFLAGS+= $(INCLUDES)
+
+ifeq ($(DEBUG),1)
+CFLAGS = -g -ggdb
+else
+CFLAGS = -O2
+endif
+CFLAGS+= -Wall
+CFLAGS+= -ffast-math
+#CFLAGS+= -fwrapv
+
+LDFLAGS =
+LIBS =
+CLIBS = -ldl
+CLIBS += -lm
+EXE = quake2
+
+ifeq ($(DEDICATED_ONLY),1)
+USE_SDL=0
+CPPFLAGS+= -DDEDICATED_ONLY
+EXE = q2ded
+endif
+
+ifeq ($(USE_SDL),1)
+SYSOBJ_CDA = linux/cd_sdl.o
+SYSOBJ_SND = linux/snd_sdl.o
+CPPFLAGS+= -DSDL_CLIENT
+SDL_CONFIG =sdl-config
+SDL_CFLAGS = $(shell $(SDL_CONFIG) --cflags 2> /dev/null)
+SDL_LIBS   = $(shell $(SDL_CONFIG) --libs 2> /dev/null)
+CFLAGS+= $(SDL_CFLAGS)
+LIBS  += $(SDL_LIBS)
+else
+# use native linux apis for sound and cdaudio
+SYSOBJ_CDA = linux/cd_linux.o
+SYSOBJ_SND = linux/snd_oss.o
+endif
+
+ifneq ($(DEDICATED_ONLY),1)
+ifeq ($(USE_GAMESPY),1)
+CPPFLAGS+= -DGAMESPY
+ifneq ($(GAMESPY_DLL),1)
+CPPFLAGS+= -DGAMESPY_HARD_LINKED
+endif
+endif
+
+ifeq ($(USE_CURL),1)
+CPPFLAGS+= -DUSE_CURL -DCURL_NO_OLDIES
+LIBS += -lcurl
+endif
+endif
+
+ifeq ($(USE_OGG),1)
+CPPFLAGS+= -DOGG_SUPPORT
+ifneq ($(USE_TREMOR),1)
+LIBS += -lvorbisfile -lvorbis -logg
+else
+CPPFLAGS+= -DVORBIS_USE_TREMOR
+LIBS += -lvorbisidec -logg
+endif
+endif
+
+LINUX = linux/net_bsd.o \
+	linux/q_shlinux.o \
+	linux/glob.o \
+	linux/sys_linux.o
+
+ifeq ($(DEDICATED_ONLY),1)
+CLIENT = null/cl_null.o \
+	null/cd_null.o
+else
+LINUXCLIENT = \
+	$(SYSOBJ_CDA) \
+	$(SYSOBJ_SND) \
+	linux/vid_menu.o \
+	linux/vid_so.o
+
+CLIENT = client/cl_input.o \
+	client/cl_inv.o \
+	client/cl_main.o \
+	client/cl_cin.o \
+	client/cl_ents.o \
+	client/cl_http.o \
+	client/cl_fx.o \
+	client/cl_parse.o \
+	client/cl_pred.o \
+	client/cl_scrn.o \
+	client/cl_tent.o \
+	client/cl_view.o \
+	client/menu.o \
+	client/console.o \
+	client/keys.o \
+	client/snd_dma.o \
+	client/snd_mem.o \
+	client/snd_mix.o \
+	client/snd_stream.o \
+	client/snd_wavstream.o \
+	client/qmenu.o \
+	client/cl_newfx.o
+
+ifeq ($(USE_GAMESPY),1)
+ifneq ($(GAMESPY_DLL),1)
+GAMESPY = Goa/CEngine/darray.o \
+	Goa/CEngine/gserver.o \
+	Goa/CEngine/gserverlist.o \
+	Goa/CEngine/gutil.o \
+	Goa/CEngine/hashtable.o \
+	Goa/nonport.o
+endif
+endif
+endif
+
+QCOMMON = qcommon/cmd.o \
+	qcommon/cmd_auto.o \
+	qcommon/cmodel.o \
+	qcommon/common.o \
+	qcommon/crc.o \
+	qcommon/cvar.o \
+	qcommon/files.o \
+	qcommon/md4.o \
+	qcommon/net_chan.o \
+	qcommon/pmove.o \
+	game/m_flash.o \
+	game/q_shared.o
+
+SERVER = server/sv_ccmds.o \
+	server/sv_ents.o \
+	server/sv_game.o \
+	server/sv_init.o \
+	server/sv_main.o \
+	server/sv_send.o \
+	server/sv_user.o \
+	server/sv_world.o
+
+OBJECTS = $(CLIENT) $(QCOMMON) $(SERVER) $(GAMESPY) $(LINUX) $(LINUXCLIENT)
+
+
+.PHONY: clean
+
+all: $(EXE)
+
+$(EXE): $(OBJECTS)
+	$(CC) $(OBJECTS) $(LDFLAGS) $(LIBS) $(CLIBS) -o $(EXE)
+
+clean:
+	rm -f qcommon/*.o
+	rm -f client/*.o
+	rm -f server/*.o
+	rm -f linux/*.o
+	rm -f null/*.o
+	rm -f Goa/*.o
+	rm -f Goa/CEngine/*.o
+	rm -f game/*.o
+
+%.o: %.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@

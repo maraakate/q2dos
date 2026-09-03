@@ -18,9 +18,6 @@
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 */
 
-/*  $Header: /cvsroot/glide/glide3x/h3/glide3/src/xtexdl.S,v 1.1.1.1.8.2 2004/10/05 14:39:55 dborca Exp $ */
-/*  $Revision: 1.1.1.1.8.2 $ */
-/*  $Log: xtexdl.S,v $
 /*  Revision 1.1.1.1.8.2  2004/10/05 14:39:55  dborca
 /*  removed detritus
 /*
@@ -301,6 +298,5 @@ ALIGN(32)
 
 .L_END_grTexDownload_3DNow_MMX:
 .size _grTexDownload_3DNow_MMX,.L_END_grTexDownload_3DNow_MMX-_grTexDownload_3DNow_MMX
-
 
 .end

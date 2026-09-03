@@ -21,11 +21,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#ifndef __linux__
-#include <conio.h>
-#else
-#include <linutil.h>
-#endif
 #include <assert.h>
 #include <string.h>
 
@@ -39,11 +34,6 @@ static const char *version;
 static const char name[]    = "test26";
 static const char purpose[] = "tests grLfbWriteRegion, and grLfbReadRegion";
 static const char usage[]   = "-n <frames> -r <res>";
-
-static const char *renderBufferString[] = {
-    "GR_BUFFER_FRONTBUFFER",
-    "GR_BUFFER_BACKBUFFER "
-};
 
 static const char *sourceFormatString[] = {
     "GR_LFB_SRC_FMT_565       ",
@@ -69,7 +59,7 @@ static void imageConvert( void *dst,
                           GrLfbSrcFmt_t format,
                           FxU32 *bpp );
 
-void main( int argc, char **argv) {
+int main( int argc, char **argv) {
     char match; 
     char **remArgs;
     int  rv;
@@ -95,13 +85,13 @@ void main( int argc, char **argv) {
     assert( hwconfig = tlVoodooType() );
 
     /* Process Command Line Arguments */
-    while( rv = tlGetOpt( argc, argv, "nr", &match, &remArgs ) ) {
+    while ((rv = tlGetOpt(argc, argv, "nr", &match, &remArgs)) != 0) {
         if ( rv == -1 ) {
             printf( "Unrecognized command line argument\n" );
             printf( "%s %s\n", name, usage );
             printf( "Available resolutions:\n%s\n",
                     tlGetResolutionList() );
-            return;
+            return -1;
         }
         switch( match ) {
         case 'n':
@@ -165,7 +155,7 @@ void main( int argc, char **argv) {
               (int) scrWidth, (int) scrHeight);
 
       tlErrorMessage(errMsg);
-      return;
+      return -1;
     }
 
     sourceFormat = GR_LFB_SRC_FMT_565;
@@ -250,7 +240,7 @@ void main( int argc, char **argv) {
     
  __errExit:    
     grGlideShutdown();
-    return;
+    return 0;
 }
 
 

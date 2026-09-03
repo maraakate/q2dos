@@ -20,8 +20,6 @@
 */
 
 /*
- *  $Header: /cvsroot/glide/glide3x/h3/glide3/src/cpudtect.S,v 1.1.1.1.6.3 2004/10/05 14:39:55 dborca Exp $
- *  $Log: cpudtect.S,v $
  *  Revision 1.1.1.1.6.3  2004/10/05 14:39:55  dborca
  *  removed detritus
  *

@@ -217,7 +217,7 @@ Widow2Spawn(edict_t *self)
 
 			ent->monsterinfo.aiflags |= AI_SPAWNED_WIDOW | AI_DO_NOT_COUNT | AI_IGNORE_SHOTS;
 
-			if (!(coop && coop->value))
+			if (!(coop && coop->intValue))
 			{
 				designated_enemy = self->enemy;
 			}
@@ -457,7 +457,7 @@ widow2_disrupt_reattack(edict_t *self)
 
 	luck = random();
 
-	if (luck < (0.25 + ((float)(skill->value)) * 0.15))
+	if (luck < (0.25 + ((float)(skill->intValue)) * 0.15))
 	{
 		self->monsterinfo.nextframe = FRAME_firea01;
 	}
@@ -1145,10 +1145,11 @@ widow2_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
 
 	if (self->health < (self->max_health / 2))
 	{
-		self->s.skinnum = 1;
+		self->s.skinnum |= 1;
+		self->blood_type = 3;	// Knightmare- sparks and blood
 	}
 
-	if (skill->value == 3)
+	if (skill->intValue == 3)
 	{
 		return; /* no pain anims in nightmare */
 	}
@@ -1168,8 +1169,8 @@ widow2_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
 	{
 		gi.sound(self, CHAN_VOICE, sound_pain2, 1, ATTN_NONE, 0);
 
-		if ((skill->value < 3) &&
-			(random() < (0.6 - (0.2 * ((float)skill->value)))))
+		if ((skill->intValue < 3) &&
+			(random() < (0.6 - (0.2 * ((float)skill->intValue)))))
 		{
 			self->monsterinfo.aiflags &= ~AI_MANUAL_STEERING;
 			self->monsterinfo.currentmove = &widow2_move_pain;
@@ -1179,8 +1180,8 @@ widow2_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
 	{
 		gi.sound(self, CHAN_VOICE, sound_pain3, 1, ATTN_NONE, 0);
 
-		if ((skill->value < 3) &&
-			(random() < (0.75 - (0.1 * ((float)skill->value)))))
+		if ((skill->intValue < 3) &&
+			(random() < (0.75 - (0.1 * ((float)skill->intValue)))))
 		{
 			self->monsterinfo.aiflags &= ~AI_MANUAL_STEERING;
 			self->monsterinfo.currentmove = &widow2_move_pain;
@@ -1236,6 +1237,7 @@ widow2_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /* 
 		return;
 	}
 
+
 	/* check for gib */
 	if (self->health <= self->gib_health)
 	{
@@ -1282,10 +1284,14 @@ widow2_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /* 
 		return;
 	}
 
+	/* regular death */
 	gi.sound(self, CHAN_VOICE, sound_death, 1, ATTN_NONE, 0);
 	self->deadflag = DEAD_DEAD;
 	self->takedamage = DAMAGE_NO;
 	self->count = 0;
+	self->s.skinnum |= 1;	// Knightmare- make sure pain skin is set if we got one-shotted
+	self->blood_type = 3;	// Knightmare- sparks and blood
+
 	KillChildren(self);
 	self->monsterinfo.quad_framenum = 0;
 	self->monsterinfo.double_framenum = 0;
@@ -1374,7 +1380,7 @@ Widow2_CheckAttack(edict_t *self)
 			if (widow2_tongue_attack_ok(spot1, spot2, 256))
 			{
 				/* be nice in easy mode */
-				if ((skill->value == 0) && (rand() & 3))
+				if ((skill->intValue == 0) && (rand() & 3))
 				{
 					return false;
 				}
@@ -1469,7 +1475,7 @@ SP_monster_widow2(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;
@@ -1488,17 +1494,17 @@ SP_monster_widow2(edict_t *self)
 	VectorSet(self->mins, -70, -70, 0);
 	VectorSet(self->maxs, 70, 70, 144);
 
-	self->health = 2000 + 800 + 1000 * (skill->value);
+	self->health = 2000 + 800 + 1000 * (skill->intValue);
 
-	if (coop->value)
+	if (coop->intValue)
 	{
-		self->health += 500 * (skill->value);
+		self->health += 500 * (skill->intValue);
 	}
 
 	self->gib_health = -900;
 	self->mass = 2500;
 
-	if (skill->value == 3)
+	if (skill->intValue == 3)
 	{
 		self->monsterinfo.power_armor_type = POWER_ARMOR_SHIELD;
 		self->monsterinfo.power_armor_power = 750;
@@ -1519,6 +1525,9 @@ SP_monster_widow2(edict_t *self)
 	self->monsterinfo.attack = widow2_attack;
 	self->monsterinfo.search = widow2_search;
 	self->monsterinfo.checkattack = Widow2_CheckAttack;
+
+	self->blood_type = 2; // Knightmare- use sparks blood type
+
 	gi.linkentity(self);
 
 	self->monsterinfo.currentmove = &widow2_move_stand;
@@ -1725,6 +1734,7 @@ ThrowWidowGibReal(edict_t *self, char *gibname, int damage, int type,
 void
 BloodFountain(edict_t *self, int number, vec3_t startpos, int damage)
 {
+#if 0 /* FS: FIXME?  This earlies out and does nothing. */
 	int n;
 	vec3_t vd;
 	vec3_t origin, size, velocity;
@@ -1756,6 +1766,7 @@ BloodFountain(edict_t *self, int number, vec3_t startpos, int damage)
 		velocity[0] *= 2;
 		velocity[1] *= 2;
 	}
+#endif
 }
 
 void
@@ -1790,13 +1801,13 @@ ThrowMoreStuff(edict_t *self, vec3_t point)
 		return;
 	}
 
-	if (coop && coop->value)
+	if (coop && coop->intValue)
 	{
 		ThrowSmallStuff(self, point);
 		return;
 	}
 
-	for (n = 0; n < 1; n++)
+//	for (n = 0; n < 1; n++)
 	{
 		ThrowWidowGibLoc(self, "models/objects/gibs/sm_meat/tris.md2",
 				300, GIB_ORGANIC, point, false);
@@ -1898,7 +1909,7 @@ WidowExplode(edict_t *self)
 		case 12:
 			self->s.sound = 0;
 
-			for (n = 0; n < 1; n++)
+//			for (n = 0; n < 1; n++)
 			{
 				ThrowWidowGib(self, "models/objects/gibs/sm_meat/tris.md2",
 						400, GIB_ORGANIC);
@@ -1972,13 +1983,13 @@ WidowExplosion1(edict_t *self)
 	gi.WritePosition(startpoint);
 	gi.multicast(self->s.origin, MULTICAST_ALL);
 
-	for (n = 0; n < 1; n++)
+//	for (n = 0; n < 1; n++)
 	{
 		ThrowWidowGibLoc(self, "models/objects/gibs/sm_meat/tris.md2",
 				300, GIB_ORGANIC, startpoint, false);
 	}
 
-	for (n = 0; n < 1; n++)
+//	for (n = 0; n < 1; n++)
 	{
 		ThrowWidowGibLoc(self, "models/objects/gibs/sm_metal/tris.md2",
 				100, GIB_METALLIC, startpoint, false);
@@ -2011,13 +2022,13 @@ WidowExplosion2(edict_t *self)
 	gi.WritePosition(startpoint);
 	gi.multicast(self->s.origin, MULTICAST_ALL);
 
-	for (n = 0; n < 1; n++)
+//	for (n = 0; n < 1; n++)
 	{
 		ThrowWidowGibLoc(self, "models/objects/gibs/sm_meat/tris.md2",
 				300, GIB_ORGANIC, startpoint, false);
 	}
 
-	for (n = 0; n < 1; n++)
+//	for (n = 0; n < 1; n++)
 	{
 		ThrowWidowGibLoc(self, "models/objects/gibs/sm_metal/tris.md2",
 				100, GIB_METALLIC, startpoint, false);
@@ -2050,13 +2061,13 @@ WidowExplosion3(edict_t *self)
 	gi.WritePosition(startpoint);
 	gi.multicast(self->s.origin, MULTICAST_ALL);
 
-	for (n = 0; n < 1; n++)
+//	for (n = 0; n < 1; n++)
 	{
 		ThrowWidowGibLoc(self, "models/objects/gibs/sm_meat/tris.md2",
 				300, GIB_ORGANIC, startpoint, false);
 	}
 
-	for (n = 0; n < 1; n++)
+//	for (n = 0; n < 1; n++)
 	{
 		ThrowWidowGibLoc(self, "models/objects/gibs/sm_metal/tris.md2",
 				100, GIB_METALLIC, startpoint, false);
@@ -2089,13 +2100,13 @@ WidowExplosion4(edict_t *self)
 	gi.WritePosition(startpoint);
 	gi.multicast(self->s.origin, MULTICAST_ALL);
 
-	for (n = 0; n < 1; n++)
+//	for (n = 0; n < 1; n++)
 	{
 		ThrowWidowGibLoc(self, "models/objects/gibs/sm_meat/tris.md2",
 				300, GIB_ORGANIC, startpoint, false);
 	}
 
-	for (n = 0; n < 1; n++)
+//	for (n = 0; n < 1; n++)
 	{
 		ThrowWidowGibLoc(self, "models/objects/gibs/sm_metal/tris.md2",
 				100, GIB_METALLIC, startpoint, false);
@@ -2128,13 +2139,13 @@ WidowExplosion5(edict_t *self)
 	gi.WritePosition(startpoint);
 	gi.multicast(self->s.origin, MULTICAST_ALL);
 
-	for (n = 0; n < 1; n++)
+//	for (n = 0; n < 1; n++)
 	{
 		ThrowWidowGibLoc(self, "models/objects/gibs/sm_meat/tris.md2",
 				300, GIB_ORGANIC, startpoint, false);
 	}
 
-	for (n = 0; n < 1; n++)
+//	for (n = 0; n < 1; n++)
 	{
 		ThrowWidowGibLoc(self, "models/objects/gibs/sm_metal/tris.md2",
 				100, GIB_METALLIC, startpoint, false);
@@ -2167,13 +2178,13 @@ WidowExplosion6(edict_t *self)
 	gi.WritePosition(startpoint);
 	gi.multicast(self->s.origin, MULTICAST_ALL);
 
-	for (n = 0; n < 1; n++)
+//	for (n = 0; n < 1; n++)
 	{
 		ThrowWidowGibLoc(self, "models/objects/gibs/sm_meat/tris.md2",
 				300, GIB_ORGANIC, startpoint, false);
 	}
 
-	for (n = 0; n < 1; n++)
+//	for (n = 0; n < 1; n++)
 	{
 		ThrowWidowGibLoc(self, "models/objects/gibs/sm_metal/tris.md2",
 				100, GIB_METALLIC, startpoint, false);
@@ -2206,13 +2217,13 @@ WidowExplosion7(edict_t *self)
 	gi.WritePosition(startpoint);
 	gi.multicast(self->s.origin, MULTICAST_ALL);
 
-	for (n = 0; n < 1; n++)
+//	for (n = 0; n < 1; n++)
 	{
 		ThrowWidowGibLoc(self, "models/objects/gibs/sm_meat/tris.md2",
 				300, GIB_ORGANIC, startpoint, false);
 	}
 
-	for (n = 0; n < 1; n++)
+//	for (n = 0; n < 1; n++)
 	{
 		ThrowWidowGibLoc(self, "models/objects/gibs/sm_metal/tris.md2",
 				100, GIB_METALLIC, startpoint, false);

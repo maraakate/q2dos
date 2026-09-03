@@ -46,12 +46,7 @@ cvar_t *sv_airaccelerate;
 
 cvar_t  *sv_noreload;                   // don't reload level state when reentering
 
-#ifndef DEDICATED_ONLY
-extern cvar_t  *maxclients;                    // FIXME: rename sv_maxclients
-                                        //made extern from a collision in watcom
-#else
-cvar_t	*maxclients;
-#endif
+cvar_t	*maxclients;                    // FIXME: rename sv_maxclients
 
 cvar_t  *sv_showclamp;
 
@@ -64,10 +59,15 @@ cvar_t	*sv_entfile;	// Knightmare 6/25/12- cvar to control use of .ent files
 cvar_t	*sv_skipcinematics; /* FS: Skip cinematics if we want to. */
 cvar_t	*sv_allow_download_maps_in_paks; /* FS: Allow bsp downloads from a pak file if we want to. */
 cvar_t	*sv_downloadserver; /* FS: From R1Q2: HTTP Downloading */
+cvar_t	*sv_idlekick; /* FS: Kick excessive idlers.  From R1Q2 */
 
 /* FS: Added these to filter out wallfly's spammy rcon status request every 30 seconds */
 cvar_t		*sv_filter_wallfly_rcon_request;
 cvar_t		*sv_filter_wallfly_ip;
+
+cvar_t		*sv_getspace_overflow_hack; /* FS: Bullshit hack for coop mod. */
+
+extern	int num_sz_getspace_overflows;
 
 void Master_Shutdown (void);
 
@@ -294,7 +294,7 @@ void SVC_Info (void)
 	int		i, count;
 	int		version;
 
-	if (maxclients->value == 1)
+	if (maxclients->intValue == 1)
 		return;		// ignore in single player
 
 	version = atoi (Cmd_Argv(1));
@@ -582,7 +582,7 @@ int Rcon_Validate (void)
 	if (!strlen (rcon_password->string))
 		return 0;
 
-	if (strcmp (Cmd_Argv(1), rcon_password->string) )
+	if (strcmp (Cmd_Argv(1), rcon_password->string) != 0)
 		return 0;
 
 	return 1;
@@ -875,7 +875,7 @@ void SV_ReadPackets (void)
 			break;
 		}
 		
-		if (i != maxclients->value)
+		if (i != maxclients->intValue)
 			continue;
 	}
 }
@@ -916,6 +916,25 @@ void SV_CheckTimeouts (void)
 			cl->state = cs_free;	// can now be reused
 			continue;
 		}
+
+		/* FS: From R1Q2.  Kick excessive idlers */
+		if (cl->state == cs_spawned && dedicated->intValue)
+		{
+			if ((Q_stricmp(cl->name, "WallFly[BZZZ]") != 0) && (Q_stricmp(sv_filter_wallfly_ip->string, NET_AdrToString(cl->netchan.remote_address)) != 0))
+			{
+				cl->idletime++;
+				if (sv_idlekick->intValue && cl->idletime >= sv_idlekick->intValue * 100)
+				{
+					SV_ClientPrintf (cl, PRINT_HIGH, "DROPPED: You have been disconnected due to inactivity.\n");
+					SV_BroadcastPrintf (PRINT_HIGH, "%s has been disconnected due to inactivity.\n", cl->name);
+					SV_DropClient (cl);
+					cl->lastmessage = svs.realtime;
+					cl->state = cs_free;
+					continue;
+				}
+			}
+		}
+
 		if ( (cl->state == cs_connected || cl->state == cs_spawned) 
 			&& cl->lastmessage < droppoint)
 		{
@@ -958,7 +977,7 @@ SV_RunGameFrame
 */
 void SV_RunGameFrame (void)
 {
-	if (host_speeds->value)
+	if (host_speeds->intValue)
 		time_before_game = Sys_Milliseconds ();
 
 	// we always need to bump framenum, even if we
@@ -969,22 +988,21 @@ void SV_RunGameFrame (void)
 	sv.time = sv.framenum*100;
 
 	// don't run if paused
-	if (!sv_paused->value || maxclients->value > 1)
+	if (!sv_paused->intValue || maxclients->intValue > 1)
 	{
 		ge->RunFrame ();
 
 		// never get more than one tic behind
 		if (sv.time < svs.realtime)
 		{
-			if (sv_showclamp->value)
+			if (sv_showclamp->intValue)
 				Com_Printf ("sv highclamp\n");
 			svs.realtime = sv.time;
 		}
 	}
 
-	if (host_speeds->value)
+	if (host_speeds->intValue)
 		time_after_game = Sys_Milliseconds ();
-
 }
 
 /*
@@ -1013,12 +1031,13 @@ void SV_Frame (int msec)
 	SV_ReadPackets ();
 
 	// move autonomous things around if enough time has passed
-	if (!sv_timedemo->value && svs.realtime < sv.time)
+	if ((!sv_timedemo->intValue && svs.realtime < sv.time) ||
+		(sv.state != ss_demo && svs.realtime < sv.time) ) /* FS: timedemo only in demos, please */
 	{
 		// never let the time get too far off
 		if (sv.time - svs.realtime > 100)
 		{
-			if (sv_showclamp->value)
+			if (sv_showclamp->intValue)
 				Com_Printf ("sv lowclamp\n");
 			svs.realtime = sv.time - 100;
 		}
@@ -1047,6 +1066,12 @@ void SV_Frame (int msec)
 	// clear teleport flags, etc for next frame
 	SV_PrepWorldFrame ();
 
+	if (sv_getspace_overflow_hack->intValue && num_sz_getspace_overflows >= 1000)
+	{
+		num_sz_getspace_overflows = 0;
+		Com_Printf("SZ_GetSpace() overflow hack - problem map: %s\n", sv.name);
+		Cbuf_AddText(va("map %s\n", sv.name));
+	}
 }
 
 //============================================================================
@@ -1215,25 +1240,32 @@ void SV_Init (void)
 	allow_download_maps = Cvar_Get ("allow_download_maps", "1", CVAR_ARCHIVE);
 // Knightmare 6/25/12- cvar to control use of .ent files
 	sv_entfile = Cvar_Get ("sv_entfile", "1", CVAR_ARCHIVE);
-	sv_entfile->description = "Toggle the use of .ent files.";
+	Cvar_SetDescription("sv_entfile", "Toggle the use of .ent files.");
 
 	/* FS: Added */
 	sv_skipcinematics = Cvar_Get ("sv_skipcinematics", "0", CVAR_ARCHIVE);
-	sv_skipcinematics->description = "Skip the loading of *.cin cinematics";
+	Cvar_SetDescription("sv_skipcinematics", "Skip the loading of *.cin cinematics");
 
 	/* FS: Allow bsp downloads from a pak file if we want to. */
 	sv_allow_download_maps_in_paks = Cvar_Get ("sv_allow_download_maps_in_paks", "1", 0);
-	sv_allow_download_maps_in_paks->description = "Allow BSP downloads accessed from a PAK file.";
+	Cvar_SetDescription("sv_allow_download_maps_in_paks", "Allow BSP downloads accessed from a PAK file.");
 
 	/* FS: From R1Q2: HTTP Downloading */
 	sv_downloadserver = Cvar_Get ("sv_downloadserver", "", 0);
-	sv_downloadserver->description = "URL to a location where clients can download game content over HTTP. Default empty.  Path leads to game dir name.  i.e. quake2.com/baseq2/maps\n";
+	Cvar_SetDescription("sv_downloadserver", "URL to a location where clients can download game content over HTTP. Default empty.  Path leads to game dir name.  i.e. quake2.com/baseq2/maps\n");
+
+	/* FS: Kick excessive idlers.  From R1Q2 */
+	sv_idlekick = Cvar_Get("sv_idlekick", "300", 0);
+	Cvar_SetDescription("sv_idlekick", "Kick excessive idlers after X seconds.  Set to 0 to disable.");
 
 	/* FS: Added these to filter out wallfly's spammy rcon status request every 30 seconds */
 	sv_filter_wallfly_rcon_request = Cvar_Get ("sv_filter_wallfly_rcon_request", "0", 0);
-	sv_filter_wallfly_rcon_request->description = "Filter rcon requests from WallFly[BZZZ]/Tastyspleen linked servers.  If set, sv_filter_wallfly_ip is needed and DEVELOPER_MSG_SERVER will be required to see WallFly RCONs.";
-	sv_filter_wallfly_ip = Cvar_Get ("sv_filter_wallfly_ip", "74.86.102.74", 0);
-	sv_filter_wallfly_ip->description = "WallFly/Tastyspleen IP for filtering rcon requests.  Requires sv_filter_wallfly_rcon_request CVAR to be enabled.";
+	Cvar_SetDescription("sv_filter_wallfly_rcon_request", "Filter rcon requests from WallFly[BZZZ]/Tastyspleen linked servers.  If set, sv_filter_wallfly_ip is needed and DEVELOPER_MSG_SERVER will be required to see WallFly RCONs.");
+	sv_filter_wallfly_ip = Cvar_Get ("sv_filter_wallfly_ip", "23.227.170.221", 0);
+	Cvar_SetDescription("sv_filter_wallfly_ip", "WallFly/Tastyspleen IP for filtering rcon requests.  Requires sv_filter_wallfly_rcon_request CVAR to be enabled.");
+
+	sv_getspace_overflow_hack = Cvar_Get("sv_getspace_overflow_hack", "0", 0);
+	Cvar_SetDescription("sv_getspace_overflow_hack", "Reset map if stuck in SZ_GetSpace() overflow loop.  Resets after 1000 overflowed packets.\n");
 
 	sv_noreload = Cvar_Get ("sv_noreload", "0", 0);
 
@@ -1242,7 +1274,7 @@ void SV_Init (void)
 	public_server = Cvar_Get ("public", "0", 0);
 
 	sv_iplimit = Cvar_Get ("sv_iplimit", "3", 0);	/* r1ch: limit connections per ip address (stop zombie dos/flood) */
-	sv_iplimit->description = "Limit connections per IP address.  Stops zombie DoS/Flood.";
+	Cvar_SetDescription("sv_iplimit", "Limit connections per IP address.  Stops zombie DoS/Flood.");
 
 	sv_reconnect_limit = Cvar_Get ("sv_reconnect_limit", "3", CVAR_ARCHIVE);
 
@@ -1332,4 +1364,3 @@ void SV_GetUptime (void) /* FS: Uptime for /info */
 	units = seconds - 10*tens;
 	Com_sprintf (uptime_infostring, sizeof(uptime_infostring), "%3i:%i%i", minutes, tens, units);
 }
-

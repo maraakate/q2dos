@@ -101,11 +101,11 @@ void Z_SpawnDMItems()
 	int count = 1;
 	
 	// only in deathmatch
-	if (!deathmatch->value)
+	if (!deathmatch->intValue)
 		return;
 
 	// only with the flag set
-	if ((int)zdmflags->value & ZDM_ZAERO_ITEMS)
+	if (zdmflags->intValue & ZDM_ZAERO_ITEMS)
 	{
 		return;
 	}

@@ -1,4 +1,3 @@
-;; -*-asm-*-
 ;; THIS SOFTWARE IS SUBJECT TO COPYRIGHT PROTECTION AND IS OFFERED ONLY
 ;; PURSUANT TO THE 3DFX GLIDE GENERAL PUBLIC LICENSE. THERE IS NO RIGHT
 ;; TO USE THE GLIDE TRADEMARK WITHOUT PRIOR WRITTEN PERMISSION OF 3DFX
@@ -17,9 +16,6 @@
 ;; 
 ;; COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 ;;
-;; $Header: /cvsroot/glide/glide3x/h5/glide3/src/xdraw2.inc,v 1.1.8.10 2007/05/13 09:21:06 koolsmoky Exp $
-;; $Revision: 1.1.8.10 $
-;; $Log: xdraw2.inc,v $
 ;; Revision 1.1.8.10  2007/05/13 09:21:06  koolsmoky
 ;; removed problematic context checks
 ;;

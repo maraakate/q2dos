@@ -17,12 +17,7 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-**
-** $Revision: 1.2.6.4 $ 
-** $Date: 2005/05/25 08:56:24 $ 
-**
 */
-
 
 /* NOTE: This file is compiled to naught if we aren't
    running under Win32 */
@@ -30,14 +25,14 @@
 #include <3dfx.h>
 #include <glidesys.h>
 
-#if defined( __WIN32__ )
-
 #define FX_DLL_DEFINITION
 #include <fxdll.h>
 #include <glide.h>
 
 #include "fxglide.h"
 #include "fxcmd.h"
+
+#if defined( __WIN32__ )
 
 #if (GLIDE_PLATFORM & GLIDE_OS_WIN32)
 #include <windows.h>
@@ -49,8 +44,8 @@ static DWORD            tlsIndex;
 static FxBool threadInit;
 static FxBool criticalSectionInit;
 
-void 
-initThreadStorage( void ) 
+void
+initThreadStorage( void )
 {
   if ( !threadInit ) {
     threadInit = 1;
@@ -68,23 +63,11 @@ void setThreadValue( unsigned long value ) {
     TlsSetValue( _GlideRoot.tlsIndex, (void*)value );
 }
 
-#pragma warning (4:4035)        /* No return value */
-unsigned long getThreadValueSLOW( void ) {
+unsigned long getThreadValueSLOW( void )
+{
     GR_CHECK_F( "getThreadValue", !threadInit, "Thread storage not initialized\n" );
 
-#if 0
-    return (FxU32)TlsGetValue( _GlideRoot.tlsIndex );
-#elif 1
-    __GR_GET_TLSC_VALUE();
-#else
-    __asm {
-      __asm mov esi, DWORD PTR fs:[WNT_TEB_PTR] 
-      __asm add esi, DWORD PTR _GlideRoot.tlsOffset \
-     __asm mov eax, DWORD PTR [esi] \
-}
-
-#endif
-
+    return getThreadValueFast();
 }
 
 void initCriticalSection( void ) {
@@ -106,17 +89,7 @@ void endCriticalSection( void ) {
 
 #elif defined(macintosh)
 
-#include <3dfx.h>
-#include <glidesys.h>
-
-#define FX_DLL_DEFINITION
-#include <fxdll.h>
-#include <glide.h>
-
-#include "fxglide.h"
-#include "fxcmd.h"
-
-FxU32 _threadValueMacOS;
+unsigned long _threadValueMacOS;
 
 void initThreadStorage(void)
 {
@@ -127,11 +100,11 @@ void setThreadValue( unsigned long value )
 	_threadValueMacOS = value;
 }
 
-FxU32 getThreadValueSLOW( void )
+unsigned long getThreadValueSLOW( void )
 {
 	return _threadValueMacOS;
 }
- 
+
 void initCriticalSection(void)
 {
 }
@@ -145,17 +118,6 @@ void endCriticalSection(void)
 }
 
 #elif defined(__linux__) || defined(__FreeBSD__)
-
-
-#include <3dfx.h>
-#include <glidesys.h>
-
-#define FX_DLL_DEFINITION
-#include <fxdll.h>
-#include <glide.h>
-
-#include "fxglide.h"
-#include "fxcmd.h"
 
 unsigned long threadValueLinux;
 
@@ -172,7 +134,7 @@ unsigned long getThreadValueSLOW( void )
 {
 	return threadValueLinux;
 }
- 
+
 void initCriticalSection(void)
 {
 }
@@ -187,33 +149,22 @@ void endCriticalSection(void)
 
 #elif (GLIDE_PLATFORM & GLIDE_OS_DOS32)
 
-
-#include <3dfx.h>
-#include <glidesys.h>
-
-#define FX_DLL_DEFINITION
-#include <fxdll.h>
-#include <glide.h>
-
-#include "fxglide.h"
-#include "fxcmd.h"
-
-FxU32 GR_CDECL threadValueDJGPP;
+unsigned long GR_CDECL threadValueDJGPP;
 
 void initThreadStorage(void)
 {
 }
 
-void setThreadValue( FxU32 value )
+void setThreadValue( unsigned long value )
 {
 	threadValueDJGPP = value;
 }
 
-FxU32 getThreadValueSLOW( void )
+unsigned long getThreadValueSLOW( void )
 {
 	return threadValueDJGPP;
 }
- 
+
 void initCriticalSection(void)
 {
 }

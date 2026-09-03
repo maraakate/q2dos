@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -m32 -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
-CPPFLAGS = -Did386=1 -DWITH_ACEBOT
+CPPFLAGS = -Did386=1 -DWITH_ACEBOT -DNDEBUG
 LDFLAGS = -m32 -shared -Wl,--enable-auto-image-base -Wl,--no-undefined
 
 GAME = g_ai.o \

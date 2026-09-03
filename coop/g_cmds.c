@@ -1,5 +1,7 @@
 #include "g_local.h"
+#include "p_hook.h"
 #include "m_player.h"
+#include "flashlight.h"
 
 extern void SP_info_coop_checkpoint (edict_t * self );
 extern void stopCamera(edict_t *self); /* FS: Zaero specific game dll changes */
@@ -50,7 +52,7 @@ ClientTeam(edict_t *ent, char* value)
 		return value;
 	}
 
-	if ((int)(dmflags->value) & DF_MODELTEAMS)
+	if (dmflags->intValue & DF_MODELTEAMS)
 	{
 		*p = 0;
 		return value;
@@ -78,7 +80,7 @@ OnSameTeam(edict_t *ent1, edict_t *ent2)
 		}
 	}
 
-	if (!((int)(dmflags->value) & (DF_MODELTEAMS | DF_SKINTEAMS)))
+	if (!(dmflags->intValue & (DF_MODELTEAMS | DF_SKINTEAMS)))
 	{
 		return false;
 	}
@@ -312,7 +314,7 @@ Cmd_Give_f(edict_t *ent)
 		return;
 	}
 
-	if ((deathmatch->value || coop->value) && !Client_CanCheat(ent))
+	if ((deathmatch->intValue || coop->intValue) && !Client_CanCheat(ent))
 	{
 		gi.cprintf(ent, PRINT_HIGH,
 				"You must run the server with '+set cheats 1' to enable this command.\n");
@@ -589,7 +591,7 @@ Cmd_God_f(edict_t *ent)
 		return;
 	}
 
-	if ((deathmatch->value || coop->value) && !Client_CanCheat(ent))
+	if ((deathmatch->intValue || coop->intValue) && !Client_CanCheat(ent))
 	{
 		gi.cprintf(ent, PRINT_HIGH,
 				"You must run the server with '+set cheats 1' to enable this command.\n");
@@ -630,7 +632,7 @@ Cmd_Notarget_f(edict_t *ent)
 		return;
 	}
 
-	if ((deathmatch->value || coop->value) && !Client_CanCheat(ent))
+	if ((deathmatch->intValue || coop->intValue) && !Client_CanCheat(ent))
 	{
 		gi.cprintf(ent, PRINT_HIGH,
 				"You must run the server with '+set cheats 1' to enable this command.\n");
@@ -668,7 +670,7 @@ Cmd_Noclip_f(edict_t *ent)
 		return;
 	}
 
-	if ((deathmatch->value || coop->value) && !Client_CanCheat(ent))
+	if ((deathmatch->intValue || coop->intValue) && !Client_CanCheat(ent))
 	{
 		gi.cprintf(ent, PRINT_HIGH, "You must run the server with '+set cheats 1' to enable this command.\n");
 		return;
@@ -937,6 +939,7 @@ Cmd_Use_f(edict_t *ent)
 void
 Cmd_Drop_f(edict_t *ent)
 {
+	int dropTimer; /* FS */
 	int index;
 	gitem_t *it;
 	char *s;
@@ -953,6 +956,16 @@ Cmd_Drop_f(edict_t *ent)
 		return;
 	}
 
+	if (sv_drop_timeout->value) /* FS: Stop trouble makers */
+	{
+		dropTimer = (ent->client->dropTimeout + sv_drop_timeout->value) - level.time;
+		if (dropTimer > 0)
+		{
+			gi.cprintf(ent, PRINT_HIGH, "You must wait at least %d second(s) before you can use this command.\n", dropTimer);
+			return;
+		}
+	}
+
 	s = gi.args();
 	it = FindItem(s);
 
@@ -965,6 +978,12 @@ Cmd_Drop_f(edict_t *ent)
 	if (!it->drop)
 	{
 		gi.cprintf(ent, PRINT_HIGH, "Item is not dropable.\n");
+		return;
+	}
+
+	if (!G_SpawnCheck(256))
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Too many items in world.  Cannot drop right now.\n");
 		return;
 	}
 
@@ -1059,6 +1078,7 @@ Cmd_Drop_f(edict_t *ent)
 	}
 
 	it->drop(ent, it);
+	ent->client->dropTimeout = level.time; /* FS */
 }
 
 void
@@ -1077,7 +1097,7 @@ Cmd_Score_f(edict_t *ent)
 		PMenu_Close(ent);
 	}
 
-	if (!deathmatch->value && !coop->value)
+	if (!deathmatch->intValue && !coop->intValue)
 	{
 		return;
 	}
@@ -1103,7 +1123,7 @@ Cmd_Help_f(edict_t *ent)
 	}
 
 	/* this is for backwards compatability */
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		Cmd_Score_f(ent);
 		return;
@@ -1133,7 +1153,6 @@ Cmd_Help_f(edict_t *ent)
 	ent->client->showhelp = true;
 	ent->client->pers.helpchanged = 0;
 	HelpComputerMessage(ent);
-	gi.unicast(ent, true);
 }
 
 void
@@ -1514,7 +1533,7 @@ Cmd_Players_f(edict_t *ent)
 
 	count = 0;
 
-	for (i = 0; i < maxclients->value; i++)
+	for (i = 0; i < maxclients->intValue; i++)
 	{
 		if (game.clients[i].pers.connected)
 		{
@@ -1612,31 +1631,31 @@ void sayCmd_CheckVote(edict_t *ent, char *voteChat)
 	if(!voteChat || voteChat[0] == '\0')
 		return;
 
-	if(!stricmp(voteChat, "vote yes"))
+	if(!Q_stricmp(voteChat, "vote yes"))
 	{
 		gi.WriteByte(svc_stufftext);
 		gi.WriteString("vote yes\n");
 		gi.unicast(ent, true);
 	}
-	else if(!stricmp(voteChat, "vote no"))
+	else if(!Q_stricmp(voteChat, "vote no"))
 	{
 		gi.WriteByte(svc_stufftext);
 		gi.WriteString("vote no\n");
 		gi.unicast(ent, true);
 	}
-	else if(!stricmp(voteChat, "vote stop"))
+	else if (!Q_stricmp(voteChat, "vote stop"))
 	{
 		gi.WriteByte(svc_stufftext);
 		gi.WriteString("vote stop\n");
 		gi.unicast(ent, true);
 	}
-	else if(!stricmp(voteChat, "vote restartmap"))
+	else if (!Q_stricmp(voteChat, "vote restartmap"))
 	{
 		gi.WriteByte(svc_stufftext);
 		gi.WriteString("vote restartmap\n");
 		gi.unicast(ent, true);
 	}
-	else if(!stricmp(voteChat, "vote playerexit"))
+	else if (!Q_stricmp(voteChat, "vote playerexit"))
 	{
 		gi.WriteByte(svc_stufftext);
 		gi.WriteString("vote playerexit\n");
@@ -1666,13 +1685,31 @@ void sayCmd_CheckVote(edict_t *ent, char *voteChat)
 		gi.WriteString(va("%s\n", voteChat));
 		gi.unicast(ent, true);
 	}
-	else if ( !stricmp(voteChat, "vote help")	|| !stricmp(voteChat, "vote list") || !stricmp(voteChat, "vote cmds")	|| !stricmp(voteChat, "vote commands") )
+	else if(!strncmp(voteChat, "vote kick ", 10))
+	{
+		gi.WriteByte(svc_stufftext);
+		gi.WriteString(va("%s\n", voteChat));
+		gi.unicast(ent, true);
+	}
+	else if(!strncmp(voteChat, "vote ban ", 9))
+	{
+		gi.WriteByte(svc_stufftext);
+		gi.WriteString(va("%s\n", voteChat));
+		gi.unicast(ent, true);
+	}
+	else if (!strncmp(voteChat, "vote silence ", 13))
+	{
+		gi.WriteByte(svc_stufftext);
+		gi.WriteString(va("%s\n", voteChat));
+		gi.unicast(ent, true);
+	}
+	else if (!Q_stricmp(voteChat, "vote help") || !Q_stricmp(voteChat, "vote list") || !Q_stricmp(voteChat, "vote cmds") || !Q_stricmp(voteChat, "vote commands"))
 	{
 		gi.WriteByte(svc_stufftext);
 		gi.WriteString("vote help\n");
 		gi.unicast(ent, true);
 	}
-	else if (!stricmp(voteChat, "vote progress"))
+	else if (!Q_stricmp(voteChat, "vote progress"))
 	{
 		gi.WriteByte(svc_stufftext);
 		gi.WriteString("vote progress\n");
@@ -1682,13 +1719,13 @@ void sayCmd_CheckVote(edict_t *ent, char *voteChat)
 	{
 		if(bVoteInProgress && !ent->hasVoted)
 		{
-			if(!stricmp(voteChat, "yes"))
+			if (!Q_stricmp(voteChat, "yes"))
 			{
 				gi.WriteByte(svc_stufftext);
 				gi.WriteString("vote yes\n");
 				gi.unicast(ent, true);
 			}
-			else if (!stricmp(voteChat, "no"))
+			else if (!Q_stricmp(voteChat, "no"))
 			{
 				gi.WriteByte(svc_stufftext);
 				gi.WriteString("vote no\n");
@@ -1707,7 +1744,7 @@ Cmd_Say_f(edict_t *ent, qboolean team, qboolean arg0)
 	char text[2048];
 	gclient_t *cl;
 
-	if (!ent)
+	if (!ent || !ent->client)
 	{
 		return;
 	}
@@ -1717,7 +1754,12 @@ Cmd_Say_f(edict_t *ent, qboolean team, qboolean arg0)
 		return;
 	}
 
-	if (!((int)(dmflags->value) & (DF_MODELTEAMS | DF_SKINTEAMS)))
+	if (ent->client->pers.isSilenced) /* FS */
+	{
+		return;
+	}
+
+	if (!(dmflags->intValue & (DF_MODELTEAMS | DF_SKINTEAMS)))
 	{
 		team = false;
 	}
@@ -1759,7 +1801,8 @@ Cmd_Say_f(edict_t *ent, qboolean team, qboolean arg0)
 
 	strcat(text, "\n");
 
-	if (flood_msgs->value)
+	/* FS: Admins, VIPs, and WallFly are exempt from this. */
+	if (!ent->client->pers.isAdmin && !ent->client->pers.isVIP && !ent->client->pers.isWallFly && flood_msgs->value)
 	{
 		cl = ent->client;
 
@@ -1792,7 +1835,7 @@ Cmd_Say_f(edict_t *ent, qboolean team, qboolean arg0)
 		cl->flood_when[cl->flood_whenhead] = level.time;
 	}
 
-	if (dedicated->value)
+	if (dedicated->intValue)
 	{
 		gi.cprintf(NULL, PRINT_CHAT, "%s", text);
 	}
@@ -1865,7 +1908,7 @@ Cmd_PlayerList_f(edict_t *ent)
 	/* connect time, ping, score, name */
 	*text = 0;
 
-	for (i = 0, e2 = g_edicts + 1; i < maxclients->value; i++, e2++)
+	for (i = 0, e2 = g_edicts + 1; i < maxclients->intValue; i++, e2++)
 	{
 		if (!e2->inuse)
 		{
@@ -1939,7 +1982,7 @@ void Cmd_Beam_f (edict_t *ent) /* FS: From YamaqiQ2: Beam us to direct coordinat
 		return;
 	}
 
-	if ((deathmatch->value || coop->value) && !Client_CanCheat(ent))
+	if ((deathmatch->intValue || coop->intValue) && !Client_CanCheat(ent))
 	{
 		gi.cprintf(ent, PRINT_HIGH,
 				"You must run the server with '+set cheats 1' to enable this command.\n");
@@ -2104,10 +2147,8 @@ Cmd_SayPerson_f(edict_t *ent) /* FS: Tastyspleen/Q2Admin stuff.  By request. */
 	char *p;
 	char text[2048], entHeader[2048];
 	gclient_t *cl;
-	qboolean bIsPlayerNum = false;
-	qboolean bIsSearch = false;
 
-	if (!ent)
+	if (!ent || !ent->client)
 	{
 		return;
 	}
@@ -2115,6 +2156,11 @@ Cmd_SayPerson_f(edict_t *ent) /* FS: Tastyspleen/Q2Admin stuff.  By request. */
 	if ((gi.argc() < 2))
 	{
 		gi.cprintf(ent, PRINT_HIGH, "Usage: say_person [LIKE/CL] <player_name> <message>\n");
+		return;
+	}
+
+	if (ent->client->pers.isSilenced) /* FS */
+	{
 		return;
 	}
 
@@ -2209,7 +2255,8 @@ Cmd_SayPerson_f(edict_t *ent) /* FS: Tastyspleen/Q2Admin stuff.  By request. */
 	}
 	strcat(entHeader, "\n");
 
-	if (flood_msgs->value)
+	/* FS: Admins, VIPs, and WallFly are exempt from this. */
+	if (!ent->client->pers.isAdmin && !ent->client->pers.isVIP && !ent->client->pers.isWallFly && flood_msgs->value)
 	{
 		cl = ent->client;
 
@@ -2242,7 +2289,7 @@ Cmd_SayPerson_f(edict_t *ent) /* FS: Tastyspleen/Q2Admin stuff.  By request. */
 		cl->flood_when[cl->flood_whenhead] = level.time;
 	}
 
-	if (dedicated->value)
+	if (dedicated->intValue)
 	{
 		gi.cprintf(NULL, PRINT_CHAT, "%s", text);
 	}
@@ -2299,6 +2346,12 @@ ClientCommand(edict_t *ent)
 			SelectPrevItem (ent, -1);
 		}
 	
+		return;
+	}
+
+	if (Q_stricmp(cmd, "flashlight") == 0)
+	{
+		Cmd_Flashlight(ent);
 		return;
 	}
 
@@ -2501,10 +2554,6 @@ ClientCommand(edict_t *ent)
 	{
 		Cmd_Runrun_f(ent);
 	}
-	else if (Q_stricmp(cmd, "anglesverbose") == 0) /* FS: Debug test */
-	{
-		Cmd_Angles_Verbose_f(ent);
-	}
 	else if (Q_stricmp(cmd, "say_person") == 0) /* FS: Tastyspleen/Q2Admin stuff.  By request. */
 	{
 		Cmd_SayPerson_f(ent);
@@ -2527,6 +2576,15 @@ ClientCommand(edict_t *ent)
 	else if ((Q_stricmp(cmd, "push") == 0) || (Q_stricmp(cmd,"pull") == 0))
 	{
 		/* FS: Purposely do nothing.  This somehow got in my cfgs, and some other users.  I see this happen to people during vid_restarts and vid_restarts are firing off mwheelup and mwheeldown for some reason... */
+	}
+	else if (Q_stricmp(cmd, "hook") == 0)
+	{
+		hook_fire(ent);
+	}
+	else if (Q_stricmp(cmd, "unhook") == 0)
+	{
+		if (ent->client->hook)
+			hook_reset(ent->client->hook);
 	}
 	else /* anything that doesn't match a command will be a chat */
 	{

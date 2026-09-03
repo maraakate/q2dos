@@ -17,10 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-**
-** $Revision: 1.1.2.2 $ 
-** $Date: 2005/05/25 08:51:52 $ 
-**
 */
 
 #ifndef _TINI_H_

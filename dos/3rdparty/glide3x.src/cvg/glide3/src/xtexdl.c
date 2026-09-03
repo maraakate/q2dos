@@ -17,8 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/cvg/glide3/src/xtexdl.c,v 1.1.1.1.8.1 2005/08/13 21:06:57 jwrdegoede Exp $
-** $Log: xtexdl.c,v $
 ** Revision 1.1.1.1.8.1  2005/08/13 21:06:57  jwrdegoede
 ** Last needed 64 bit fixes for h5/h3, complete 64 bit support for cvg
 **

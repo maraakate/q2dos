@@ -213,7 +213,7 @@ void actor_pain (edict_t *self, edict_t *other, float kick, int damage)
 	int		n;
 
 	if (self->health < (self->max_health / 2))
-		self->s.skinnum = 1;
+		self->s.skinnum |= 1;
 
 	if (level.time < self->pain_debounce_time)
 		return;
@@ -321,13 +321,13 @@ void actor_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damage
 {
 	int		n;
 
-// check for gib
+	// check for gib
 	if (self->health <= -80)
 	{
-//		gi.sound (self, CHAN_VOICE, actor.sound_gib, 1, ATTN_NORM, 0);
-		for (n= 0; n < 2; n++)
+	//	gi.sound (self, CHAN_VOICE, actor.sound_gib, 1, ATTN_NORM, 0);
+		for (n = 0; n < 2; n++)
 			ThrowGib (self, "models/objects/gibs/bone/tris.md2", damage, GIB_ORGANIC);
-		for (n= 0; n < 4; n++)
+		for (n = 0; n < 4; n++)
 			ThrowGib (self, "models/objects/gibs/sm_meat/tris.md2", damage, GIB_ORGANIC);
 		ThrowHead (self, "models/objects/gibs/head2/tris.md2", damage, GIB_ORGANIC);
 		self->deadflag = DEAD_DEAD;
@@ -337,10 +337,11 @@ void actor_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damage
 	if (self->deadflag == DEAD_DEAD)
 		return;
 
-// regular death
+	// regular death
 //	gi.sound (self, CHAN_VOICE, actor.sound_die, 1, ATTN_NORM, 0);
 	self->deadflag = DEAD_DEAD;
 	self->takedamage = DAMAGE_YES;
+	self->s.skinnum |= 1;	// Knightmare- make sure pain skin is set if we got one-shotted
 
 	n = rand() % 2;
 	if (n == 0)
@@ -405,7 +406,7 @@ void actor_use (edict_t *self, edict_t *other, edict_t *activator)
 
 void SP_misc_actor (edict_t *self)
 {
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict (self);
 		return;
@@ -556,7 +557,7 @@ void target_actor_touch (edict_t *self, edict_t *other, cplane_t *plane, csurfac
 		other->monsterinfo.pausetime = level.time + 100000000;
 		other->monsterinfo.stand (other);
 	}
-	else if (other->movetarget == other->goalentity)
+	else if (other->movetarget && (other->movetarget == other->goalentity))
 	{
 		VectorSubtract (other->movetarget->s.origin, other->s.origin, v);
 		other->ideal_yaw = vectoyaw (v);

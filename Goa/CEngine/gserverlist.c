@@ -870,7 +870,7 @@ specified comparemode.
 sortkey can be a normal server key, or "ping" or "hostaddr" */
 void ServerListSort(GServerList serverlist, gbool ascending, char *sortkey, GCompareMode comparemode)
 {
-	ArrayCompareFn comparator = 0; /* FS: Compiler warning */
+	ArrayCompareFn comparator = NULL; /* FS: Compiler warning */
 
 	switch (comparemode)
 	{

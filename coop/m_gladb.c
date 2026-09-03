@@ -256,7 +256,7 @@ gladbGun_check(edict_t *self)
 		return;
 	}
 
-	if (skill->value == 3)
+	if (skill->intValue == 3)
 	{
 		gladbGun(self);
 	}
@@ -351,7 +351,7 @@ gladb_pain(edict_t *self, edict_t *other /* unused */,
 
 	if (self->health < (self->max_health / 2))
 	{
-		self->s.skinnum = 1;
+		self->s.skinnum |= 1;
 	}
 
 	if (level.time < self->pain_debounce_time)
@@ -475,6 +475,7 @@ gladb_die(edict_t *self, edict_t *inflictor /* unused */,
 	gi.sound(self, CHAN_VOICE, sound_die, 1, ATTN_NORM, 0);
 	self->deadflag = DEAD_DEAD;
 	self->takedamage = DAMAGE_YES;
+	self->s.skinnum |= 1;	// Knightmare- make sure pain skin is set if we got one-shotted
 
 	self->monsterinfo.currentmove = &gladb_move_death;
 }
@@ -485,7 +486,7 @@ gladb_die(edict_t *self, edict_t *inflictor /* unused */,
 void
 SP_monster_gladb(edict_t *self)
 {
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;
@@ -525,6 +526,8 @@ SP_monster_gladb(edict_t *self)
 	self->monsterinfo.sight = gladb_sight;
 	self->monsterinfo.idle = gladb_idle;
 	self->monsterinfo.search = gladb_search;
+
+	self->blood_type = 3;	// Knightmare- use sparks and blood type
 
 	gi.linkentity(self);
 	self->monsterinfo.currentmove = &gladb_move_stand;

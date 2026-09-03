@@ -1,4 +1,3 @@
-/*-*-c++-*-*/
 /*
 ** THIS SOFTWARE IS SUBJECT TO COPYRIGHT PROTECTION AND IS OFFERED ONLY
 ** PURSUANT TO THE 3DFX GLIDE GENERAL PUBLIC LICENSE. THERE IS NO RIGHT
@@ -18,20 +17,12 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-**
-** $Revision: 1.3.4.5 $ 
-** $Date: 2005/08/13 21:07:00 $ 
-**
 */
 
 #ifndef __SST1INIT_H__
 #define __SST1INIT_H__
 
 /*
-**
-** $Revision: 1.3.4.5 $
-** $Date: 2005/08/13 21:07:00 $
-**
 ** SST-1 Initialization routine protypes
 **
 ** If all initialization routines are called, it is assumed they are called
@@ -83,7 +74,9 @@
 
 #else /* DIRECTX */
 #include "ddglobal.h"
+#ifdef _MSC_VER
 #pragma optimize ("",off)   /* ddglobal.h tuns this on for retail builds */
+#endif
 #undef INIT_PRINTF
 #undef INIT_INFO
 #undef GETENV
@@ -97,7 +90,7 @@
 #ifdef FXTRACE
   #define INIT_PRINTF DDPRINTF
 #else
-  #define INIT_PRINTF 1 ? (void) 0 : (void)
+  #define INIT_PRINTF(a) (void)0
 #endif
 #define INIT_INFO(A)
 /* #define GETENV(A)  ddgetenv(A) */
@@ -156,7 +149,7 @@ p6Fence(void);
 # define P6FENCE asm volatile("mb" ::: "memory");
 #else
 #  error "P6 Fencing in-line assembler code needs to be added for this compiler"
-#endif  
+#endif
 
 #ifdef __cplusplus
 }
@@ -764,7 +757,6 @@ extern "C" {
 #endif
 
 #ifdef SST1INIT_ALLOCATE
-  static char headersIdent[] = "@#%Voodoo2 InitHeaders $Revision: 1.3.4.5 $";
   FxBool sst1InitUseVoodooFile = FXFALSE;
   sst1InitEnvVarStruct *envVarsBase = (sst1InitEnvVarStruct *) NULL;
   sst1InitDacStruct *dacStructBase = (sst1InitDacStruct *) NULL;

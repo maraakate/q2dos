@@ -19,6 +19,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // client.h -- primary header for client
 
+#ifndef __CLIENT_H
+#define __CLIENT_H
+
 //define	PARANOID			// speed sapping error checking
 
 #include <math.h>
@@ -46,19 +49,27 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "cdaudio.h"
 
 #ifdef USE_CURL /* HTTP downloading from R1Q2 */
-#ifdef _WIN32
+#ifdef _WIN32 /* using local libcurl */
 #define CURL_STATICLIB
 #define CURL_HIDDEN_SYMBOLS
 #define CURL_EXTERN_SYMBOL
 #define CURL_CALLING_CONVENTION __cdecl
+#define LOCAL_CURL_BUILD
+#endif
+#ifdef _DJGPP /* using local libcurl */
+#define CURL_STATICLIB
+#define LOCAL_CURL_BUILD
 #endif
 
-#define CURL_STATICLIB
+#ifdef LOCAL_CURL_BUILD
 #include "../libcurl/include/curl/curl.h"
+#else /* using system-installed libcurl */
+#include <curl/curl.h>
+#endif
 #define CURL_ERROR(x)	curl_easy_strerror(x)
 
 #define MAX_HTTP_HANDLES 4 /* FS: If I want to be nasty and change the value */
-#endif /* end HTTP downloading from R1Q2 */
+#endif
 
 //=============================================================================
 
@@ -301,7 +312,6 @@ typedef struct
 	FILE		*download;			// file transfer from server
 	char		downloadtempname[MAX_OSPATH];
 	char		downloadname[MAX_OSPATH];
-	int			downloadnumber;
 	dltype_t	downloadtype;
 	size_t		downloadposition;	// added for HTTP downloads
 	int			downloadpercent;
@@ -742,3 +752,7 @@ void x86_TimerStop( void );
 void x86_TimerInit( unsigned long smallest, unsigned longest );
 unsigned long *x86_TimerGetHistogram( void );
 #endif
+
+qboolean CL_IsDemoWithTimeDemo (void);
+
+#endif // __CLIENT_H

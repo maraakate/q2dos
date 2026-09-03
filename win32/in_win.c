@@ -108,7 +108,9 @@ cvar_t	*m_filter;
 
 qboolean	mlooking;
 
-void IN_MLookDown (void) { mlooking = true; }
+void IN_MLookDown (void) {
+	mlooking = true;
+}
 void IN_MLookUp (void) {
 	mlooking = false;
 	if (!freelook->value && lookspring->value)
@@ -146,7 +148,7 @@ void IN_ActivateMouse (void)
 
 	if (!mouseinitialized)
 		return;
-	if (!in_mouse->value)
+	if (!in_mouse->intValue)
 	{
 		mouseactive = false;
 		return;
@@ -224,7 +226,7 @@ void IN_StartupMouse (void)
 	cvar_t		*cv;
 
 	cv = Cvar_Get ("in_initmouse", "1", CVAR_NOSET);
-	if ( !cv->value )
+	if ( !cv->intValue)
 		return;
 
 	mouseinitialized = true;
@@ -288,7 +290,7 @@ void IN_MouseMove (usercmd_t *cmd)
 		return;
 #endif
 
-	if (m_filter->value)
+	if (m_filter->intValue)
 	{
 		mouse_x = (mx + old_mouse_x) * 0.5;
 		mouse_y = (my + old_mouse_y) * 0.5;
@@ -305,7 +307,7 @@ void IN_MouseMove (usercmd_t *cmd)
 	mouse_x *= sensitivity->value;
 	mouse_y *= sensitivity->value;
 
-// add mouse X/Y movement to cmd
+	// add mouse X/Y movement to cmd
 	if ( (in_strafe.state & 1) || (lookstrafe->value && mlooking ))
 		cmd->sidemove += m_side->value * mouse_x;
 	else
@@ -428,9 +430,7 @@ void IN_Frame (void)
 		return;
 	}
 
-	if ( !cl.refresh_prepped
-		|| cls.key_dest == key_console
-		|| cls.key_dest == key_menu)
+	if (!cl.refresh_prepped || cls.key_dest == key_console || cls.key_dest == key_menu)
 	{
 		// temporarily deactivate if in fullscreen
 		if (Cvar_VariableValue ("vid_fullscreen") == 0)
@@ -483,7 +483,7 @@ JOYSTICK
 IN_StartupJoystick
 ===============
 */
-void IN_StartupJoystick (void) 
+void IN_StartupJoystick (void)
 {
 	UINT			numdevs;
 	JOYCAPS		jc;
@@ -495,7 +495,7 @@ void IN_StartupJoystick (void)
 
 	// abort startup if user requests no joystick
 	cv = Cvar_Get ("in_initjoy", "1", CVAR_NOSET);
-	if ( !cv->value )
+	if ( !cv->intValue)
 		return;
 
 	// verify joystick driver is present
@@ -528,7 +528,7 @@ void IN_StartupJoystick (void)
 	memset (&jc, 0, sizeof(jc));
 	if ((mmr = joyGetDevCaps (joy_id, &jc, sizeof(jc))) != JOYERR_NOERROR)
 	{
-		Com_Printf ("\njoystick not found -- invalid joystick capabilities (%x)\n\n", mmr); 
+		Com_Printf ("\njoystick not found -- invalid joystick capabilities (%x)\n\n", mmr);
 		return;
 	}
 
@@ -545,7 +545,7 @@ void IN_StartupJoystick (void)
 	joy_avail = true;
 	joy_advancedinit = false;
 
-	Com_Printf ("\njoystick detected\n\n"); 
+	Com_Printf ("\njoystick detected\n\n");
 }
 
 
@@ -572,7 +572,7 @@ PDWORD RawValuePointer (int axis)
 		return &ji.dwVpos;
 	}
 
-	return 0; // FS: Compiler warning
+	return NULL;
 }
 
 
@@ -658,9 +658,7 @@ void IN_Commands (void)
 	DWORD	buttonstate, povstate;
 
 	if (!joy_avail)
-	{
 		return;
-	}
 
 	// loop through the joystick buttons
 	// key a joystick event or auxillary event for higher number buttons for each state change
@@ -756,7 +754,7 @@ void IN_JoyMove (usercmd_t *cmd)
 
 	// complete initialization if first time in
 	// this is needed as cvars are not available at initialization time
-	if( joy_advancedinit != true )
+	if(!joy_advancedinit)
 	{
 		Joy_AdvancedUpdate_f();
 		joy_advancedinit = true;
@@ -765,11 +763,11 @@ void IN_JoyMove (usercmd_t *cmd)
 	// verify joystick is available and that the user wants to use it
 	if (!joy_avail || !in_joystick->value)
 	{
-		return; 
+		return;
 	}
- 
+
 	// collect the joystick data, if possible
-	if (IN_ReadJoystick () != true)
+	if (!IN_ReadJoystick())
 	{
 		return;
 	}
@@ -788,7 +786,7 @@ void IN_JoyMove (usercmd_t *cmd)
 		// move centerpoint to zero
 		fAxisValue -= 32768.0;
 
-		// convert range from -32768..32767 to -1..1 
+		// convert range from -32768..32767 to -1..1
 		fAxisValue /= 32768.0;
 
 		switch (dwAxisMap[i])
@@ -798,7 +796,7 @@ void IN_JoyMove (usercmd_t *cmd)
 			{
 				// user wants forward control to become look control
 				if (fabs(fAxisValue) > joy_pitchthreshold->value)
-				{		
+				{
 					// if mouse invert is on, invert the joystick pitch value
 					// only absolute control support here (joy_advanced is false)
 					if (m_pitch->value < 0.0)
@@ -885,4 +883,3 @@ void IN_JoyMove (usercmd_t *cmd)
 		}
 	}
 }
-

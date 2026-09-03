@@ -22,11 +22,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#ifndef __linux__
-#include <conio.h>
-#else
-#include <linutil.h>
-#endif
 #include <assert.h>
 
 #include <glide.h>
@@ -45,7 +40,7 @@ static unsigned int iRandom (unsigned int maxr);
 
 typedef enum { NORMAL, ANTIALIASED } Mode;
 
-void main( int argc, char **argv) {
+int main( int argc, char **argv) {
     char match; 
     char **remArgs;
     int  rv;
@@ -62,7 +57,7 @@ void main( int argc, char **argv) {
     static TlVertex3D srcVerts[100];
     float angle;
 
-    int                  ftsize = 0;
+    FxI32                ftsize = 0;
     GrFog_t              *fogtable = NULL;
     FxU32                zrange[2];
     GrContext_t          gc = 0;
@@ -72,13 +67,13 @@ void main( int argc, char **argv) {
     assert( hwconfig = tlVoodooType() );
 
     /* Process Command Line Arguments */
-    while( rv = tlGetOpt( argc, argv, "nr", &match, &remArgs ) ) {
+    while ((rv = tlGetOpt(argc, argv, "nr", &match, &remArgs)) != 0) {
         if ( rv == -1 ) {
             printf( "Unrecognized command line argument\n" );
             printf( "%s %s\n", name, usage );
             printf( "Available resolutions:\n%s\n",
                     tlGetResolutionList() );
-            return;
+            return -1;
         }
         switch( match ) {
         case 'n':
@@ -120,8 +115,8 @@ void main( int argc, char **argv) {
               60, 15, 0xffffff );
     
     /* Set up Render State - flat shading - alpha blending */
-    grGet(GR_ZDEPTH_MIN_MAX, 8, (FxI32 *)zrange);  
-    grGet(GR_FOG_TABLE_ENTRIES, 4, (FxI32 *)&ftsize);
+    grGet(GR_ZDEPTH_MIN_MAX, 8, (FxI32 *)zrange);
+    grGet(GR_FOG_TABLE_ENTRIES, 4, &ftsize);
     fogtable = malloc(sizeof(GrFog_t)*ftsize);
     assert(fogtable);
     grVertexLayout(GR_PARAM_XY,  0, GR_PARAM_ENABLE);
@@ -255,7 +250,7 @@ void main( int argc, char **argv) {
     free(fogtable);
  __errExit:    
     grGlideShutdown();
-    return;
+    return 0;
 }
 
 static unsigned long randx = 1;

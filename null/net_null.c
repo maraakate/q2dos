@@ -44,8 +44,6 @@ loopback_t	loopbacks[2];
 int			ip_sockets[2];
 int			ipx_sockets[2];
 
-char *NET_ErrorString (void);
-
 //=============================================================================
 
 

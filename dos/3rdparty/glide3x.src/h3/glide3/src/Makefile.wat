@@ -1,20 +1,17 @@
 # OpenWatcom makefile for Glide3/H3 and Texus2
 # This makefile MUST be processed by GNU make!!!
+# Building under native DOS is not supported:
+#		only tested under Win32 or Linux
 #
 #  Copyright (c) 2004 - Daniel Borca
 #  Email : dborca@users.sourceforge.net
 #  Web   : http://www.geocities.com/dborca
 #
-# $Header: /cvsroot/glide/glide3x/h3/glide3/src/Attic/Makefile.wat,v 1.1.2.2 2005/05/25 08:49:25 jwrdegoede Exp $
-#
-
 
 #
 #  Available options:
 #
 #    Environment variables:
-#	FX_GLIDE_HW	build for the given ASIC (h3).
-#			default = h3
 #	H4=1		High speed Avenger.
 #			default = no
 #	OPTFLAGS	pass given optimization flags to compiler
@@ -37,8 +34,6 @@
 #	realclean:	remove all generated files
 #
 
-
-
 .PHONY: all glide3x clean realclean
 .INTERMEDIATE: fxgasm.exe wlib.lbc
 .SUFFIXES: .c .obj
@@ -50,7 +45,6 @@
 GLIDE_LIB = glide3x.lib
 TEXUS_EXE = texus2.exe
 
-FX_GLIDE_HW ?= h3
 FX_GLIDE_SW = ../../../swlibs
 GLIDE_LIBDIR = ../../lib
 TEXUS_EXEDIR = $(FX_GLIDE_SW)/bin
@@ -63,10 +57,15 @@ CC = wcl386
 AS = nasm
 AR = wlib
 
-ifeq ($(wildcard $(addsuffix /rm.exe,$(subst ;, ,$(PATH)))),)
+# detect if running under unix by finding 'rm' in $PATH :
+ifeq ($(wildcard $(addsuffix /rm,$(subst :, ,$(PATH)))),)
+DOSMODE= 1
 UNLINK = del $(subst /,\,$(1))
+FIXPATH= $(subst /,\,$1)
 else
+DOSMODE= 0
 UNLINK = $(RM) $(1)
+FIXPATH= $1
 endif
 
 ###############################################################################
@@ -91,8 +90,8 @@ ifdef DEBUG
 CDEFS += -DGDBG_INFO_ON -DGLIDE_DEBUG -DGLIDE_SANITY_ASSERT -DGLIDE_SANITY_SIZE
 endif
 
-# other
-CDEFS += -DGLIDE_PLUG -DGLIDE_SPLASH
+# shameless plug and splash screen
+#CDEFS += -DGLIDE_PLUG -DGLIDE_SPLASH
 
 ifeq ($(TEXUS2),1)
 CDEFS += -DHAVE_TEXUS2
@@ -105,17 +104,24 @@ endif
 # librarian
 ARFLAGS = -c -fo -n -t -q
 
+# linker
+# pick either of causeway, dos4g, dos32a or stub32a as link target
+LDFLAGS = -zq -k16384 -l=dos32a
+
 # assembler
 ASFLAGS = -O6 -fobj -D__WATCOMD__ --prefix _
 ASFLAGS += $(CDEFS)
 
 # compiler
-CFLAGS = -wx
-CFLAGS += -I. -I../../incsrc -I../../minihwc -I../../cinit
-CFLAGS += -I$(FX_GLIDE_SW)/fxmisc -I$(FX_GLIDE_SW)/newpci/pcilib -I$(FX_GLIDE_SW)/fxmemmap
-CFLAGS += -I$(FX_GLIDE_SW)/texus2/lib
+CFLAGS = -bt=dos -wx -zq
+# newer OpenWatcom versions enable W303 by default
+CFLAGS += -wcd=303
+INCPATH = -I. -I../../incsrc -I../../minihwc -I../../cinit
+INCPATH += -I$(FX_GLIDE_SW)/fxmisc -I$(FX_GLIDE_SW)/newpci/pcilib -I$(FX_GLIDE_SW)/fxmemmap
+INCPATH += -I$(FX_GLIDE_SW)/texus2/lib
 OPTFLAGS ?= -ox -5s
 CFLAGS += $(CDEFS) $(OPTFLAGS)
+CFLAGS += $(call FIXPATH,$(INCPATH))
 
 ifeq ($(USE_3DNOW),1)
 CFLAGS += -DGL_AMD3D
@@ -127,10 +133,6 @@ CFLAGS += -DGL_X86
 else
 CFLAGS += -DGLIDE_USE_C_TRISETUP
 endif
-
-# Watcom woes: pass parameters through environment vars
-export WCC386 = $(subst /,\,$(CFLAGS))
-export WCL386 = -zq
 
 ###############################################################################
 #	objects
@@ -158,7 +160,7 @@ GLIDE_OBJECTS = \
 	gsst.obj \
 	gtex.obj \
 	gtexdl.obj \
-	xtexdl_d.obj
+	xtexdl_def.obj
 
 ifeq ($(USE_X86),1)
 GLIDE_OBJECTS += \
@@ -220,7 +222,7 @@ endif
 ###############################################################################
 
 .c.obj:
-	$(CC) -fo=$@ -c $<
+	$(CC) $(CFLAGS) -fo=$@ -c $<
 
 ###############################################################################
 #	main
@@ -230,11 +232,11 @@ all: glide3x $(TEXUS_EXEDIR)/$(TEXUS_EXE)
 glide3x: $(GLIDE_LIBDIR)/$(GLIDE_LIB)
 
 $(GLIDE_LIBDIR)/$(GLIDE_LIB): wlib.lbc
-	$(AR) $(ARFLAGS) -o $(subst /,\,$@) @wlib
+	$(AR) $(ARFLAGS) -o $(call FIXPATH,$@) @wlib.lbc
 
 $(TEXUS_EXEDIR)/$(TEXUS_EXE): $(FX_GLIDE_SW)/texus2/cmd/cmd.c $(GLIDE_LIBDIR)/$(GLIDE_LIB)
 ifeq ($(TEXUS2),1)
-	$(CC) -fe=$(subst /,\,$@) $(subst /,\,$^)
+	$(CC) $(CFLAGS) -fe=$(call FIXPATH,$@) $(LDFLAGS) $(call FIXPATH,$^)
 else
 	$(warning Texus2 not enabled... Skipping $(TEXUS_EXE))
 endif
@@ -249,10 +251,6 @@ xdraw2_d.obj: xdraw2.asm
 	$(AS) -o $@ $(ASFLAGS) $<
 xdraw3_d.obj: xdraw3.asm
 	$(AS) -o $@ $(ASFLAGS) $<
-xtexdl_d.obj: xtexdl_def.c
-	copy xtexdl_def.c xtexdl_d.c
-	$(CC) -fo=$@ -c xtexdl_d.c
-	-$(call UNLINK,xtexdl_d.c)
 xdraw2_3.obj: xdraw2.asm
 	$(AS) -o $@ $(ASFLAGS) -DGL_AMD3D=1 $<
 xdraw3_3.obj: xdraw3.asm
@@ -263,15 +261,16 @@ xtexdl_3.obj: xtexdl.asm
 $(GLIDE_OBJECTS): fxinline.h fxgasm.h
 
 fxinline.h: fxgasm.exe
-	$< -inline > $@
+	$(call FIXPATH,./$<) -inline > $@
 
 fxgasm.h: fxgasm.exe
-	$< -hex > $@
+	$(call FIXPATH,./$<) -hex > $@
 
+# -bt without args resets build target to host OS.
 fxgasm.exe: fxgasm.c
-	$(CC) -fe=$@ $<
+	$(CC) $(CFLAGS) -bt -fe=$@ $<
 
-wlib.lbc: $(subst /,\,$(GLIDE_OBJECTS))
+wlib.lbc: $(call FIXPATH,$(GLIDE_OBJECTS))
 	@echo $(addprefix +,$^) > wlib.lbc
 
 ###############################################################################
@@ -280,6 +279,7 @@ wlib.lbc: $(subst /,\,$(GLIDE_OBJECTS))
 
 clean:
 	-$(call UNLINK,*.obj)
+	-$(call UNLINK,*.o)
 	-$(call UNLINK,../../cinit/*.obj)
 	-$(call UNLINK,../../minihwc/*.obj)
 	-$(call UNLINK,$(FX_GLIDE_SW)/newpci/pcilib/*.obj)

@@ -1,0 +1,6 @@
+# Export file for ref_soft.so
+ref_soft.so {
+	global: GetRefAPI;
+		RW_*;
+	local: *;
+};

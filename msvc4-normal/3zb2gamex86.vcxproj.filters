@@ -1,0 +1,140 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{8564c3f4-87d0-4bc5-bb2d-a0b0fbde1e7d}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;for;f90</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{add8b4f7-ee88-471c-b4bc-0a0d44d37183}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;fi;fd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{08aa5478-0dc2-45cb-a7d3-db3294c6a6b2}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\3zb2\bot.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\3zb2\bot_fire.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\3zb2\bot_func.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\3zb2\bot_za.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\3zb2\g_chase.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\3zb2\g_cmds.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\3zb2\g_combat.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\3zb2\g_ctf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\3zb2\g_func.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\3zb2\g_items.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\3zb2\g_main.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\3zb2\g_misc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\3zb2\g_monster.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\3zb2\g_phys.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\3zb2\g_save.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\3zb2\g_spawn.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\3zb2\g_svcmds.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\3zb2\g_target.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\3zb2\g_trigger.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\3zb2\g_turret.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\3zb2\g_utils.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\3zb2\g_weapon.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\3zb2\m_move.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\3zb2\p_client.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\3zb2\p_hud.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\3zb2\p_menu.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\3zb2\p_trail.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\3zb2\p_view.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\3zb2\p_weapon.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\3zb2\q_shared.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\3zb2\game.def">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\3zb2\bot.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\3zb2\botstr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\3zb2\g_ctf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\3zb2\g_local.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\3zb2\game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\3zb2\m_player.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\3zb2\p_menu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\3zb2\q_shared.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

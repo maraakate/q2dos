@@ -547,7 +547,7 @@ brain_tentacle_attack(edict_t *self)
 
 	VectorSet(aim, MELEE_DISTANCE, 0, 8);
 
-	if (fire_hit(self, aim, (10 + (rand() % 5)), -600) && (skill->value > 0))
+	if (fire_hit(self, aim, (10 + (rand() % 5)), -600) && (skill->intValue > 0))
 	{
 		self->spawnflags |= 65536;
 	}
@@ -965,7 +965,7 @@ brain_pain(edict_t *self, edict_t *other /* unused */,
 
 	if (self->health < (self->max_health / 2))
 	{
-		self->s.skinnum = 1;
+		self->s.skinnum |= 1;
 	}
 
 	if (level.time < self->pain_debounce_time)
@@ -975,7 +975,7 @@ brain_pain(edict_t *self, edict_t *other /* unused */,
 
 	self->pain_debounce_time = level.time + 3;
 
-	if (skill->value == 3)
+	if (skill->intValue == 3)
 	{
 		return; /* no pain anims in nightmare */
 	}
@@ -1021,6 +1021,8 @@ brain_dead(edict_t *self)
 	self->movetype = MOVETYPE_TOSS;
 	self->svflags |= SVF_DEADMONSTER;
 	self->nextthink = 0;
+	self->s.skinnum |= 1;	// Knightmare- make sure pain skin is set if we got one-shotted
+
 	gi.linkentity(self);
 }
 
@@ -1092,14 +1094,14 @@ brain_duck(edict_t *self, float eta) /* FS: Coop: Rogue specific */
 	/* has to be done immediately otherwise he can get stuck */
 	monster_duck_down(self);
 
-	if (skill->value == 0)
+	if (skill->intValue == 0)
 	{
 		/* PMM - stupid dodge */
 		self->monsterinfo.duck_wait_time = level.time + eta + 1;
 	}
 	else
 	{
-		self->monsterinfo.duck_wait_time = level.time + eta + (0.1 * (3 - skill->value));
+		self->monsterinfo.duck_wait_time = level.time + eta + (0.1 * (3 - skill->intValue));
 	}
 
 	self->monsterinfo.currentmove = &brain_move_duck_rogue;
@@ -1118,7 +1120,7 @@ SP_monster_brain(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;
@@ -1178,6 +1180,8 @@ SP_monster_brain(edict_t *self)
 
 	self->monsterinfo.power_armor_type = POWER_ARMOR_SCREEN;
 	self->monsterinfo.power_armor_power = 100;
+
+	self->blood_type = 3;	// Knightmare- use sparks and blood type
 
 	gi.linkentity(self);
 

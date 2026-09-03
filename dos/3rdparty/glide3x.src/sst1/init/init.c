@@ -16,13 +16,7 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-**
-** $Revision: 1.1.2.4 $ 
-** $Date: 2005/05/10 11:27:23 $ 
-**
 */
-
 
 #include "init.h"
 #include "fxinit.h"
@@ -36,37 +30,53 @@
 #define _outp outp
 #define _outpw outpw
 #endif
-#if defined(__linux__)
 
+#if defined(__linux__)
 #define _inp(port) pioInByte(port)
 #define _outp(port, data) pioOutByte(port, data)
 #define _outpw(port, data) pioOutWord(port, data);
-
 #endif
+
 #ifdef __DJGPP__
 #include <fxdpmi.h>
 #endif
 
+#if defined(SST96)
 #include <init96.h>
+#else
 #include <sst1init.h>
+#endif
 
 #ifdef _WIN32
 #define _WIN32_LEAN_AND_MEAN_
 #include <windows.h>
+#ifdef __MINGW32__
+static inline unsigned char _inp_asm (unsigned short _port) {
+  unsigned char rc;
+  __asm__ __volatile__ ("inb %w1,%b0" : "=a" (rc) : "Nd" (_port));
+  return rc;
+}
+static inline void _outp_asm (unsigned short _port, unsigned char _data) {
+  __asm__ __volatile__ ("outb %b0,%w1" : : "a" (_data), "Nd" (_port));
+}
+#define _inp  _inp_asm
+#define _outp  _outp_asm
 #endif
+#endif /* _WIN32 */
 
 #include <fxpci.h>
 #include <gdebug.h>
-
 
 
 /*-------------------------------------------------------------------
   Module Constants
   -------------------------------------------------------------------*/
 
-
+#if 0
 static InitContext
   contexts[NUM_3DFX_PRODUCTS];  /* pool of device contexts */
+#endif
+static InitContext initctx;     /* device context - no pool anymore */
 InitContext
   *context;                     /* Current device context */
 static InitDeviceInfo
@@ -178,7 +188,7 @@ initEnumHardware( InitHWEnumCallback *cb )
             FxU8 regVal;
             _outp(0x3d4, 0x3f);
             regVal = _inp(0x3d5);
-            
+
             if (!(regVal & (1 << 2))) /* we're not there */
               continue;
           }
@@ -201,38 +211,44 @@ initEnumHardware( InitHWEnumCallback *cb )
             (FxU32)hwInfo[numDevicesInSystem].regs.hwDep.VG96RegDesc.partnerRegPtr;
           hwInfo[numDevicesInSystem].hwDep.vg96Info.vg96BaseAddr = 
             (FxU32)hwInfo[numDevicesInSystem].regs.hwDep.VG96RegDesc.baseAddress;
-          
+
           numDevicesInSystem++;
-        } 
+        }
 #else
 #  error "Do hardware enumeration for this chip!"
 #endif
       }
     }
-    
 
+#if defined(SST1)
     /* Sanity Check for SLI detection */
     for( device = 0; device < numDevicesInSystem; device++ ) {
-      if ( hwInfo[device].hwClass == INIT_VOODOO &&
-          hwInfo[device].hwDep.vgInfo.sliDetect              &&
+      if( hwInfo[device].hwDep.vgInfo.sliDetect           &&
           hwInfo[device].hwDep.vgInfo.slaveBaseAddr == 0 ) {
         hwInfo[device].hwDep.vgInfo.sliDetect = FXFALSE;
       }
     }
+#endif
 
+#if 0
     /* Initialize all drivers */
     vgDriverInit( &contexts[INIT_VOODOO] );
     vg96DriverInit( &contexts[INIT_VG96] );
-
+#endif
+#if !defined(SST96)
+    vgDriverInit( &initctx );
+#else
+    vg96DriverInit( &initctx );
+#endif
 
     /* Mark the library as initialized */
     libInitialized = FXTRUE;
   }
-  
+
   if ( cb ) {
     for( device = 0; device < numDevicesInSystem; device++ ) {
       cb( &hwInfo[device] );
-    } 
+    }
   }
   return;
 } /* initEnumHardware */
@@ -346,17 +362,25 @@ initGetDeviceInfo( FxU32 devNumber, InitDeviceInfo *info )
   -------------------------------------------------------------------*/
 
 FxBool
-initDeviceSelect( FxU32 devNumber ) 
+initDeviceSelect( FxU32 devNumber )
 {
-  FxBool rv = FXFALSE;
-  
   if ( devNumber < numDevicesInSystem ) {
+#if 0 /**/
     context = &contexts[hwInfo[devNumber].hwClass];
+#endif
+#ifdef SST96
+    if (hwInfo[devNumber].hwClass != INIT_VG96)
+      return FXFALSE;
+#else
+    if (hwInfo[devNumber].hwClass != INIT_VOODOO)
+      return FXFALSE;
+#endif
+    context = &initctx;
     context->info = hwInfo[devNumber];
-    rv =  FXTRUE;
-  } 
+    return FXTRUE;
+  }
   
-  return rv;
+  return FXFALSE;
 
 }/* initDeviceSelect */
 
@@ -670,7 +694,6 @@ void initIOCtl( FxU32 token, void *argument ) {
   -------------------------------------------------------------------*/
 FxBool initControl( FxU32 code)
 {
-
     FxBool rv;
 
     GDBG_INFO((80, "initControl: code = %d, context=%.08x\n", code, context));
@@ -754,9 +777,11 @@ void initSliPciOwner( FxU32 *regbase, FxU32 owner ) {
 FxU32 initNumBoardsInSystem(void)
 {
     FxU32 numBoards, j, n;
+    const char *envp;
 
-    if(getenv(("SST_BOARDS"))) {
-        numBoards = atoi(getenv(("SST_BOARDS")));
+    envp = getenv(("SST_BOARDS"));
+    if(envp != NULL) {
+        numBoards = atoi(envp);
     } else {
         numBoards = 0;
 #if defined(SST1)

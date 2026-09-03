@@ -30,7 +30,7 @@ static int sound_pain3;
 static int sound_search1;
 static int sound_rail;
 
-static unsigned long shotsfired;
+static unsigned int shotsfired;
 
 static vec3_t spawnpoints[] = {
 	{30, 100, 16},
@@ -1315,10 +1315,10 @@ widow_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
 
 	if (self->health < (self->max_health / 2))
 	{
-		self->s.skinnum = 1;
+		self->s.skinnum |= 1;
 	}
 
-	if (skill->value == 3)
+	if (skill->intValue == 3)
 	{
 		return; /* no pain anims in nightmare */
 	}
@@ -1341,7 +1341,7 @@ widow_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
 	}
 	else if (damage < 75)
 	{
-		if ((skill->value < 3) && (random() < (0.6 - (0.2 * ((float)skill->value)))))
+		if ((skill->intValue < 3) && (random() < (0.6 - (0.2 * ((float)skill->intValue)))))
 		{
 			self->monsterinfo.currentmove = &widow_move_pain_light;
 			self->monsterinfo.aiflags &= ~AI_MANUAL_STEERING;
@@ -1351,7 +1351,7 @@ widow_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
 	}
 	else
 	{
-		if ((skill->value < 3) && (random() < (0.75 - (0.1 * ((float)skill->value)))))
+		if ((skill->intValue < 3) && (random() < (0.75 - (0.1 * ((float)skill->intValue)))))
 		{
 			self->monsterinfo.currentmove = &widow_move_pain_heavy;
 			self->monsterinfo.aiflags &= ~AI_MANUAL_STEERING;
@@ -1389,6 +1389,8 @@ widow_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /* u
 	self->deadflag = DEAD_DEAD;
 	self->takedamage = DAMAGE_NO;
 	self->count = 0;
+	self->s.skinnum |= 1;	// Knightmare- make sure pain skin is set if we got one-shotted
+
 	self->monsterinfo.quad_framenum = 0;
 	self->monsterinfo.double_framenum = 0;
 	self->monsterinfo.invincible_framenum = 0;
@@ -1454,7 +1456,7 @@ WidowPowerArmor(edict_t *self)
 	/* I don't like this, but it works */
 	if (self->monsterinfo.power_armor_power <= 0)
 	{
-		self->monsterinfo.power_armor_power += 250 * skill->value;
+		self->monsterinfo.power_armor_power += 250 * skill->intValue;
 	}
 }
 
@@ -1468,15 +1470,15 @@ WidowRespondPowerup(edict_t *self, edict_t *other)
 
 	if (other->s.effects & EF_QUAD)
 	{
-		if (skill->value == 1)
+		if (skill->intValue == 1)
 		{
 			WidowDouble(self, other->client->quad_framenum);
 		}
-		else if (skill->value == 2)
+		else if (skill->intValue == 2)
 		{
 			WidowGoinQuad(self, other->client->quad_framenum);
 		}
-		else if (skill->value == 3)
+		else if (skill->intValue == 3)
 		{
 			WidowGoinQuad(self, other->client->quad_framenum);
 			WidowPowerArmor(self);
@@ -1484,11 +1486,11 @@ WidowRespondPowerup(edict_t *self, edict_t *other)
 	}
 	else if (other->s.effects & EF_DOUBLE)
 	{
-		if (skill->value == 2)
+		if (skill->intValue == 2)
 		{
 			WidowDouble(self, other->client->double_framenum);
 		}
-		else if (skill->value == 3)
+		else if (skill->intValue == 3)
 		{
 			WidowDouble(self, other->client->double_framenum);
 			WidowPowerArmor(self);
@@ -1501,15 +1503,15 @@ WidowRespondPowerup(edict_t *self, edict_t *other)
 
 	if (other->s.effects & EF_PENT)
 	{
-		if (skill->value == 1)
+		if (skill->intValue == 1)
 		{
 			WidowPowerArmor(self);
 		}
-		else if (skill->value == 2)
+		else if (skill->intValue == 2)
 		{
 			WidowPent(self, other->client->invincible_framenum);
 		}
-		else if (skill->value == 3)
+		else if (skill->intValue == 3)
 		{
 			WidowPent(self, other->client->invincible_framenum);
 			WidowPowerArmor(self);
@@ -1528,7 +1530,7 @@ WidowPowerups(edict_t *self)
 		return;
 	}
 
-	if (!(coop && coop->value))
+	if (!(coop && coop->intValue))
 	{
 		WidowRespondPowerup(self, self->enemy);
 	}
@@ -1693,7 +1695,7 @@ Widow_CheckAttack(edict_t *self)
 	if (real_enemy_range <= (MELEE_DISTANCE + 20))
 	{
 		/* don't always melee in easy mode */
-		if ((skill->value == 0) && (rand() & 3))
+		if ((skill->intValue == 0) && (rand() & 3))
 		{
 			return false;
 		}
@@ -1770,7 +1772,7 @@ widow_blocked(edict_t *self, float dist)
 		return true;
 	}
 
-	if (blocked_checkshot(self, 0.25 + (0.05 * skill->value)))
+	if (blocked_checkshot(self, 0.25 + (0.05 * skill->intValue)))
 	{
 		return true;
 	}
@@ -1786,7 +1788,7 @@ WidowCalcSlots(edict_t *self)
 		return;
 	}
 
-	switch ((int)skill->value)
+	switch (skill->intValue)
 	{
 		case 0:
 		case 1:
@@ -1803,9 +1805,9 @@ WidowCalcSlots(edict_t *self)
 			break;
 	}
 
-	if (coop->value)
+	if (coop->intValue)
 	{
-		self->monsterinfo.monster_slots = min(6, self->monsterinfo.monster_slots + ((skill->value) * (CountPlayers() - 1)));
+		self->monsterinfo.monster_slots = min(6, self->monsterinfo.monster_slots + ((skill->intValue) * (CountPlayers() - 1)));
 	}
 }
 
@@ -1854,7 +1856,7 @@ SP_monster_widow(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;
@@ -1872,17 +1874,17 @@ SP_monster_widow(edict_t *self)
 	VectorSet(self->mins, -40, -40, 0);
 	VectorSet(self->maxs, 40, 40, 144);
 
-	self->health = 2000 + 1000 * (skill->value);
+	self->health = 2000 + 1000 * (skill->intValue);
 
-	if (coop->value)
+	if (coop->intValue)
 	{
-		self->health += 500 * (skill->value);
+		self->health += 500 * (skill->intValue);
 	}
 
 	self->gib_health = -5000;
 	self->mass = 1500;
 
-	if (skill->value == 3)
+	if (skill->intValue == 3)
 	{
 		self->monsterinfo.power_armor_type = POWER_ARMOR_SHIELD;
 		self->monsterinfo.power_armor_power = 500;
@@ -1906,6 +1908,8 @@ SP_monster_widow(edict_t *self)
 	self->monsterinfo.sight = widow_sight;
 
 	self->monsterinfo.blocked = widow_blocked;
+
+	self->blood_type = 3;	// Knightmare- use sparks and blood type
 
 	gi.linkentity(self);
 

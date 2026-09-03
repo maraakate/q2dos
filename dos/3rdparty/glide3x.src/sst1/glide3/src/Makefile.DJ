@@ -4,15 +4,12 @@
 #  Email : dborca@users.sourceforge.net
 #  Web   : http://www.geocities.com/dborca
 #
-# $Header: /cvsroot/glide/glide3x/sst1/glide3/src/Attic/Makefile.DJ,v 1.1.2.9 2005/11/29 22:05:55 dborca Exp $
-#
-
 
 #
 #  Available options:
 #
 #    Environment variables:
-#	FX_GLIDE_HW	build for the given ASIC (sst1, sst96).
+#	FX_GLIDE_HW	build for the given ASIC (either sst1, or sst96).
 #			default = sst1
 #	OPTFLAGS	pass given optimization flags to compiler
 #			default = -O1 -ffast-math (+ -mtune=pentium if USE_X86=1)
@@ -30,8 +27,6 @@
 #	realclean:	remove all generated files
 #
 
-
-
 .PHONY: all glide3x clean realclean
 .INTERMEDIATE: fxgasm.exe
 
@@ -46,7 +41,7 @@ TEXUS_EXE = texus2.exe
 
 FX_GLIDE_HW ?= sst1
 FX_GLIDE_SW = ../../../swlibs
-GLIDE_LIBDIR = ../../lib
+GLIDE_LIBDIR = ../../lib/$(FX_GLIDE_HW)
 TEXUS_EXEDIR = $(FX_GLIDE_SW)/bin
 
 ###############################################################################
@@ -54,10 +49,12 @@ TEXUS_EXEDIR = $(FX_GLIDE_SW)/bin
 ###############################################################################
 
 CC = gcc
-HOST_CC = gcc
 AS = nasm
 AR = ar
 DXE3GEN = dxe3gen
+
+#for cross-builds
+HOST_CC = gcc
 
 UNLINK = rm -f $(1)
 
@@ -79,9 +76,11 @@ ifeq ($(FX_GLIDE_HW),sst96)
 CDEFS += -DSST96
 CDEFS += -DSST96_FIFO
 #CDEFS += -DSST96_ALT_FIFO_WRAP
-#CDEFS += -DINIT96VGASWAP -DINIT_ACCESS_DIRECT
+#CDEFS += -DINIT96VGASWAP
+CDEFS += -DINIT_ACCESS_DIRECT
 CDEFS += -DGLIDE_USE_ALT_REGMAP
-GLIDE_LIBDIR = ../../lib/sst96
+else
+$(error Invalid FX_GLIDE_HW setting)
 endif
 endif
 
@@ -110,7 +109,12 @@ ASFLAGS += $(CDEFS)
 
 # compiler
 CFLAGS = -Wall
-CFLAGS += -I. -I../../incsrc -I../../init -I../../init/initvg -I../../init/init96
+CFLAGS += -I. -I../../incsrc -I../../init
+ifeq ($(FX_GLIDE_HW),sst1)
+CFLAGS += -I../../init/initvg
+else
+CFLAGS += -I../../init/init96
+endif
 CFLAGS += -I$(FX_GLIDE_SW)/fxmisc -I$(FX_GLIDE_SW)/newpci/pcilib -I$(FX_GLIDE_SW)/fxmemmap
 CFLAGS += -I$(FX_GLIDE_SW)/texus2/lib
 CFLAGS += $(CDEFS)
@@ -125,6 +129,8 @@ endif
 
 # optflags
 CFLAGS += $(OPTFLAGS)
+
+# for cross-builds
 HOST_CFLAGS=$(filter-out -mcpu=% -mtune=% -march=%,$(CFLAGS))
 
 ###############################################################################
@@ -166,19 +172,22 @@ GLIDE_OBJECTS += \
 endif
 endif
 
+INIT_OBJECTS = \
+	../../init/init.o \
+	../../init/gdebug.o
+
 ifeq ($(FX_GLIDE_HW),sst96)
 GLIDE_OBJECTS += \
-	sst96.o \
+	sst96.o
+INIT_OBJECTS += \
+	../../init/vg96drvr.o \
 	../../init/init96/init96.o \
 	../../init/init96/dxdrvr.o \
 	../../init/init96/initat3d.o \
 	../../init/init96/initmcrx.o
-endif
-
-GLIDE_OBJECTS += \
-	../../init/init.o \
+else
+INIT_OBJECTS += \
 	../../init/vgdrvr.o \
-	../../init/vg96drvr.o \
 	../../init/initvg/gamma.o \
 	../../init/initvg/dac.o \
 	../../init/initvg/video.o \
@@ -187,8 +196,11 @@ GLIDE_OBJECTS += \
 	../../init/initvg/util.o \
 	../../init/initvg/info.o \
 	../../init/initvg/print.o \
-	../../init/initvg/gdebug.o \
-	../../init/initvg/sst1init.o \
+	../../init/initvg/sst1init.o
+endif
+
+GLIDE_OBJECTS += \
+	$(INIT_OBJECTS) \
 	$(FX_GLIDE_SW)/newpci/pcilib/sst1_pci.o \
 	$(FX_GLIDE_SW)/newpci/pcilib/fxmsr.o \
 	$(FX_GLIDE_SW)/newpci/pcilib/fxpci.o \
@@ -241,7 +253,7 @@ $(GLIDE_LIBDIR)/$(GLIDE_LIB): $(GLIDE_OBJECTS)
 	$(AR) $(ARFLAGS) $@ $^
 
 $(GLIDE_LIBDIR)/$(GLIDE_DXE) $(GLIDE_LIBDIR)/$(GLIDE_IMP): $(GLIDE_OBJECTS)
-	-$(DXE3GEN) -o $(GLIDE_LIBDIR)/$(GLIDE_DXE) -Y $(GLIDE_LIBDIR)/$(GLIDE_IMP) -D "Glide3($(FX_GLIDE_HW)) DJGPP" -E _gr -E _gu -E _tx -U $^
+	-$(DXE3GEN) -o $(GLIDE_LIBDIR)/$(GLIDE_DXE) -Y $(GLIDE_LIBDIR)/$(GLIDE_IMP) -E _gr -E _gu -E _tx -U $^
 
 $(TEXUS_EXEDIR)/$(TEXUS_EXE): $(FX_GLIDE_SW)/texus2/cmd/cmd.c $(GLIDE_LIBDIR)/$(GLIDE_LIB)
 ifeq ($(TEXUS2),1)
@@ -260,29 +272,6 @@ xdraw.o: xdraw.asm
 	$(AS) -o $@ $(ASFLAGS) $<
 xdraw96.o: xdraw96.asm
 	$(AS) -o $@ $(ASFLAGS) $<
-
-ifeq ($(FX_GLIDE_HW),sst96)
-../../init/initvg/gamma.o: ../../init/initvg/gamma.c
-	$(CC) -o $@ $(CFLAGS) -USST96 -c $<
-../../init/initvg/dac.o: ../../init/initvg/dac.c
-	$(CC) -o $@ $(CFLAGS) -USST96 -c $<
-../../init/initvg/video.o: ../../init/initvg/video.c
-	$(CC) -o $@ $(CFLAGS) -USST96 -c $<
-../../init/initvg/parse.o: ../../init/initvg/parse.c
-	$(CC) -o $@ $(CFLAGS) -USST96 -c $<
-../../init/initvg/sli.o: ../../init/initvg/sli.c
-	$(CC) -o $@ $(CFLAGS) -USST96 -c $<
-../../init/initvg/util.o: ../../init/initvg/util.c
-	$(CC) -o $@ $(CFLAGS) -USST96 -c $<
-../../init/initvg/info.o: ../../init/initvg/info.c
-	$(CC) -o $@ $(CFLAGS) -USST96 -c $<
-../../init/initvg/print.o: ../../init/initvg/print.c
-	$(CC) -o $@ $(CFLAGS) -USST96 -c $<
-../../init/initvg/gdebug.o: ../../init/initvg/gdebug.c
-	$(CC) -o $@ $(CFLAGS) -USST96 -c $<
-../../init/initvg/sst1init.o: ../../init/initvg/sst1init.c
-	$(CC) -o $@ $(CFLAGS) -USST96 -c $<
-endif
 
 $(GLIDE_OBJECTS): fxinline.h fxgasm.h
 

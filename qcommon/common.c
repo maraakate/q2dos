@@ -63,6 +63,10 @@ cvar_t	*showtrace;
 cvar_t	*dedicated;
 cvar_t	*cfg_default; /* FS: Added */
 
+#ifdef _WIN32 /* FS */
+cvar_t	*win_close_on_error;
+#endif
+
 FILE	*logfile;
 
 int		server_state;
@@ -72,6 +76,8 @@ int	time_before_game;
 int	time_after_game;
 int	time_before_ref;
 int	time_after_ref;
+
+int num_sz_getspace_overflows;
 
 /*
 ============================================================================
@@ -116,19 +122,22 @@ Both client and server can use this, and it will output
 to the apropriate place.
 =============
 */
-void Com_Printf (char *fmt, ...)
+void Com_Printf (const char *fmt, ...)
 {
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
+	size_t		msgLen;
 
 	va_start (argptr,fmt);
 	Q_vsnprintf (msg, sizeof(msg), fmt, argptr);
 	va_end (argptr);
 	msg[sizeof(msg)-1] = 0;
 
+	msgLen = strlen(msg);
+
 	if (rd_target)
 	{
-		if ((strlen (msg) + strlen(rd_buffer)) > (rd_buffersize - 1))
+		if ((msgLen + strlen(rd_buffer)) > (rd_buffersize - 1))
 		{
 			rd_flush(rd_target, rd_buffer);
 			*rd_buffer = 0;
@@ -141,8 +150,8 @@ void Com_Printf (char *fmt, ...)
 	Con_Print (msg);
 
 	// also echo to debugging console
-	if (msg[strlen(msg)-1] != '\r') // skip overwrittten outputs
-	Sys_ConsoleOutput (msg);
+	if (msgLen >= 1 && msg[msgLen - 1] != '\r') // skip overwrittten outputs
+		Sys_ConsoleOutput (msg);
 
 	// logfile
 	if (logfile_active && logfile_active->value)
@@ -180,18 +189,18 @@ Com_DPrintf
 A Com_Printf that only shows up if the "developer" cvar is set
 ================
 */
-void Com_DPrintf (unsigned long developerFlags, char *fmt, ...) /* FS: Added developer flags */
+void Com_DPrintf (unsigned int developerFlags, const char *fmt, ...) /* FS: Added developer flags */
 {
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
-	unsigned long			devValue = 0;
+	unsigned int			devValue = 0;
 		
-	if (!developer || !developer->value)
+	if (!developer || !developer->intValue)
 		return;			// don't confuse non-developers with techie stuff...
 
-	devValue = (unsigned long)developer->value;
+	devValue = (unsigned int)developer->intValue;
 
-	if (developer->value == 1) /* FS: Show all except extremely verbose shit */
+	if (developer->intValue == 1) /* FS: Show all except extremely verbose shit */
 		devValue = 65534;
 
 	if (!(devValue & developerFlags))
@@ -214,7 +223,7 @@ Both client and server can use this, and it will
 do the apropriate things.
 =============
 */
-void Com_Error (int code, char *fmt, ...)
+void Com_Error (int code, const char *fmt, ...)
 {
 	va_list		argptr;
 	static char		msg[MAXPRINTMSG];
@@ -271,6 +280,7 @@ void Com_Quit (void)
 {
 	SV_Shutdown ("Server quit\n", false);
 	CL_Shutdown ();
+	Cmd_Shutdown(); /* FS: Has to come later because CL_Shutdown may run Cmd_RemoveCommand() for some things */
 
 	if (logfile)
 	{
@@ -952,11 +962,12 @@ void *SZ_GetSpace (sizebuf_t *buf, int length)
 		Com_Printf ("SZ_GetSpace: overflow\n");
 		SZ_Clear (buf); 
 		buf->overflowed = true;
+		num_sz_getspace_overflows++; /* FS: Bullshit hack for coop maps that get stuck sometimes so I don't have to reboot the server. */
 	}
 
 	data = buf->data + buf->cursize;
 	buf->cursize += length;
-	
+
 	return data;
 }
 
@@ -1218,7 +1229,10 @@ void *Z_TagMalloc (int size, int tag)
 	size = size + sizeof(zhead_t);
 	z = malloc(size);
 	if (!z)
-		Com_Error (ERR_FATAL, "Z_Malloc: failed on allocation of %i bytes",size);
+	{
+		Com_Error (ERR_FATAL, "Z_Malloc: failed on allocation of %i bytes", size);
+		return NULL;
+	}
 	memset (z, 0, size);
 	z_count++;
 	z_bytes += size;
@@ -1429,8 +1443,8 @@ void Qcommon_Init (int argc, char **argv)
 	FS_InitFilesystem ();
 
 	/* FS: New default config stuff so we can keep some sanity between DOS and Win32 */
-	cfg_default = Cvar_Get("cfg_default", "q2dos.cfg", CVAR_NOSET);
-	cfg_default->description = "Default cfg file to use for this gaming session.  Must be set at run time.";
+	cfg_default = Cvar_Get("cfg_default", CFGFILENAME, CVAR_NOSET);
+	Cvar_SetDescription("cfg_default", "Default cfg file to use for this gaming session.  Must be set at run time.");
 	Cbuf_AddText ("exec default.cfg\n");
 
 	/* FS: If it's NULL or not even at least "a.cfg" length then enforce default values */
@@ -1456,13 +1470,13 @@ void Qcommon_Init (int argc, char **argv)
 	host_speeds = Cvar_Get ("host_speeds", "0", 0);
 	log_stats = Cvar_Get ("log_stats", "0", 0);
 	developer = Cvar_Get ("developer", "0", 0);
-	developer->description = "Enable the use of developer messages. \nAvailable flags:\n  * All flags except verbose messages - 1\n  * Standard msgs - 2\n  * Sound msgs - 4\n  * Network msgs - 8\n  * File IO msgs - 16\n  * Graphics renderer msgs - 32\n  * Game DLL msgs - 64\n  * Memory management msgs - 128\n  * Server msgs - 256\n  * CD Audio msgs - 512\n  * OGG Vorbis msgs - 1024\n  * Physics msgs - 2048\n  * Entity msgs - 4096\n  * Save/Restore msgs - 8192\n  * Currently unused - 16384\n  * Currently unused - 32768\n  * Extremely verbose msgs - 65536\n  * Extremely verbose Gamespy msgs - 131072";
+	Cvar_SetDescription("developer", "Enable the use of developer messages. \nAvailable flags:\n  * All flags except verbose messages - 1\n  * Standard msgs - 2\n  * Sound msgs - 4\n  * Network msgs - 8\n  * File IO msgs - 16\n  * Graphics renderer msgs - 32\n  * Game DLL msgs - 64\n  * Memory management msgs - 128\n  * Server msgs - 256\n  * CD Audio msgs - 512\n  * OGG Vorbis msgs - 1024\n  * Physics msgs - 2048\n  * Entity msgs - 4096\n  * Save/Restore msgs - 8192\n  * Currently unused - 16384\n  * Currently unused - 32768\n  * Extremely verbose msgs - 65536\n  * Extremely verbose Gamespy msgs - 131072");
 	timescale = Cvar_Get ("timescale", "1", 0);
 	fixedtime = Cvar_Get ("fixedtime", "0", 0);
 	logfile_active = Cvar_Get ("logfile", "0", 0);
-	logfile_active->description = "Log console output.  1 -- Overwrite previous existing file.  2 or higher -- Append previous existing file.  Control the name with logfile_name CVAR.";
+	Cvar_SetDescription("logfile", "Log console output.  1 -- Overwrite previous existing file.  2 or higher -- Append previous existing file.  Control the name with logfile_name CVAR.");
 	logfile_name = Cvar_Get ("logfile_name", "qconsole.log", 0);
-	logfile_name->description = "File name to create/append for logfile CVAR.";
+	Cvar_SetDescription("logfile_name", "File name to create/append for logfile CVAR.");
 	showtrace = Cvar_Get ("showtrace", "0", 0);
 #ifdef DEDICATED_ONLY
 	dedicated = Cvar_Get ("dedicated", "1", CVAR_NOSET);
@@ -1470,11 +1484,16 @@ void Qcommon_Init (int argc, char **argv)
 	dedicated = Cvar_Get ("dedicated", "0", CVAR_NOSET);
 #endif
 
+#ifdef _WIN32
+	win_close_on_error = Cvar_Get("win_close_on_error", "0", 0);
+	Cvar_SetDescription("win_close_on_error", "Silently terminate Q2DOS if a Sys_Error() is generated.  Useful for dedicated servers.");
+#endif
+
 	s = va("Q2DOS %4.2f %s %s %s", VERSION, CPUSTRING, __DATE__, BUILDSTRING);
 	Cvar_Get ("version", s, CVAR_SERVERINFO|CVAR_NOSET);
 
 
-	if (dedicated->value)
+	if (dedicated->intValue)
 	{
 		Cmd_AddCommand ("quit", Com_Quit);
 	}
@@ -1489,7 +1508,7 @@ void Qcommon_Init (int argc, char **argv)
 
 #ifdef _WIN32
 #ifdef NEW_DED_CONSOLE
-	if (!dedicated->value)
+	if (!dedicated->intValue)
 		Sys_ShowConsole(false);
 #endif // NEW_DED_CONSOLE
 #endif // _WIN32
@@ -1497,7 +1516,7 @@ void Qcommon_Init (int argc, char **argv)
 	// add + commands from command line
 	if (!Cbuf_AddLateCommands ())
 	{	// if the user didn't give any commands, run default action
-		if (!dedicated->value)
+		if (!dedicated->intValue)
 		{
 			Cbuf_AddText ("d1\n");
 		}
@@ -1538,12 +1557,12 @@ void Qcommon_Frame (int msec)
 	{
 		log_stats->modified = false;
 
-		if ( log_stats->value )
+		if (log_stats->intValue)
 		{
 			if ( log_stats_file )
 			{
 				fclose( log_stats_file );
-				log_stats_file = 0;
+				log_stats_file = NULL;
 			}
 
 			log_stats_file = fopen( "stats.log", "w" );
@@ -1558,18 +1577,18 @@ void Qcommon_Frame (int msec)
 			if ( log_stats_file )
 			{
 				fclose( log_stats_file );
-				log_stats_file = 0;
+				log_stats_file = NULL;
 			}
 		}
 	}
 
-	if (fixedtime->value)
+	if (fixedtime->intValue)
 	{
-		msec = fixedtime->value;
+		msec = fixedtime->intValue;
 	}
-	else if (timescale->value)
+	else if (timescale->intValue)
 	{
-		msec = (int)(msec * timescale->value);
+		msec = msec * timescale->intValue;
 
 		if (msec < 1)
 		{
@@ -1577,7 +1596,7 @@ void Qcommon_Frame (int msec)
 		}
 	}
 
-	if (showtrace->value)
+	if (showtrace->intValue)
 	{
 		extern	int c_traces, c_brush_traces;
 		extern	int	c_pointcontents;
@@ -1601,26 +1620,26 @@ void Qcommon_Frame (int msec)
 
 	Cbuf_Execute ();
 
-	if (host_speeds->value)
+	if (host_speeds->intValue)
 	{
 		time_before = Sys_Milliseconds ();
 	}
 
 	SV_Frame (msec);
 
-	if (host_speeds->value)
+	if (host_speeds->intValue)
 	{
 		time_between = Sys_Milliseconds ();
 	}
 
 	CL_Frame (msec);
 
-	if (host_speeds->value)
+	if (host_speeds->intValue)
 	{
 		time_after = Sys_Milliseconds ();
 	}
 
-	if (host_speeds->value)
+	if (host_speeds->intValue)
 	{
 		int			all, sv, gm, cl, rf;
 

@@ -27,8 +27,6 @@ viddef_t	vid;
 
 refimport_t	ri;
 
-int gl_texture0, gl_texture1;
-
 model_t		*r_worldmodel;
 
 float		gldepthmin, gldepthmax;
@@ -151,6 +149,9 @@ cvar_t	*vid_ref;
 
 cvar_t	*r_skydistance; /* Knightmare- variable sky range */
 cvar_t	*developer;		/* Knightmare added */
+cvar_t	*r_gunfov;		/* FS */
+
+GLdouble _farz;
 
 /*
 =================
@@ -163,7 +164,7 @@ qboolean R_CullBox (vec3_t mins, vec3_t maxs)
 {
 	int		i;
 
-	if (r_nocull->value)
+	if (r_nocull->intValue)
 		return false;
 
 	for (i=0 ; i<4 ; i++)
@@ -188,7 +189,7 @@ void R_RotateForEntity (entity_t *e, qboolean full)
 /* Knightmare- allow disabling of backwards alias model roll */
 int R_RollMult (void)
 {
-	if (r_entity_fliproll->value)
+	if (r_entity_fliproll->intValue)
 		return -1;
 	else
 		return 1;
@@ -348,7 +349,7 @@ void R_DrawEntitiesOnList (void)
 {
 	int		i;
 
-	if (!r_drawentities->value)
+	if (!r_drawentities->intValue)
 		return;
 
 	// draw non-transparent first
@@ -435,7 +436,7 @@ void R_DrawEntitiesOnList (void)
 ** GL_DrawParticles
 **
 */
-void GL_DrawParticles( int num_particles, const particle_t particles[], const unsigned colortable[768] )
+void GL_DrawParticles( int num_particles, const particle_t particles[], const unsigned colortable[] )
 {
 	const particle_t *p;
 	int				i;
@@ -540,7 +541,7 @@ R_PolyBlend
 */
 void R_PolyBlend (void)
 {
-	if (!gl_polyblend->value)
+	if (!gl_polyblend->intValue)
 		return;
 	if (!v_blend[3])
 		return;
@@ -732,7 +733,6 @@ void R_SetupGL (void)
 	int		x, x2, y2, y, w, h;
 
 	/* Knightmare- variable sky range */
-	static GLdouble farz; 
 	GLdouble boxsize;
 	/* end Knightmare */
 
@@ -756,16 +756,16 @@ void R_SetupGL (void)
 		r_skydistance->modified = false;
 		boxsize = r_skydistance->value;
 		boxsize -= 252 * ceil (boxsize / 2300);
-		farz = 1.0;
-		while (farz < boxsize) // make this a power of 2
+		_farz = 1.0;
+		while (_farz < boxsize) // make this a power of 2
 		{
-			farz *= 2.0;
-			if (farz >= 65536) // don't make it larger than this
+			_farz *= 2.0;
+			if (_farz >= 65536) // don't make it larger than this
 				break;
 		}
-		farz *= 2.0; //double since boxsize is distance from camera to edge of skybox
+		_farz *= 2.0; //double since boxsize is distance from camera to edge of skybox
 					//not total size of skybox
-		ri.Con_Printf(PRINT_DEVELOPER, "farz now set to %g\n", farz);
+		ri.Con_Printf(PRINT_DEVELOPER, "farz now set to %g\n", _farz);
 	}
 	/* end Knightmare */
 
@@ -777,7 +777,7 @@ void R_SetupGL (void)
 	qglMatrixMode(GL_PROJECTION);
     qglLoadIdentity ();
  	/* Knightmare-  increase back clipping plane distance */
-	MYgluPerspective (r_newrefdef.fov_y,  screenaspect,  4,  farz); // was 4096
+	MYgluPerspective (r_newrefdef.fov_y,  screenaspect,  4,  _farz); // was 4096
 	/* end Knightmare */
 
 	qglCullFace(GL_FRONT);
@@ -800,7 +800,7 @@ void R_SetupGL (void)
 	//
 	// set drawing parms
 	//
-	if (gl_cull->value)
+	if (gl_cull->intValue)
 		qglEnable(GL_CULL_FACE);
 	else
 		qglDisable(GL_CULL_FACE);
@@ -819,11 +819,11 @@ void R_Clear (void)
 {
 	GLbitfield clearbits = 0;	/* Knightmare added */
 
-	if (gl_ztrick->value)
+	if (gl_ztrick->intValue)
 	{
 		static int trickframe;
 
-		if (gl_clear->value)
+		if (gl_clear->intValue)
 		//	qglClear (GL_COLOR_BUFFER_BIT);
 			clearbits |=  GL_COLOR_BUFFER_BIT;
 
@@ -843,7 +843,7 @@ void R_Clear (void)
 	}
 	else
 	{
-		if (gl_clear->value)
+		if (gl_clear->intValue)
 		//	qglClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			clearbits |=  (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	/* Knightmare changed */
 		else
@@ -885,7 +885,7 @@ r_newrefdef must be set before the first call
 */
 void R_RenderView (refdef_t *fd)
 {
-	if (r_norefresh->value)
+	if (r_norefresh->intValue)
 		return;
 
 	r_newrefdef = *fd;
@@ -893,7 +893,7 @@ void R_RenderView (refdef_t *fd)
 	if (!r_worldmodel && !( r_newrefdef.rdflags & RDF_NOWORLDMODEL ) )
 		ri.Sys_Error (ERR_DROP, "R_RenderView: NULL worldmodel");
 
-	if (r_speeds->value)
+	if (r_speeds->intValue)
 	{
 		c_brush_polys = 0;
 		c_alias_polys = 0;
@@ -901,7 +901,7 @@ void R_RenderView (refdef_t *fd)
 
 	R_PushDlights ();
 
-	if (gl_finish->value)
+	if (gl_finish->intValue)
 		qglFinish ();
 
 	R_SetupFrame ();
@@ -924,7 +924,7 @@ void R_RenderView (refdef_t *fd)
 
 	R_Flash();
 
-	if (r_speeds->value)
+	if (r_speeds->intValue)
 	{
 		ri.Con_Printf (PRINT_ALL, "%4i wpoly %4i epoly %i tex %i lmaps\n",
 			c_brush_polys, 
@@ -1032,10 +1032,10 @@ void R_SetLightLevel (void)
 }
 
 /*
-@@@@@@@@@@@@@@@@@@@@@
+====================
 R_RenderFrame
 
-@@@@@@@@@@@@@@@@@@@@@
+====================
 */
 void R_RenderFrame (refdef_t *fd)
 {
@@ -1077,13 +1077,13 @@ void R_Register ( void )
 	gl_mode = ri.Cvar_Get( "gl_mode", "3", CVAR_ARCHIVE );
 	gl_lightmap = ri.Cvar_Get ("gl_lightmap", "0", 0);
 	gl_shadows = ri.Cvar_Get ("gl_shadows", "0", CVAR_ARCHIVE );
-	gl_shadows->description = "Enable blob-rendering shadows.";
+	ri.Cvar_SetDescription("gl_shadows", "Enable blob-rendering shadows.");
 	gl_shadowalpha = ri.Cvar_Get ("gl_shadowalpha", "0.4", 0); /* Knightmare- added shadow alpha */
 	gl_dynamic = ri.Cvar_Get ("gl_dynamic", "1", 0);
-	gl_dynamic->description = "Enable dynamic lighting effects.";
+	ri.Cvar_SetDescription("gl_dynamic", "Enable dynamic lighting effects.");
 	gl_nobind = ri.Cvar_Get ("gl_nobind", "0", 0);
 	gl_round_down = ri.Cvar_Get ("gl_round_down", "1", 0);
-	gl_round_down->description = "Round down textures.  Only active active on 3DFX Voodoo cards.";
+	ri.Cvar_SetDescription("gl_round_down", "Round down textures.  Only active on 3DFX Voodoo cards.");
 	gl_picmip = ri.Cvar_Get ("gl_picmip", "0", 0);
 	gl_skymip = ri.Cvar_Get ("gl_skymip", "0", 0);
 	gl_showtris = ri.Cvar_Get ("gl_showtris", "0", 0);
@@ -1093,23 +1093,31 @@ void R_Register ( void )
 #else
 	gl_ztrick = ri.Cvar_Get ("gl_ztrick", "0", 0);
 #endif
-	gl_ztrick->description = "Toggles the use of a trick to prevent the clearing of the z-buffer between frames. When this variable is set to 1 the game will not clear the z-buffer between frames. This will result in increased performance but might cause problems for some display hardware.";
+	ri.Cvar_SetDescription("gl_ztrick", "Toggles the use of a trick to prevent the clearing of the z-buffer between frames. When this variable is set to 1 the game will not clear the z-buffer between frames. This will result in increased performance but might cause problems for some display hardware.");
 	gl_finish = ri.Cvar_Get ("gl_finish", "0", CVAR_ARCHIVE);
-	gl_finish->description = "Send a gl_finish at the end of every frame.  Some old video cards may require this.";
+	ri.Cvar_SetDescription("gl_finish", "Send a gl_finish at the end of every frame.  Some old video cards may require this.");
 	gl_clear = ri.Cvar_Get ("gl_clear", "0", 0);
-	gl_clear->description = "Use a clear colour to avoid Hall of Mirror (HOM) effects.  Useful for noclipping, spectating, and finding leaks in maps.";
+	ri.Cvar_SetDescription("gl_clear", "Use a clear colour to avoid Hall of Mirror (HOM) effects.  Useful for noclipping, spectating, and finding leaks in maps.");
 	gl_cull = ri.Cvar_Get ("gl_cull", "1", 0);
-	gl_cull->description = "Cull (i.e. skip) rendering of objects not in the viewport.";
+	ri.Cvar_SetDescription("gl_cull", "Cull (i.e. skip) rendering of objects not in the viewport.");
 	gl_polyblend = ri.Cvar_Get ("gl_polyblend", "1", 0);
-	gl_polyblend->description = "Show palette blends i.e. screen turning red from damage.";
+	ri.Cvar_SetDescription("gl_polyblend", "Show palette blends i.e. screen turning red from damage.");
 	gl_flashblend = ri.Cvar_Get ("gl_flashblend", "0", 0);
-	gl_flashblend->description = "Set to 0 to use fake dynamic lights that have a mushroom cloud effect.  Can improve performance on old hardware.";
+	ri.Cvar_SetDescription("gl_flashblend", "Set to 0 to use fake dynamic lights that have a mushroom cloud effect.  Can improve performance on old hardware.");
 	gl_playermip = ri.Cvar_Get ("gl_playermip", "0", 0);
 	gl_monolightmap = ri.Cvar_Get( "gl_monolightmap", "0", 0 );
 #ifdef __DJGPP__ /* FS: Don't clash with win32's usage of opengl32 and mini drivers */
 	gl_driver = ri.Cvar_Get( "gl_dosdriver", "gl.dxe", CVAR_ARCHIVE);
-#else
+#elif defined(GLIMP_SDL) /* to load SDL's default opengl driver -- see qgl_linux.c */
+	gl_driver = ri.Cvar_Get( "gl_driver", "", CVAR_ARCHIVE );
+#elif defined(_WIN32)
 	gl_driver = ri.Cvar_Get( "gl_driver", "opengl32", CVAR_ARCHIVE );
+#elif defined(__APPLE__)
+	gl_driver = ri.Cvar_Get( "gl_driver", "/System/Library/Frameworks/OpenGL.framework/Libraries/libGL.dylib", CVAR_ARCHIVE );
+#elif defined(__NetBSD__)||defined(__OpenBSD__)||defined(__sgi__)
+	gl_driver = ri.Cvar_Get( "gl_driver", "libGL.so", CVAR_ARCHIVE );
+#else /* other unix */
+	gl_driver = ri.Cvar_Get( "gl_driver", "libGL.so.1", CVAR_ARCHIVE );
 #endif
 
 	gl_anisotropic = ri.Cvar_Get( "gl_anisotropic", "0", CVAR_ARCHIVE );
@@ -1128,18 +1136,18 @@ void R_Register ( void )
 #else
 	gl_ext_multitexture = ri.Cvar_Get( "gl_ext_multitexture", "1", CVAR_ARCHIVE );
 #endif
-	gl_ext_multitexture->description = "Enables multitexturing.  Typically decreases performance in most situations.  Useful for 1280x1024 (and higher) and 32bpp modes.";
+	ri.Cvar_SetDescription("gl_ext_multitexture", "Enables multitexturing.  Typically decreases performance in most situations.  Useful for 1280x1024 (and higher) and 32bpp modes.");
 #ifdef __DJGPP__
 	gl_ext_pointparameters = ri.Cvar_Get( "gl_ext_pointparameters", "0", CVAR_ARCHIVE ); /* FS: Hardlocks when it's time to draw a particle */
 #else
 	gl_ext_pointparameters = ri.Cvar_Get( "gl_ext_pointparameters", "1", CVAR_ARCHIVE );
 #endif
-	gl_ext_pointparameters->description = "Draws rounded particle effects instead of blocky particle effects.  Can decrease performance or cause hard-locks on some configurations.  Particle size is controlled with gl_particle_size.";
+	ri.Cvar_SetDescription("gl_ext_pointparameters", "Draws rounded particle effects instead of blocky particle effects.  Can decrease performance or cause hard-locks on some configurations.  Particle size is controlled with gl_particle_size.");
 	gl_ext_compiled_vertex_array = ri.Cvar_Get( "gl_ext_compiled_vertex_array", "1", CVAR_ARCHIVE );
 	/* Knightmare- non-power-of-two texture support */
 	gl_arb_texturenonpoweroftwo = ri.Cvar_Get( "gl_arb_texturenonpoweroftwo", "1", CVAR_ARCHIVE );
 	gl_nonpoweroftwo_mipmaps = ri.Cvar_Get( "gl_nonpoweroftwo_mipmaps", "1", CVAR_ARCHIVE );
-	gl_nonpoweroftwo_mipmaps->description = "Allow non-power-of-two textures if hardware supports it.";
+	ri.Cvar_SetDescription("gl_nonpoweroftwo_mipmaps", "Allow non-power-of-two textures if hardware supports it.");
 
 	gl_newtextureformat = ri.Cvar_Get("gl_newtextureformat", "1", CVAR_ARCHIVE);	/* Knightmare- whether to use RGBA textures / BGRA lightmaps */
 
@@ -1149,7 +1157,7 @@ void R_Register ( void )
 	gl_saturatelighting = ri.Cvar_Get( "gl_saturatelighting", "0", 0 );
 
 	gl_3dlabs_broken = ri.Cvar_Get( "gl_3dlabs_broken", "1", CVAR_ARCHIVE );
-	gl_3dlabs_broken->description = "Prevent the toggling of fullscreen/windowed mode when running on a broken 3Dlabs driver.";
+	ri.Cvar_SetDescription("gl_3dlabs_broken", "Prevent the toggling of fullscreen/windowed mode when running on a broken 3Dlabs driver.");
 
 	vid_fullscreen = ri.Cvar_Get( "vid_fullscreen", "1", CVAR_ARCHIVE );
 	vid_gamma = ri.Cvar_Get( "vid_gamma", "1.0", CVAR_ARCHIVE );
@@ -1157,8 +1165,9 @@ void R_Register ( void )
 
 	r_skydistance = ri.Cvar_Get("r_skydistance", "4600", 0); /* Knightmare- variable sky range */
 	r_entity_fliproll = ri.Cvar_Get( "r_entity_fliproll", "0", 0);	/* Knightmare- allow disabling of backwards alias model roll */
-	r_entity_fliproll->description = "Allow disabling of backwards alias model roll.";
+	ri.Cvar_SetDescription("r_entity_fliproll", "Allow disabling of backwards alias model roll.");
 	r_lightcutoff = ri.Cvar_Get("r_lightcutoff", "64", 0);	// DMP: dynamic light cutoff now variable
+	r_gunfov = ri.Cvar_Get("r_gunfov", "80", CVAR_ARCHIVE); /* FS */
 	developer = ri.Cvar_Get ("developer", "0", 0);	/* Knightmare added */
 
 	ri.Cmd_AddCommand( "imagelist", GL_ImageList_f );
@@ -1176,26 +1185,40 @@ R_SetMode
 qboolean R_SetMode (void)
 {
 	rserr_t err;
-	qboolean fullscreen;
+	rdisptype_t fullscreen;
 
 	/* cds check only needed with WIN32 to deal with a broken driver */
 	#ifdef _WIN32
 	if ( vid_fullscreen->modified && !gl_config.allow_cds )
 	{
 		ri.Con_Printf( PRINT_ALL, "R_SetMode() - CDS not allowed with this driver\n" );
-		ri.Cvar_SetValue( "vid_fullscreen", !vid_fullscreen->value );
+		ri.Cvar_SetValue("vid_fullscreen", (float)!vid_fullscreen->intValue);
 		vid_fullscreen->modified = false;
 	}
 	#endif
-	fullscreen = vid_fullscreen->value;
+
+	switch (vid_fullscreen->intValue)
+	{
+		case 1:
+			fullscreen = dt_fullscreen;
+			break;
+		case 0:
+			fullscreen = dt_windowed;
+			break;
+		case 2:
+		default:
+			fullscreen = dt_borderless;
+			break;
+	}
+
 	r_skydistance->modified = true; /* Knightmare- skybox size variable */
 
 	vid_fullscreen->modified = false;
 	gl_mode->modified = false;
 
-	if ( ( err = GLimp_SetMode( &vid.width, &vid.height, gl_mode->value, fullscreen ) ) == rserr_ok )
+	if ( ( err = GLimp_SetMode( &vid.width, &vid.height, gl_mode->intValue, fullscreen ) ) == rserr_ok )
 	{
-		gl_state.prev_mode = gl_mode->value;
+		gl_state.prev_mode = gl_mode->intValue;
 	}
 	else
 	{
@@ -1204,7 +1227,7 @@ qboolean R_SetMode (void)
 			ri.Cvar_SetValue( "vid_fullscreen", 0);
 			vid_fullscreen->modified = false;
 			ri.Con_Printf( PRINT_ALL, "ref_gl::R_SetMode() - fullscreen unavailable in this mode\n" );
-			if ( ( err = GLimp_SetMode( &vid.width, &vid.height, gl_mode->value, false ) ) == rserr_ok )
+			if ( ( err = GLimp_SetMode( &vid.width, &vid.height, gl_mode->intValue, dt_windowed ) ) == rserr_ok )
 				return true;
 		}
 		else if ( err == rserr_invalid_mode )
@@ -1215,7 +1238,7 @@ qboolean R_SetMode (void)
 		}
 
 		// try setting it back to something safe
-		if ( ( err = GLimp_SetMode( &vid.width, &vid.height, gl_state.prev_mode, false ) ) != rserr_ok )
+		if ( ( err = GLimp_SetMode( &vid.width, &vid.height, gl_state.prev_mode, dt_windowed ) ) != rserr_ok )
 		{
 			ri.Con_Printf( PRINT_ALL, "ref_gl::R_SetMode() - could not revert to safe mode\n" );
 			return false;
@@ -1278,6 +1301,7 @@ int R_Init ( void *hinstance, void *hWnd )
 	char vendor_buffer[1000];
 	int		err;
 	int		j;
+	GLint		value = 0;
 	extern float r_turbsin[256];
 
 	for ( j = 0; j < 256; j++ )
@@ -1331,7 +1355,8 @@ int R_Init ( void *hinstance, void *hWnd )
 	ri.Con_Printf (PRINT_ALL, "GL_VERSION: %s\n", gl_config.version_string );
 
 	/* Knighmare- added max texture size */
-	qglGetIntegerv(GL_MAX_TEXTURE_SIZE,&gl_config.max_texsize);
+	qglGetIntegerv(GL_MAX_TEXTURE_SIZE,&value);
+	gl_config.max_texsize = value;
 	ri.Con_Printf (PRINT_DEVELOPER, "GL_MAX_TEXTURE_SIZE: %i\n", gl_config.max_texsize ); /* Knightmare- changed to PRINT_DEVELOPER */
 	if (gl_config.max_texsize <= 0)	// catch if driver doesn't have this
 		gl_config.max_texsize = 256;
@@ -1362,38 +1387,22 @@ int R_Init ( void *hinstance, void *hWnd )
 	/* end Knigthmare */
 
 	strcpy( renderer_buffer, gl_config.renderer_string );
-	strlwr( renderer_buffer );
+	Q_strlwr( renderer_buffer );
 
 	strcpy( vendor_buffer, gl_config.vendor_string );
-	strlwr( vendor_buffer );
+	Q_strlwr( vendor_buffer );
 
 	/* Knightmare- replaced the vendor detection  */
-	if (strstr(vendor_buffer, "nvidia")) {
-		gl_config.renderer = GL_RENDERER_NVIDIA;
-		if (strstr(renderer_buffer, "geforce"))	gl_config.renderer |= GL_RENDERER_GEFORCE;
-	}
-	else if (strstr(vendor_buffer, "ati")) {
-		gl_config.renderer = GL_RENDERER_ATI;
-		if (strstr(vendor_buffer, "radeon"))		gl_config.renderer |= GL_RENDERER_RADEON;
-	}
-	else if (!Q_strncasecmp(renderer_buffer, "3dfx", 4)	  ||
+	if (!Q_strncasecmp(renderer_buffer, "3dfx", 4)	  ||
 		 !Q_strncasecmp(renderer_buffer, "SAGE Glide", 10) ||
 		 !Q_strncasecmp(renderer_buffer, "Glide ", 6)	  || /* possible with Mesa 3.x/4.x/5.0.x */
 		 !Q_strncasecmp(renderer_buffer, "Mesa Glide", 10))
 	{
 		gl_config.renderer = GL_RENDERER_VOODOO;
 	}
-	else if (strstr(vendor_buffer, "matrox"))		gl_config.renderer = GL_RENDERER_MATROX;
-	else if (strstr(vendor_buffer, "intel"))		gl_config.renderer = GL_RENDERER_INTEL;
-	else if (strstr	(vendor_buffer, "sgi"))			gl_config.renderer = GL_RENDERER_SGI;
 	else if (strstr	(renderer_buffer, "permedia"))	gl_config.renderer = GL_RENDERER_PERMEDIA2;
-	else if (strstr	(renderer_buffer, "glint"))		gl_config.renderer = GL_RENDERER_GLINT_MX;
 	else if (strstr	(renderer_buffer, "glzicd"))	gl_config.renderer = GL_RENDERER_REALIZM;
-	else if (strstr	(renderer_buffer, "pcx1"))		gl_config.renderer = GL_RENDERER_PCX1;
-	else if (strstr	(renderer_buffer, "pcx2"))		gl_config.renderer = GL_RENDERER_PCX2;
-	else if (strstr	(renderer_buffer, "pmx"))		gl_config.renderer = GL_RENDERER_PMX;
 	else if (strstr	(renderer_buffer, "verite"))	gl_config.renderer = GL_RENDERER_RENDITION;
-	else if (strstr	(vendor_buffer, "sis"))			gl_config.renderer = GL_RENDERER_SIS;
 	else if (strstr (renderer_buffer, "voodoo"))	gl_config.renderer = GL_RENDERER_VOODOO;
 	else if (strstr	(renderer_buffer, "gdi generic")) gl_config.renderer = GL_RENDERER_MCD;
 	else											gl_config.renderer = GL_RENDERER_DEFAULT;
@@ -1440,7 +1449,7 @@ int R_Init ( void *hinstance, void *hWnd )
 
 	if ( gl_config.renderer & GL_RENDERER_3DLABS )
 	{
-		if ( gl_3dlabs_broken->value )
+		if (gl_3dlabs_broken->intValue)
 			gl_config.allow_cds = false;
 		else
 			gl_config.allow_cds = true;
@@ -1522,7 +1531,7 @@ int R_Init ( void *hinstance, void *hWnd )
 	// GL_EXT_point_parameters
 	if ( StringContainsToken( gl_config.extensions_string, "GL_EXT_point_parameters" ) )
 	{
-		if ( gl_ext_pointparameters->value )
+		if (gl_ext_pointparameters->intValue)
 		{
 			qglPointParameterfEXT = ( void (APIENTRY *)( GLenum, GLfloat ) ) qwglGetProcAddress( "glPointParameterfEXT" );
 			qglPointParameterfvEXT = ( void (APIENTRY *)( GLenum, const GLfloat * ) ) qwglGetProcAddress( "glPointParameterfvEXT" );
@@ -1544,39 +1553,13 @@ int R_Init ( void *hinstance, void *hWnd )
 		ri.Con_Printf( PRINT_ALL, "...GL_EXT_point_parameters not found\n" );
 	}
 
-#ifdef __linux__
-	// 3DFX_set_global_palette
-	if ( StringContainsToken( gl_config.extensions_string, "3DFX_set_global_palette" ))
-	{
-		if ( gl_ext_palettedtexture->value )
-		{
-			qgl3DfxSetPaletteEXT = ( void ( APIENTRY * ) (GLuint *) )qwglGetProcAddress( "gl3DfxSetPaletteEXT" );
-			if (qgl3DfxSetPaletteEXT) {
-				ri.Con_Printf( PRINT_ALL, "...using 3DFX_set_global_palette\n" );
-				qglColorTableEXT = Fake_glColorTableEXT;
-			}
-			else {
-				ri.Con_Printf( PRINT_ALL, "...failed loading 3DFX_set_global_palette\n" );
-			}
-		}
-		else
-		{
-			ri.Con_Printf( PRINT_ALL, "...ignoring 3DFX_set_global_palette\n" );
-		}
-	}
-	else
-	{
-		ri.Con_Printf( PRINT_ALL, "...3DFX_set_global_palette not found\n" );
-	}
-#endif
-
 #ifndef __DJGPP__ /* FS: Causes odd missing things on real hadrware && locks */
 	// GL_EXT_paletted_texture / GL_EXT_shared_texture_palette
 	if ( !qglColorTableEXT &&
 		StringContainsToken( gl_config.extensions_string, "GL_EXT_paletted_texture" ) && 
 		StringContainsToken( gl_config.extensions_string, "GL_EXT_shared_texture_palette" ) )
 	{
-		if ( gl_ext_palettedtexture->value )
+		if (gl_ext_palettedtexture->intValue)
 		{
 			qglColorTableEXT = ( void ( APIENTRY * ) ( GLenum, GLenum, GLsizei, GLenum, GLenum, const GLvoid * ) ) qwglGetProcAddress( "glColorTableEXT" );
 			if (qglColorTableEXT)
@@ -1598,29 +1581,29 @@ int R_Init ( void *hinstance, void *hWnd )
 	gl_config.multitexture = false;
 	if ( StringContainsToken( gl_config.extensions_string, "GL_ARB_multitexture" ) )
 	{
-		if ( gl_ext_multitexture->value )
+		if (gl_ext_multitexture->intValue)
 		{
-			qglMultiTexCoord2f = ( void * ) qwglGetProcAddress( "glMultiTexCoord2fARB" );
-			qglActiveTextureARB = ( void * ) qwglGetProcAddress( "glActiveTextureARB" );
-			qglClientActiveTextureARB = ( void * ) qwglGetProcAddress( "glClientActiveTextureARB" );
-			if (qglMultiTexCoord2f && qglActiveTextureARB && qglClientActiveTextureARB) {
-				qglGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &gl_config.max_texunits);
+			qglMultiTexCoord2fARB = (void (APIENTRY *)(GLenum,GLfloat,GLfloat)) qwglGetProcAddress( "glMultiTexCoord2fARB" );
+			qglActiveTextureARB = (void (APIENTRY *)(GLenum)) qwglGetProcAddress( "glActiveTextureARB" );
+			qglClientActiveTextureARB = (void (APIENTRY *)(GLenum)) qwglGetProcAddress( "glClientActiveTextureARB" );
+			if (qglMultiTexCoord2fARB && qglActiveTextureARB && qglClientActiveTextureARB) {
+				value = 0;
+				qglGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &value);
+				gl_config.max_texunits = value;
 				if (gl_config.max_texunits > 1) {
-					gl_texture0 = GL_TEXTURE0_ARB;
-					gl_texture1 = GL_TEXTURE1_ARB;
 					gl_config.multitexture = true;
 					gl_state.multitextureEnabled = false;	/* Knightmare added */
 					ri.Con_Printf( PRINT_ALL, "...using GL_ARB_multitexture, %i TMUs\n", gl_config.max_texunits );
 				}
 				else {
-					qglMultiTexCoord2f = NULL;
+					qglMultiTexCoord2fARB = NULL;
 					qglActiveTextureARB = NULL;
 					qglClientActiveTextureARB = NULL;
 					ri.Con_Printf( PRINT_ALL, "...not using GL_ARB_multitexture, < 2 TMUs\n" );
 				}
 			}
 			else {
-				qglMultiTexCoord2f = NULL;
+				qglMultiTexCoord2fARB = NULL;
 				qglActiveTextureARB = NULL;
 				qglClientActiveTextureARB = NULL;
 				ri.Con_Printf( PRINT_ALL, "...failed loading GL_ARB_multitexture\n" );
@@ -1636,46 +1619,12 @@ int R_Init ( void *hinstance, void *hWnd )
 		ri.Con_Printf( PRINT_ALL, "...GL_ARB_multitexture not found\n" );
 	}
 
-	// GL_SGIS_multitexture
-	if ( StringContainsToken( gl_config.extensions_string, "GL_SGIS_multitexture" ) )
-	{
-		if ( qglActiveTextureARB )
-		{
-			ri.Con_Printf( PRINT_ALL, "...GL_SGIS_multitexture deprecated in favor of ARB_multitexture\n" );
-		}
-		else if ( gl_ext_multitexture->value )
-		{
-			qglMultiTexCoord2f = ( void * ) qwglGetProcAddress( "glMTexCoord2fSGIS" );
-			qglSelectTextureSGIS = ( void * ) qwglGetProcAddress( "glSelectTextureSGIS" );
-			if (qglMultiTexCoord2f && qglSelectTextureSGIS) {
-				gl_texture0 = GL_TEXTURE0_SGIS;
-				gl_texture1 = GL_TEXTURE1_SGIS;
-				gl_config.multitexture = true;
-				gl_config.max_texunits = 2;
-				ri.Con_Printf( PRINT_ALL, "...using GL_SGIS_multitexture\n" );
-			}
-			else {
-				qglMultiTexCoord2f = NULL;
-				qglSelectTextureSGIS = NULL;
-				ri.Con_Printf( PRINT_ALL, "...failed loading GL_SGIS_multitexture\n" );
-			}
-		}
-		else
-		{
-			ri.Con_Printf( PRINT_ALL, "...ignoring GL_SGIS_multitexture\n" );
-		}
-	}
-	else
-	{
-		ri.Con_Printf( PRINT_ALL, "...GL_SGIS_multitexture not found\n" );
-	}
-
 	// GL_ARB_texture_non_power_of_two
 	/* Knightmare- non-power-of-two texture support */
 	gl_config.arbTextureNonPowerOfTwo = false;
 	if ( StringContainsToken( gl_config.extensions_string, "GL_ARB_texture_non_power_of_two" ) )
 	{
-		if (gl_arb_texturenonpoweroftwo->value) {
+		if (gl_arb_texturenonpoweroftwo->intValue) {
 			ri.Con_Printf (PRINT_ALL, "...using GL_ARB_texture_non_power_of_two\n");
 			gl_config.arbTextureNonPowerOfTwo = true;
 		}
@@ -1794,7 +1743,7 @@ void R_BeginFrame( float camera_separation )
 		gl_log->modified = false;
 	}
 
-	if ( gl_log->value )
+	if (gl_log->intValue)
 	{
 		GLimp_LogNewFrame();
 	}
@@ -2005,10 +1954,9 @@ void	Draw_Fill (int x, int y, int w, int h, int c);
 void	Draw_FadeScreen (void);
 
 /*
-@@@@@@@@@@@@@@@@@@@@@
+=============
 GetRefAPI
-
-@@@@@@@@@@@@@@@@@@@@@
+=============
 */
 refexport_t GetRefAPI (refimport_t rimp )
 {
@@ -2054,7 +2002,7 @@ refexport_t GetRefAPI (refimport_t rimp )
 
 #ifndef REF_HARD_LINKED
 // this is only here so the functions in q_shared.c and q_shwin.c can link
-void Sys_Error (char *error, ...)
+void Sys_Error (const char *error, ...)
 {
 	va_list		argptr;
 	char		text[1024];
@@ -2067,7 +2015,7 @@ void Sys_Error (char *error, ...)
 	ri.Sys_Error (ERR_FATAL, "%s", text);
 }
 
-void Com_Printf (char *fmt, ...)
+void Com_Printf (const char *fmt, ...)
 {
 	va_list		argptr;
 	char		text[1024];

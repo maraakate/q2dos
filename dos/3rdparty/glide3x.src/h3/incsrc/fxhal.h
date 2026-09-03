@@ -1,5 +1,3 @@
-
-
 /*
 ** THIS SOFTWARE IS SUBJECT TO COPYRIGHT PROTECTION AND IS OFFERED ONLY
 ** PURSUANT TO THE 3DFX GLIDE GENERAL PUBLIC LICENSE. THERE IS NO RIGHT
@@ -18,9 +16,6 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-** $Revision: 1.1.1.1 $
-** $Date: 1999/11/24 21:45:02 $
 */
 
 #ifndef __FXHAL_H__
@@ -33,9 +28,6 @@
 #include <fxpci.h>
 
 #include <h3info.h>
-
-// Allow SourceSafe to track Revision values
-#define HAL_H_REV "$Revision: 1.1.1.1 $"
 
 // Just to unconfuse myself:
 //

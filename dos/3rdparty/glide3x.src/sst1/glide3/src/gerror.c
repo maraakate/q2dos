@@ -18,8 +18,6 @@
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
 **
-** $Header: /cvsroot/glide/glide3x/sst1/glide3/src/Attic/gerror.c,v 1.1.2.2 2004/03/08 07:42:21 dborca Exp $
-** $Log: gerror.c,v $
 ** Revision 1.1.2.2  2004/03/08 07:42:21  dborca
 ** Voodoo Rush fixes
 **

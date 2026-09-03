@@ -124,7 +124,7 @@ SP_target_speaker(edict_t *ent)
 	}
 	else
 	{
-		strncpy(buffer, st.noise, sizeof(buffer));
+		strncpy(buffer, st.noise, sizeof(buffer) - 1);
 	}
 
 	ent->noise_index = gi.soundindex(buffer);
@@ -192,7 +192,7 @@ SP_target_help(edict_t *ent)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 	 	/* auto-remove for deathmatch */
 		G_FreeEdict(ent);
@@ -241,7 +241,7 @@ SP_target_secret(edict_t *ent)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 	 	/* auto-remove for deathmatch */
 		G_FreeEdict(ent);
@@ -303,7 +303,7 @@ SP_target_goal(edict_t *ent)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 	 	/* auto-remove for deathmatch */
 		G_FreeEdict(ent);
@@ -512,7 +512,7 @@ use_target_changelevel(edict_t *self, edict_t *other, edict_t *activator)
 		return; /* already activated */
 	}
 
-	if (!deathmatch->value && !coop->value)
+	if (!deathmatch->intValue && !coop->intValue)
 	{
 		if (g_edicts[1].health <= 0)
 		{
@@ -521,7 +521,7 @@ use_target_changelevel(edict_t *self, edict_t *other, edict_t *activator)
 	}
 
 	/* if noexit, do a ton of damage to other */
-	if (deathmatch->value && !((int)dmflags->value & DF_ALLOW_EXIT) &&
+	if (deathmatch->intValue && !(dmflags->intValue & DF_ALLOW_EXIT) &&
 		(other != world))
 	{
 		T_Damage(other, self, self, vec3_origin, other->s.origin,
@@ -541,7 +541,7 @@ use_target_changelevel(edict_t *self, edict_t *other, edict_t *activator)
 	}
 
 	/* if going to a new unit, clear cross triggers */
-	if (self->map && strstr(self->map, "*"))
+	if (self->map && strchr(self->map, '*'))
 	{
 		game.serverflags &= ~(SFL_CROSS_TRIGGER_MASK);
 	}
@@ -1363,7 +1363,7 @@ SP_target_lightramp(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;

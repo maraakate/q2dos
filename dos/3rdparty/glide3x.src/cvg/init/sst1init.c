@@ -1,4 +1,3 @@
-/*-*-c++-*-*/
 /*
 ** THIS SOFTWARE IS SUBJECT TO COPYRIGHT PROTECTION AND IS OFFERED ONLY
 ** PURSUANT TO THE 3DFX GLIDE GENERAL PUBLIC LICENSE. THERE IS NO RIGHT
@@ -17,10 +16,6 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-**
-** $Revision: 1.2.8.7 $ 
-** $Date: 2005/08/13 21:07:00 $ 
 **
 */
 
@@ -141,7 +136,10 @@
 ** VOODOO2_PATH                  path    Path used to locate "voodoo2.ini" file
 **
 */
-#ifdef __WIN32__
+
+#undef FX_DLL_ENABLE /* so that we don't dllexport the symbols */
+
+#ifdef _MSC_VER
 #pragma optimize ("",off)
 #endif
 #include <stdio.h>
@@ -169,9 +167,6 @@
 #ifdef __WIN32__
 #include <windows.h>
 #endif
-
-// Allow SourceSafe to track Revision
-static char codeIdent[] = "@#%" VERSIONSTR ;
 
 /*
 ** sst1InitMapBoard():
@@ -203,10 +198,11 @@ FX_EXPORT FxU32 * FX_CSTYLE sst1InitMapBoardDirect(FxU32 BoardNumber,
     FxU32 *sstbase;
     FxU32 j, n;
     FxU32 sstv2_noremap = 0;
+    const char *envp;
     int i;
 
-    if( GETENV( ("SSTV2_DEVICEID") ) &&
-        (SSCANF(GETENV(("SSTV2_DEVICEID")), "%i", &i) == 1) )
+    envp = GETENV(("SSTV2_DEVICEID"));
+    if(envp && (SSCANF(envp, "%i", &i) == 1) )
       deviceID = i;
     else
       deviceID = 0x0002;
@@ -230,23 +226,19 @@ FX_EXPORT FxU32 * FX_CSTYLE sst1InitMapBoardDirect(FxU32 BoardNumber,
      * board which will (of course) fail to map.  
      */
     if(firstTime) {
-      // Make Watcom happy
-      codeIdent[0] = '@';
-      headersIdent[0] = '@';
-      
       // Find "voodoo2.ini" file if it exists...
       sst1InitUseVoodooFile = sst1InitVoodooFile();
       
-      if( GETENV( ("SSTV2_NOREMAP") ) &&
-          (SSCANF(GETENV(("SSTV2_NOREMAP")), "%i", &i) == 1) )
+      envp = GETENV(("SSTV2_NOREMAP"));
+      if(envp && (SSCANF(envp, "%i", &i) == 1) )
         sstv2_noremap = i;
       else
         sstv2_noremap = 0;
-#if !macintosh && !__linux__     
+#if !macintosh && !__linux__
       if (!sstv2_noremap) {
         fxremap(); /* remap single board SLI */
       }
-#endif      
+#endif
       if(!(boardsInSystem = sst1InitNumBoardsInSystem())) {
         firstTime = FXTRUE;
         return(NULL);
@@ -254,11 +246,6 @@ FX_EXPORT FxU32 * FX_CSTYLE sst1InitMapBoardDirect(FxU32 BoardNumber,
     }
 
     if( clearBoardInfo ) {
-        INIT_PRINTF(("sst1Init Routines"));
-#ifdef FX_DLL_ENABLE
-        INIT_PRINTF(("(DLL)"));
-#endif
-        INIT_PRINTF((": %s\n", VERSIONSTR));
         INIT_PRINTF(("sst1InitMapBoard(): BoardsInSystem = %d\n",
           boardsInSystem));
 
@@ -347,8 +334,7 @@ FX_EXPORT FxU32 * FX_CSTYLE sst1InitMapBoardDirect(FxU32 BoardNumber,
 #ifdef __WIN32__
                   MessageBox(NULL, pciGetErrorString(), NULL, MB_OK);
                   INIT_PRINTF(("sst1InitMapBoard(): 0x%X\n", GetLastError()));
-#endif // __WIN32__
-
+#endif
 
                   INIT_PRINTF(("pciError(): %s", pciGetErrorString()));
 
@@ -362,7 +348,7 @@ FX_EXPORT FxU32 * FX_CSTYLE sst1InitMapBoardDirect(FxU32 BoardNumber,
        // Search through all known boards for SLI enabled...
        FxU32 k;
        SstRegs *sst;
- 
+
        for(k=0; k<boardsInSystemReally; k++) {
           // Disable SLI if detected...
           if(!(sstbase = (FxU32 *) sst1BoardInfo[k].virtAddr[0]))
@@ -370,7 +356,7 @@ FX_EXPORT FxU32 * FX_CSTYLE sst1InitMapBoardDirect(FxU32 BoardNumber,
           sst1InitDeviceNumber = sst1BoardInfo[k].deviceNumber;
           sst1CurrentBoard = &sst1BoardInfo[k];
           sst = (SstRegs *) sstbase;
-    
+
           if(IGET(sst->fbiInit1) & SST_EN_SCANLINE_INTERLEAVE) {
              INIT_PRINTF(("sst1InitMapBoard(): Disabling Scanline Interleaving (board #%d)...\n", (k+1)));
              // Disable SLI Snooping...
@@ -407,10 +393,11 @@ FX_EXPORT FxU32 * FX_CSTYLE sst1InitMapBoardDirect(FxU32 BoardNumber,
     sst1BoardInfo[BoardNumber].vgaPassthruEnable = 0x0;
     sst1BoardInfo[BoardNumber].fbiVideo16BPP = 0;
 
-    if(GETENV(("SSTV2_VGA_PASS"))) {
-        INIT_PRINTF(("sst1InitMapBoard(): Using SST_VGA_PASS=%d\n",
-            ATOI(GETENV(("SSTV2_VGA_PASS")))));
-        if(ATOI(GETENV(("SSTV2_VGA_PASS")))) {
+    envp = GETENV(("SSTV2_VGA_PASS"));
+    if(envp) {
+        i = ATOI(envp);
+        INIT_PRINTF(("sst1InitMapBoard(): Using SST_VGA_PASS=%d\n", i));
+        if(i) {
             sst1BoardInfo[BoardNumber].vgaPassthruEnable = SST_EN_VGA_PASSTHRU;
             sst1BoardInfo[BoardNumber].vgaPassthruDisable = 0x0;
         } else {
@@ -437,6 +424,7 @@ FX_EXPORT FxBool FX_CSTYLE sst1InitRegisters(FxU32 *sstbase)
     FxU32 ft_clkdel, tf0_clkdel, tf1_clkdel, tf2_clkdel;
     sst1ClkTimingStruct sstGrxClk;
     SstRegs *sst = (SstRegs *) sstbase;
+    const char *envp;
     int i;
 
     if(!sst)
@@ -472,16 +460,16 @@ FX_EXPORT FxBool FX_CSTYLE sst1InitRegisters(FxU32 *sstbase)
     sst1InitReturnStatus(sstbase);
     
     // Adjust Trex-to-Fbi FIFO
-    if(GETENV(("SSTV2_TF_FIFO_THRESH")) &&
-       (SSCANF(GETENV(("SSTV2_TF_FIFO_THRESH")), "%i", &i) == 1) )
+    envp = GETENV(("SSTV2_TF_FIFO_THRESH"));
+    if(envp && (SSCANF(envp, "%i", &i) == 1) )
         tf_fifo_thresh = i;
     else
         tf_fifo_thresh = 0x8;
     INIT_PRINTF(("sst1InitRegisters(): Setting TREX-to-FBI FIFO THRESHOLD to 0x%x...\n",
         tf_fifo_thresh));
 
-    if(GETENV(("SSTV2_PFT_CLKDEL")) &&
-       (SSCANF(GETENV(("SSTV2_PFT_CLKDEL")), "%i", &i) == 1) )
+    envp = GETENV(("SSTV2_PFT_CLKDEL"));
+    if(envp && (SSCANF(envp, "%i", &i) == 1) )
         ft_clkdel = i;
     else
         ft_clkdel = 0x8; // Okay for 16 MHz startup...
@@ -547,8 +535,8 @@ FX_EXPORT FxBool FX_CSTYLE sst1InitRegisters(FxU32 *sstbase)
     }
 
     // set TREX0 init values
-    if(GETENV(("SSTV2_TREX0INIT0")) &&
-       (SSCANF(GETENV(("SSTV2_TREX0INIT0")), "%i", &i) == 1) ) {
+    envp = GETENV(("SSTV2_TREX0INIT0"));
+    if(envp && (SSCANF(envp, "%i", &i) == 1) ) {
         INIT_PRINTF(("sst1InitRegisters(): Using SST_TREX0INIT0 environment variable\n"));
         sst1CurrentBoard->tmuInit0[0] = i;
     } else
@@ -556,15 +544,15 @@ FX_EXPORT FxBool FX_CSTYLE sst1InitRegisters(FxU32 *sstbase)
 
     INIT_PRINTF(("sst1InitRegisters(): Storing TREX0INIT0=0x%x\n",
         sst1CurrentBoard->tmuInit0[0]));
-    if(GETENV(("SSTV2_TREX0INIT1")) &&
-       (SSCANF(GETENV(("SSTV2_TREX0INIT1")), "%i", &i) == 1) ) {
+    envp = GETENV(("SSTV2_TREX0INIT1"));
+    if(envp && (SSCANF(envp, "%i", &i) == 1) ) {
         INIT_PRINTF(("sst1InitRegisters(): Using SST_TREX0INIT1 environment variable\n"));
         sst1CurrentBoard->tmuInit1[0] = i;
     } else
         sst1CurrentBoard->tmuInit1[0] = SST_TREX0INIT1_DEFAULT;
 
-    if(GETENV(("SSTV2_PTF0_CLKDEL")) &&
-       (SSCANF(GETENV(("SSTV2_PTF0_CLKDEL")), "%i", &tf0_clkdel) == 1)) {
+    envp = GETENV(("SSTV2_PTF0_CLKDEL"));
+    if(envp && (SSCANF(envp, "%i", &tf0_clkdel) == 1)) {
         sst1CurrentBoard->tmuInit1[0] = (sst1CurrentBoard->tmuInit1[0] &
             ~SST_TEX_TF_CLK_DEL_ADJ) |
             (tf0_clkdel<<SST_TEX_TF_CLK_DEL_ADJ_SHIFT);
@@ -573,22 +561,22 @@ FX_EXPORT FxBool FX_CSTYLE sst1InitRegisters(FxU32 *sstbase)
         sst1CurrentBoard->tmuInit1[0]));
 
     // set TREX1 init values
-    if(GETENV(("SSTV2_TREX1INIT0")) && 
-       (SSCANF(GETENV(("SSTV2_TREX1INIT0")), "%i", &i) == 1) ) {
+    envp = GETENV(("SSTV2_TREX1INIT0"));
+    if(envp && (SSCANF(envp, "%i", &i) == 1) ) {
         INIT_PRINTF(("sst1InitRegisters(): Using SST_TREX1INIT0 environment variable\n"));
         sst1CurrentBoard->tmuInit0[1] = i;
     } else
         sst1CurrentBoard->tmuInit0[1] = SST_TREX1INIT0_DEFAULT;
     INIT_PRINTF(("sst1InitRegisters(): Storing TREX1INIT0=0x%x\n",
         sst1CurrentBoard->tmuInit0[1]));
-    if(GETENV(("SSTV2_TREX1INIT1")) &&
-       (SSCANF(GETENV(("SSTV2_TREX1INIT1")), "%i", &i) == 1) ) {
+    envp = GETENV(("SSTV2_TREX1INIT1"));
+    if(envp && (SSCANF(envp, "%i", &i) == 1) ) {
         INIT_PRINTF(("sst1InitRegisters(): Using SST_TREX1INIT1 environment variable\n"));
         sst1CurrentBoard->tmuInit1[1] = i;
     } else
         sst1CurrentBoard->tmuInit1[1] = SST_TREX1INIT1_DEFAULT;
-    if(GETENV(("SSTV2_PTF1_CLKDEL")) &&
-       (SSCANF(GETENV(("SSTV2_PTF1_CLKDEL")), "%i", &tf1_clkdel) == 1) ) {
+    envp = GETENV(("SSTV2_PTF1_CLKDEL"));
+    if(envp && (SSCANF(envp, "%i", &tf1_clkdel) == 1) ) {
         sst1CurrentBoard->tmuInit1[1] = (sst1CurrentBoard->tmuInit1[1] &
             ~SST_TEX_TF_CLK_DEL_ADJ) |
             (tf1_clkdel<<SST_TEX_TF_CLK_DEL_ADJ_SHIFT);
@@ -596,24 +584,23 @@ FX_EXPORT FxBool FX_CSTYLE sst1InitRegisters(FxU32 *sstbase)
     INIT_PRINTF(("sst1InitRegisters(): Storing TREX1INIT1=0x%x\n",
         sst1CurrentBoard->tmuInit1[1]));
 
-
     // set TREX2 init values
-    if(GETENV(("SSTV2_TREX2INIT0")) &&
-       (SSCANF(GETENV(("SSTV2_TREX2INIT0")), "%i", &i) == 1) ) {
+    envp = GETENV(("SSTV2_TREX2INIT0"));
+    if(envp && (SSCANF(envp, "%i", &i) == 1) ) {
         INIT_PRINTF(("sst1InitRegisters(): Using SST_TREX2INIT0 environment variable\n"));
         sst1CurrentBoard->tmuInit0[2] = i;
     } else
         sst1CurrentBoard->tmuInit0[2] = SST_TREX2INIT0_DEFAULT;
     INIT_PRINTF(("sst1InitRegisters(): Storing TREX2INIT0=0x%x\n",
         sst1CurrentBoard->tmuInit0[2]));
-    if(GETENV(("SSTV2_TREX2INIT1")) &&
-       (SSCANF(GETENV(("SSTV2_TREX2INIT1")), "%i", &i) == 1) ) {
+    envp = GETENV(("SSTV2_TREX2INIT1"));
+    if(envp && (SSCANF(envp, "%i", &i) == 1) ) {
         INIT_PRINTF(("sst1InitRegisters(): Using SST_TREX2INIT1 environment variable\n"));
         sst1CurrentBoard->tmuInit1[2] = i;
     } else
         sst1CurrentBoard->tmuInit1[2] = SST_TREX2INIT1_DEFAULT;
-    if(GETENV(("SSTV2_PTF2_CLKDEL")) &&
-       (SSCANF(GETENV(("SSTV2_PTF2_CLKDEL")), "%i", &tf2_clkdel) == 1) ) {
+    envp = GETENV(("SSTV2_PTF2_CLKDEL"));
+    if(envp && (SSCANF(envp, "%i", &tf2_clkdel) == 1) ) {
         sst1CurrentBoard->tmuInit1[2] = (sst1CurrentBoard->tmuInit1[2] &
             ~SST_TEX_TF_CLK_DEL_ADJ) |
             (tf2_clkdel<<SST_TEX_TF_CLK_DEL_ADJ_SHIFT);
@@ -720,8 +707,9 @@ FX_EXPORT FxBool FX_CSTYLE sst1InitRegisters(FxU32 *sstbase)
     sst1InitIdleFBINoNOP(sstbase);
 
     // LFB writes stored in memory FIFO?
-    if(GETENV(("SSTV2_MEMFIFO_LFB")))
-        n = ATOI(GETENV(("SSTV2_MEMFIFO_LFB")));
+    envp = GETENV(("SSTV2_MEMFIFO_LFB"));
+    if(envp)
+        n = ATOI(envp);
     else
         n = 1;
     if(n) {
@@ -731,8 +719,9 @@ FX_EXPORT FxBool FX_CSTYLE sst1InitRegisters(FxU32 *sstbase)
     }
 
     // Texture memory writes stored in memory FIFO?
-    if(GETENV(("SSTV2_MEMFIFO_TEX")))
-        n = ATOI(GETENV(("SSTV2_MEMFIFO_TEX")));
+    envp = GETENV(("SSTV2_MEMFIFO_TEX"));
+    if(envp)
+        n = ATOI(envp);
     else
         n = 1;
     if(n) {
@@ -909,11 +898,13 @@ FX_EXPORT FxBool FX_CSTYLE sst1InitShutdown(FxU32 *sstbase)
             return(FXFALSE);
     }
 
-    if(GETENV(("SSTV2_NOSHUTDOWN")))
+    if(GETENV(("SSTV2_NOSHUTDOWN"))) {
         INIT_PRINTF(("sst1InitShutdown(): Bypassing shutdown with SSTV2_NOSHUTDOWN\n"));
+        goto noshutdown;
+    }
 
     n = 0;
-    while(!GETENV(("SSTV2_NOSHUTDOWN"))) {
+    for ( ;; ) {
         if(!n)
             sstPtr = sstMaster;
         else
@@ -958,7 +949,9 @@ FX_EXPORT FxBool FX_CSTYLE sst1InitShutdown(FxU32 *sstbase)
         if((++n > 1) || !sliEnabled)
             break;
     }
-    
+
+    noshutdown: ;
+
     /* sst1InitIdle(sstbase);  */
 
 #if !DIRECTX
@@ -983,7 +976,7 @@ FX_EXPORT FxBool FX_CSTYLE sst1InitShutdown(FxU32 *sstbase)
     // Make sure that the board info structures are
     // cleared next time sst1InitMapBoard() is called.
     clearBoardInfo = FXTRUE;
-      
+
     return(FXTRUE);
 }
 
@@ -1119,9 +1112,11 @@ FX_ENTRY FxU32 FX_CSTYLE sst1InitNumBoardsInSystem(void)
     FxU32 vendorID = _3DFX_PCI_ID;     // 3Dfx Vendor ID
     FxU32 deviceID;                    // 0x0002 - Find Voodoo2 boards ( 0xFFFF - Find any 3Dfx board)
     FxU32 j, n;
+    const char *envp;
 
-    if( GETENV( ("SSTV2_DEVICEID") ) )
-      deviceID = ATOI( GETENV( "SSTV2_DEVICEID" ) );
+    envp = GETENV(("SSTV2_DEVICEID"));
+    if(envp)
+      deviceID = ATOI(envp);
     else
       deviceID = 0x0002;
 
@@ -1130,8 +1125,9 @@ FX_ENTRY FxU32 FX_CSTYLE sst1InitNumBoardsInSystem(void)
        if(pciFindCardMulti(vendorID, deviceID, &n, j))
            boardsInSystemReally++;
     }
-    if(GETENV(("SSTV2_BOARDS")))
-       return(ATOI(GETENV(("SSTV2_BOARDS"))));
+    envp = GETENV(("SSTV2_BOARDS"));
+    if(envp)
+       return ATOI(envp);
     else
        return(boardsInSystemReally);
 }
@@ -1337,6 +1333,6 @@ sst1InitCachingAMD(FxU32* sstBase, FxBool enableP, FxBool hasP2MTRR)
   return retVal;
 } // sst1InitSetCachingAMD
 
-#ifdef __WIN32__
+#ifdef _MSC_VER
 #pragma optimize ("",on)
 #endif

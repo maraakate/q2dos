@@ -1,0 +1,65 @@
+CC = gcc
+
+# comment this out to enable assertions:
+CPPFLAGS+= -DNDEBUG
+CPPFLAGS+= -Did386=1
+
+CFLAGS = -Wall -fPIC
+#CFLAGS+= -g -ggdb
+CFLAGS+= -O2
+CFLAGS+= -ffast-math
+#CFLAGS+= -fwrapv
+
+LDFLAGS = -shared
+# make sure that this flags is supported
+LDFLAGS+= -Wl,--no-undefined
+# export only the relevant functions:
+LDFLAGS+= -Wl,--version-script=game.version
+LDLIBS = -lm
+
+TARGETS = game.so
+
+GAME = g_ai.o \
+	g_chase.o \
+	g_cmds.o \
+	g_combat.o \
+	g_ctf.o \
+	g_func.o \
+	g_items.o \
+	g_main.o \
+	g_misc.o \
+	g_monster.o \
+	g_phys.o \
+	g_save.o \
+	g_spawn.o \
+	g_svcmds.o \
+	g_target.o \
+	g_trigger.o \
+	g_utils.o \
+	g_weapon.o \
+	menu.o \
+	move.o \
+	p_client.o \
+	p_hud.o \
+	p_trail.o \
+	p_view.o \
+	p_weapon.o \
+	q_shared.o
+
+.PHONY: default all clean
+#
+
+OBJECTS = $(GAME)
+
+default: all
+
+all: $(TARGETS)
+
+%.o: %.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+
+game.so: $(OBJECTS)
+	$(CC) -o $@ $(LDFLAGS) $(OBJECTS) $(LDLIBS)
+
+clean:
+	rm -f *.o $(TARGETS)

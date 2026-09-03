@@ -105,7 +105,7 @@ qboolean	CL_CheckOrDownloadFile (char *filename)
 		return true;
 	}
 
-	if (FS_LoadFile (filename, NULL) != -1)
+	if (FS_FileExists(filename))
 	{	// it exists, no need to download
 		return true;
 	}
@@ -115,6 +115,7 @@ qboolean	CL_CheckOrDownloadFile (char *filename)
 		// We return true so that the precache check keeps feeding us more files.
 		// Since we have multiple HTTP connections we want to minimize latency
 		// and be constantly sending requests, not one at a time.
+		cls.forcePacket = true;
 		return true;
 	}
 #endif
@@ -177,7 +178,6 @@ qboolean	CL_CheckOrDownloadFile (char *filename)
 		va("download %s", cls.downloadname));
 	}
 
-	cls.downloadnumber++;
 	cls.forcePacket = true;
 
 	return false;
@@ -209,7 +209,7 @@ void	CL_Download_f (void)
 	//Com_sprintf(filename, sizeof(filename), "%s", Cmd_Argv(1));
 	filename = Cmd_Argv(1);
 
-	if (FS_LoadFile (filename, NULL) != -1)
+	if (FS_FileExists(filename))
 	{	
 		// it exists, no need to download
 		Com_Printf("File already exists.\n");
@@ -385,7 +385,7 @@ void CL_ParseServerData (void)
 	strncpy (cl.gamedir, str, sizeof(cl.gamedir)-1);
 
 	// set gamedir
-	if ((*str && (!fs_gamedirvar->string || !*fs_gamedirvar->string || strcmp(fs_gamedirvar->string, str))) || (!*str && (fs_gamedirvar->string || *fs_gamedirvar->string)))
+	if ((*str && (!fs_gamedirvar->string || !*fs_gamedirvar->string || strcmp(fs_gamedirvar->string, str) != 0)) || (!*str && (fs_gamedirvar->string || *fs_gamedirvar->string)))
 		Cvar_Set("game", str);
 
 	// parse player entity number
@@ -454,7 +454,7 @@ void CL_LoadClientinfo (clientinfo_t *ci, char *s)
 	// isolate the player's name
 	strncpy(ci->name, s, sizeof(ci->name));
 	ci->name[sizeof(ci->name)-1] = 0;
-	t = strstr (s, "\\");
+	t = strchr (s, '\\');
 	if (t)
 	{
 		ci->name[t-s] = 0;
@@ -477,9 +477,9 @@ void CL_LoadClientinfo (clientinfo_t *ci, char *s)
 	{
 		// isolate the model name
 		strcpy (model_name, s);
-		t = strstr(model_name, "/");
+		t = strchr(model_name, '/');
 		if (!t)
-			t = strstr(model_name, "\\");
+			t = strchr(model_name, '\\');
 		if (!t)
 			t = model_name;
 		*t = 0;
@@ -532,7 +532,7 @@ void CL_LoadClientinfo (clientinfo_t *ci, char *s)
 				Com_sprintf (weapon_filename, sizeof(weapon_filename), "players/male/%s", cl_weaponmodels[i]);
 				ci->weaponmodel[i] = re.RegisterModel(weapon_filename);
 			}
-			if (!cl_vwep->value)
+			if (!cl_vwep->intValue)
 				break; // only one when vwep is off
 		}
 
@@ -639,11 +639,11 @@ void CL_PlayBackgroundTrack (void)
 		Com_sprintf (name, sizeof(name), "music/%s.", cl.configstrings[CS_CDTRACK]);
 		p = name + strlen(name);
 		strcpy (p, "wav");
-		if (FS_LoadFile(name, NULL) != -1)
+		if (FS_FileExists(name))
 			have_extmusic |= BGMUSIC_WAV;
 #ifdef OGG_SUPPORT
 		strcpy (p, "ogg");
-		if (FS_LoadFile(name, NULL) != -1)
+		if (FS_FileExists(name))
 			have_extmusic |= BGMUSIC_OGG;
 #endif
 
@@ -678,11 +678,11 @@ void CL_PlayBackgroundTrack (void)
 	Com_sprintf (name, sizeof(name), "music/track%02i.", CL_MissionPackCDTrack(track));
 	p = name + strlen(name);
 	strcpy (p, "wav");
-	if (FS_LoadFile(name, NULL) != -1)
+	if (FS_FileExists(name))
 		have_extmusic |= BGMUSIC_WAV;
 #ifdef OGG_SUPPORT
 	strcpy (p, "ogg");
-	if (FS_LoadFile(name, NULL) != -1)
+	if (FS_FileExists(name))
 		have_extmusic |= BGMUSIC_OGG;
 #endif
 
@@ -774,7 +774,7 @@ void CL_ParseConfigString (void)
 		i -= CS_PLAYERSKINS;
 		if (i < cl.maxclients)
 		{
-			if (cl.refresh_prepped && strcmp(olds, s))
+			if (cl.refresh_prepped && strcmp(olds, s) != 0)
 				CL_ParseClientinfo (i);
 		}
 		else
@@ -860,7 +860,7 @@ void CL_ParseStartSoundPacket(void)
 
 void SHOWNET(char *s)
 {
-	if (cl_shownet->value>=2)
+	if (cl_shownet->intValue >=2)
 		Com_Printf ("%3i:%s\n", net_message.readcount-1, s);
 }
 
@@ -870,7 +870,7 @@ void SHOWNET(char *s)
 	   potentially scary shit */
 qboolean CL_MaliciousStuffText(char *s)
 {
-	if(!cl_stufftext_check->value)
+	if(!cl_stufftext_check->intValue)
 		return false;
 
 	if(!s || s[0] == 0)
@@ -905,9 +905,9 @@ void CL_ParseServerMessage (void)
 //
 // if recording demos, copy the message out
 //
-	if (cl_shownet->value == 1)
+	if (cl_shownet->intValue == 1)
 		Com_Printf ("%i ",net_message.cursize);
-	else if (cl_shownet->value >= 2)
+	else if (cl_shownet->intValue >= 2)
 		Com_Printf ("------------------\n");
 
 

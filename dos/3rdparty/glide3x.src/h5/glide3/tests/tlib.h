@@ -17,12 +17,7 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-**
-** $Revision: 1.1 $ 
-** $Date: 2000/06/15 00:32:51 $ 
-**
 */
-
 
 #ifndef _TLIB_H_
 #define _TLIB_H_
@@ -37,7 +32,7 @@ extern "C" {
 #ifdef assert
 #undef assert
 #endif
-#define assert(exp) (exp)
+#define assert(exp) (void) (exp)
 #endif
 
 /* The two most commonly defined macros in the known universe */
@@ -231,7 +226,7 @@ GrContext_t* tlGetRenderContext(FxU32 glideDeviceNum, FxU32 hWnd,
                                 int nColBuf, int nAuxBuf);
 
 FxBool
-tlErrorMessage(char *err);  
+tlErrorMessage(const char *err);
 
 typedef FxU32 TlPalette[256];
 typedef struct {

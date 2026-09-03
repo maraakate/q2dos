@@ -1,0 +1,109 @@
+CC = gcc
+NASM = nasm
+
+# asm optimizations:
+USE_ASM=1
+# use nasm or gas as assembler:
+USE_NASM=0
+
+CFLAGS = -Wall -O2 -fPIC
+CFLAGS+= -fomit-frame-pointer
+CFLAGS+= -ffast-math
+CPPFLAGS+= -DNDEBUG
+CPPFLAGS+= -I. -I../client -I../qcommon -I../game
+CPPFLAGS+= -I../macosx
+LDFLAGS = -dynamiclib
+LDFLAGS+= -Wl,-single_module
+# export only the relevant functions:
+LDFLAGS+= -Wl,-exported_symbols_list,ref.export
+LDLIBS =
+
+ifeq ($(USE_ASM),1)
+CPPFLAGS+= -Did386=1
+# enable text relocs in 'slidable image' :
+LDFLAGS+= -Wl,-read_only_relocs,suppress
+else
+CPPFLAGS+= -Did386=0
+endif
+ifeq ($(USE_NASM),1)
+ASMDIR=../nasm
+else
+ASMDIR=../gas
+endif
+
+CPPFLAGS+= -DSWIMP_SDL
+SDL_FRAMEWORK_PATH=../macosx
+SDL_LIBS  =-F$(SDL_FRAMEWORK_PATH)
+SDL_CFLAGS=-F$(SDL_FRAMEWORK_PATH)
+SDL_LIBS +=-Wl,-framework,SDL -Wl,-framework,Cocoa
+CFLAGS+= $(SDL_CFLAGS)
+LDLIBS+= $(SDL_LIBS)
+
+REFSOFT = ../game/q_shared.o \
+	../linux/glob.o \
+	../linux/q_shlinux.o \
+	../linux/rw_sdl.o \
+	r_alias.o \
+	r_main.o \
+	r_light.o \
+	r_misc.o \
+	r_model.o \
+	r_part.o \
+	r_poly.o \
+	r_polyse.o \
+	r_rast.o \
+	r_scan.o \
+	r_sprite.o \
+	r_surf.o \
+	r_aclip.o \
+	r_bsp.o \
+	r_draw.o \
+	r_edge.o \
+	r_image.o
+
+ifeq ($(USE_ASM),1)
+REFASM = $(ASMDIR)/math_ref.o \
+	$(ASMDIR)/math.o \
+	$(ASMDIR)/r_aclipa.o \
+	$(ASMDIR)/r_aliasa.o \
+	$(ASMDIR)/r_draw16.o \
+	$(ASMDIR)/r_drawa.o \
+	$(ASMDIR)/r_edgea.o \
+	$(ASMDIR)/r_parta.o \
+	$(ASMDIR)/r_polysa.o \
+	$(ASMDIR)/r_scana.o \
+	$(ASMDIR)/r_spr8.o \
+	$(ASMDIR)/r_surf8.o \
+	$(ASMDIR)/r_varsa.o \
+	$(ASMDIR)/sys_dosa.o
+
+endif
+
+.PHONY: all clean
+#
+
+OBJECTS = $(REFSOFT) $(REFASM)
+
+all: ref_soft.dylib
+
+ref_soft.dylib: $(OBJECTS)
+	$(CC) -o $@ $(LDFLAGS) $(OBJECTS) $(LDLIBS)
+
+clean:
+	rm -f *.o
+	rm -f ../linux/*.o
+	rm -f ../game/*.o
+	rm -f ../qcommon/*.o
+	rm -f ../gas/*.o
+	rm -f ../nasm/*.o
+
+DO_AS=$(CC) -x assembler-with-cpp
+
+%.o: %.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+
+%.o: %.s
+	$(DO_AS) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+
+%.o: %.asm
+	$(NASM) -I../nasm/ -f macho -o $@ $<

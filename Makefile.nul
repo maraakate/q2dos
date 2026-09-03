@@ -34,6 +34,7 @@ CLIENT =	client/cl_input.o \
 	client/cl_newfx.o 
 
 QCOMMON = 	qcommon/cmd.o \
+	qcommon/cmd_auto.o \
 	qcommon/cmodel.o \
 	qcommon/common.o \
 	qcommon/crc.o \

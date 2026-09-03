@@ -842,7 +842,7 @@ void SP_monster_autocannon(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;
@@ -852,7 +852,7 @@ void SP_monster_autocannon(edict_t *self)
 		self->style = 1;
 
 	// if we're on hard or nightmare, use fast lasers
-	if (skill->value >= 2 && self->style == 4)
+	if (skill->intValue >= 2 && self->style == 4)
 		self->style = 3;
 
 	// precache some sounds and models

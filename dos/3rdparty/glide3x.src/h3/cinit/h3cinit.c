@@ -21,9 +21,6 @@
 **
 ** Description: HW-specific initialization routines for Banshee/Avenger.
 **
-** $Revision: 1.1.1.1.8.4 $
-** $Date: 2004/03/02 07:30:56 $
-**
 ** $History: h3cinit.c $
 ** 
 ** *****************  Version 1  *****************
@@ -765,13 +762,14 @@ h3InitVideoProc(FxU32 regBase,
 } // h3InitVideo
 
 
+static const
 FxU16 mode_table[][24] =
-{ 
+{
 #include "modetabl.h"
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-        
 };
 
+static const
 FxU8 vgaattr[] = {0x00, 0x00, 0x00, 0x00, 0x00, 
                   0x00, 0x00, 0x00, 0x00, 0x00, 
                   0x00, 0x00, 0x00, 0x00, 0x00, 
@@ -788,7 +786,7 @@ Information:
 Return:         (FxU16 *)   Ptr to the entry in the mode table,
                             NULL if failure.
 ----------------------------------------------------------------------*/
-FxU16 *h3InitFindVideoMode (FxU32 xRes, FxU32 yRes, FxU32 refresh)
+const FxU16 *h3InitFindVideoMode (FxU32 xRes, FxU32 yRes, FxU32 refresh)
 {
  int i = 0;
  int best = -1;
@@ -835,7 +833,7 @@ h3InitSetVideoMode(
 {
     FxU16 i, j;
     FxU8 garbage;
-    FxU16 *rs = h3InitFindVideoMode(xRes, yRes, refresh);
+    const FxU16 *rs = h3InitFindVideoMode(xRes, yRes, refresh);
     FxU32 vidProcCfg;
 #ifndef H3VDD
     FxU32 scanlinedouble;

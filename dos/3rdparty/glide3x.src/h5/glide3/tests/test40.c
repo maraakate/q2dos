@@ -16,22 +16,17 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
 */
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#ifndef __linux__
-#include <conio.h>
-#else
-#include <linutil.h>
-#endif
 #include <assert.h>
 #include <string.h>
 
 #include <glide.h>
 #include "tlib.h"
+
 
 static const char name[]    = "test40";
 static const char purpose[] = "mipmap download/source test";
@@ -61,7 +56,7 @@ rebuildTextureMap(struct texInfo* texMap,
 static FxBool
 rebuildLodMap(struct texInfo* texMap);
 
-void 
+int 
 main(int argc, char **argv) 
 {
   GrScreenResolution_t 
@@ -82,13 +77,13 @@ main(int argc, char **argv)
     char **remArgs;
     int  rv;
 
-    while(rv = tlGetOpt(argc, argv, "dfnr", &match, &remArgs)) {
+    while((rv = tlGetOpt(argc, argv, "dfnr", &match, &remArgs)) != 0) {
       if (rv == -1) {
         printf("Unrecognized command line argument\n");
         printf("%s %s\n", name, usage);
         printf("Available resolutions:\n%s\n",
                tlGetResolutionList());
-        return;
+        return -1;
       }
 
       switch(match) {
@@ -385,6 +380,7 @@ main(int argc, char **argv)
 
  __errExit:    
   grGlideShutdown();
+  return 0;
 }
 
 static FxBool

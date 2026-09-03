@@ -323,7 +323,7 @@ void Weapon_EMPNuke (edict_t *ent)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		if (ent->client->ps.gunframe == 0)
 		{
@@ -447,7 +447,7 @@ void PlasmaShield_die (edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		gi.sound(self, CHAN_VOICE, gi.soundindex("items/plasmashield/psdie.wav"), 1, ATTN_NORM, 0);
 	}
@@ -491,12 +491,12 @@ void Use_PlasmaShield (edict_t *ent, gitem_t *item)
 		return;
 	}
 
-	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
+	if (! ( dmflags->intValue & DF_INFINITE_AMMO ) )
 	{
 		ent->client->pers.inventory[ammoIdx]--;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		gi.sound(ent, CHAN_VOICE, gi.soundindex("items/plasmashield/psfire.wav"), 1, ATTN_NORM, 0);
 	}

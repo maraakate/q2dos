@@ -214,7 +214,7 @@ dabeam_hit(edict_t *self) /* FS: Coop: Xatrix specific */
 			(tr.ent != self->owner))
 		{
 			T_Damage(tr.ent, self, self->owner, self->movedir, tr.endpos,
-					vec3_origin, self->dmg, skill->value, DAMAGE_ENERGY,
+					vec3_origin, self->dmg, skill->intValue, DAMAGE_ENERGY,
 					MOD_TARGET_LASER);
 		}
 
@@ -1168,7 +1168,7 @@ monster_start(edict_t *self)
 		return false;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return false;

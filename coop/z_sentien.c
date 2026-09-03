@@ -583,15 +583,15 @@ void sentien_post_blast_attack(edict_t *self)
 	if (visible(self, self->enemy) &&
 		infront(self, self->enemy))
 	{
-		if(skill->value == 1)
+		if (skill->intValue == 1)
 		{
 			refire = 0.40f;
 		}
-		else if(skill->value == 2)
+		else if (skill->intValue == 2)
 		{
 			refire = 0.60f;
 		}
-		else if(skill->value >= 3)
+		else if(skill->intValue >= 3)
 		{
 			refire = 0.75f;
 		}
@@ -951,14 +951,14 @@ void sentien_fend (edict_t *self, edict_t *attacker, float eta, trace_t *fake /*
 		return;
 	}
 
-	if (skill->value == 0)
+	if (skill->intValue == 0)
 	{
 		if (random() > 0.45f)
 		{
 			return;
 		}
 	}
-	else if(skill->value == 1)
+	else if (skill->intValue == 1)
 	{
 		if (random() > 0.60f)
 		{
@@ -1047,6 +1047,7 @@ void sentien_pain (edict_t *self, edict_t *other, float kick, int damage)
 	if((self->health < (self->max_health / 2)))
 	{
 		self->s.skinnum |= 1;
+		self->blood_type = 3;	// Knightmare- sparks and blood
 	}
 
 	// less than this we don't flinch
@@ -1079,7 +1080,7 @@ void sentien_pain (edict_t *self, edict_t *other, float kick, int damage)
 		return;
 	}
 
-	if (skill->value >= 1)
+	if (skill->intValue >= 1)
 	{
 		// don't flinch if attacking
 		if(self->monsterinfo.currentmove == &sentien_move_laser_attack ||
@@ -1089,7 +1090,7 @@ void sentien_pain (edict_t *self, edict_t *other, float kick, int damage)
 		}
 	}
 
-	if (skill->value == 3)
+	if (skill->intValue == 3)
 	{
 		return;      // no pain anims in nightmare
 	}
@@ -1242,7 +1243,7 @@ void sentien_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int dama
 	{
 		gi.sound (self, CHAN_VOICE, gi.soundindex ("misc/udeath.wav"), 1, ATTN_NORM, 0);
 
-		for (n= 0; n < 1 /*4*/; n++)
+//		for (n= 0; n < 1 /*4*/; n++)
 		{
 			ThrowGib (self, "models/objects/gibs/sm_meat/tris.md2", damage, GIB_ORGANIC);
 		}
@@ -1265,7 +1266,8 @@ void sentien_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int dama
 
 	self->deadflag = DEAD_DEAD;
 	self->takedamage = DAMAGE_YES;
-	self->s.skinnum |= 1;
+	self->s.skinnum |= 1;	// Knightmare- make sure pain skin is set if we got one-shotted
+	self->blood_type = 3;	// Knightmare- sparks and blood
 
 	if (random() < 0.80)
 	{
@@ -1359,22 +1361,26 @@ void SP_monster_sentien(edict_t *self)
 
 	self->monsterinfo.reducedDamageAmount = 0.85;
 
+	self->blood_type = 2; // Knightmare- use sparks blood type
+
 	self->laser = NULL;
 	gi.linkentity(self);
 
 	create_sentien_laser(self);
 
-	if(skill->value == 2)
+	if (self->laser)
 	{
-		self->laser->dmg *= 1.5;
-		self->yaw_speed *= 1.5;
+		if (skill->intValue == 2)
+		{
+			self->laser->dmg *= 1.5;
+			self->yaw_speed *= 1.5;
+		}
+		else if(skill->intValue >= 3)
+		{
+			self->laser->dmg *= 2.5;
+			self->yaw_speed *= 2;
+		}
 	}
-	else if(skill->value >= 3)
-	{
-		self->laser->dmg *= 2.5;
-		self->yaw_speed *= 2;
-	}
-
 
 	self->monsterinfo.currentmove = &sentien_move_stand1;
 	self->monsterinfo.scale = MODEL_SCALE;

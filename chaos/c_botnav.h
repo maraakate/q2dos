@@ -42,8 +42,8 @@ typedef struct
 } nodes_t;
 
 
-nodes_t		nodes[MAX_NODES];
-nodeinfo_t	nodeinfo[MAX_NODES];
+extern nodes_t		nodes[MAX_NODES];
+extern nodeinfo_t	nodeinfo[MAX_NODES];
 
 
 // functions

@@ -5,9 +5,6 @@
 #  Email : dborca@users.sourceforge.net
 #  Web   : http://www.geocities.com/dborca
 #
-# $Header: /cvsroot/glide/glide3x/h3/glide3/tests/Attic/Makefile.win32,v 1.1.2.1 2004/10/04 08:55:20 dborca Exp $
-#
-
 
 #
 #  Available options:
@@ -22,10 +19,9 @@
 #	<file.exe>	build a specific file
 #
 
-
 .PHONY: all
 .SUFFIXES: .c .obj .exe
-.SECONDARY: tlib.obj
+.SECONDARY: tlib.obj fxos.obj
 
 FX_GLIDE_HW ?= h3
 TOP = ../../..
@@ -48,3 +44,9 @@ LDLIBS = user32.lib gdi32.lib $(TOP)/$(FX_GLIDE_HW)/lib/glide3x.lib
 
 all:
 	$(error Must specify <filename.exe> to build)
+
+sbench.exe: sbench.obj fxos.obj tlib.obj
+	$(LD) -out:$@ $(LDFLAGS) $^ $(LDLIBS)
+
+fxos.obj: $(TOP)/swlibs/fxmisc/fxos.c
+	$(CC) -Fo$@ $(CFLAGS) -c $<

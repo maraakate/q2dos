@@ -17,7 +17,6 @@
  ** 
  ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
  **
- ** $Header: /cvsroot/glide/glide3x/h5/glide3/src/gsplash.c,v 1.3.4.2 2003/06/05 08:23:54 koolsmoky Exp $
  ** $Log: 
  **  3    3dfx      1.0.1.0.1.0 10/11/00 Brent           Forced check in to enforce
  **       branching.
@@ -172,10 +171,7 @@ GR_DIENTRY(grSplash,void,(float x, float y,
 /* nothing */
 }
 
-#elif !defined(_WIN32)
-#include "gsplash0.c"
-
-#else /* win32 version */
+#elif defined(_WIN32)
 #include <math.h>
 
 #include <3dfx.h>
@@ -233,4 +229,15 @@ GR_DIENTRY(grSplash,void,(float x, float y,
 #undef FN_NAME
 }
 
+#else /* others */
+#include <3dfx.h>
+#define FX_DLL_DEFINITION
+#include <fxdll.h>
+#include <glide.h>
+#include "fxglide.h"
+GR_DIENTRY(grSplash,void,(float x, float y,
+                          float w, float h,
+                          FxU32 frameNumber)) {
+/* nothing */
+}
 #endif

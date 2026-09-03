@@ -17,7 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/h5/glide3/src/glidesys.h,v 1.3.4.3 2003/07/24 03:51:08 anholt Exp $
 ** $Log: 
 **  3    3dfx      1.0.1.0.1.0 10/11/00 Brent           Forced check in to enforce
 **       branching.
@@ -112,7 +111,7 @@ n** -----------------------------------------------------------------------
 #if defined(__IRIX__) || defined(__sparc__) || defined(__linux__) || \
 	defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
 #  define GLIDE_OS        GLIDE_OS_UNIX
-#elif defined(__DOS__)
+#elif defined(__DOS__) || defined(__MSDOS__)
 #  define GLIDE_OS        GLIDE_OS_DOS32
 #elif defined(__WIN32__)
 #  define GLIDE_OS        GLIDE_OS_WIN32

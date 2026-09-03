@@ -16,12 +16,7 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-** $ Revision: $
-** $ Date: $
-**
 */
-
 
 #ifndef _FXOS_H_
 #define _FXOS_H_
@@ -36,7 +31,7 @@ extern "C" {
 void sleep(int secs);
 #define gethostname fxGethostname
 
-int gethostname(char *name, int namelen);
+int gethostname(char *name, unsigned long namelen);
 
 #   endif
 

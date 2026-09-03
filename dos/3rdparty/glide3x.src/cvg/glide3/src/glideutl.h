@@ -16,12 +16,6 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-** $Header: /cvsroot/glide/glide3x/cvg/glide3/src/glideutl.h,v 1.1.1.1 1999/12/07 21:42:33 joseph Exp $
-** $Log: glideutl.h,v $
-** Revision 1.1.1.1  1999/12/07 21:42:33  joseph
-** Initial checkin into SourceForge.
-**
 ** 
 ** 1     10/08/98 11:30a Brent
 ** 

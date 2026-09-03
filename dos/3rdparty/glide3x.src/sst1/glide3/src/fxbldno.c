@@ -17,15 +17,9 @@
  * 
  * COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
  *
- * $Header: /cvsroot/glide/glide3x/sst1/glide3/src/Attic/fxbldno.c,v 1.1.2.1 2004/03/02 07:55:29 dborca Exp $
- * $Log: fxbldno.c,v $
  * Revision 1.1.2.1  2004/03/02 07:55:29  dborca
  * Bastardised Glide3x for SST1
  *
- * Revision 1.1.1.1  1999/12/07 21:48:51  joseph
- * Initial checkin into SourceForge.
- *
- * 
  * 1     7/25/97 9:05a Pgj
  * generate fxbldno.h which defines BUILD_NUMBER
  *
@@ -35,7 +29,7 @@
 #include <stdio.h>
 #include <time.h>
 
-main(int argc, char **argv)
+int main(void)
 {
     struct tm	locTime;
     time_t	sysTime;
@@ -44,7 +38,7 @@ main(int argc, char **argv)
     time(&sysTime);
     locTime = *localtime(&sysTime);
 
-    if (build = getenv("BUILD_NUMBER")) {
+    if ((build = getenv("BUILD_NUMBER")) != NULL) {
 	printf("#define BUILD_NUMBER	%s\n", build);
     } else {
 	unsigned short magic;

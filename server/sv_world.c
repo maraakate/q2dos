@@ -487,7 +487,10 @@ int SV_HullForEntity (edict_t *ent)
 		model = sv.models[ ent->s.modelindex ];
 
 		if (!model)
+		{
 			Com_Error (ERR_FATAL, "MOVETYPE_PUSH with a non bsp model");
+			return 0;
+		}
 
 		return model->headnode;
 	}
@@ -567,8 +570,6 @@ void SV_ClipMoveToEntities ( moveclip_t *clip )
 			else
 				clip->trace = trace;
 		}
-		else if (trace.startsolid)
-			clip->trace.startsolid = true;
 	}
 }
 

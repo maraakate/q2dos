@@ -1,4 +1,3 @@
-/*-*-c++-*-*/
 #ifndef __CVGINFO_H__
 #define __CVGINFO_H__
 
@@ -20,11 +19,9 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-** $Revision: 1.1.1.1.8.1 $
-** $Date: 2005/08/13 21:07:00 $
 */
 
+/*
 #if defined(__unix__) && ! defined(__CVGREGS_H__)
 // basic data types
 #define FxU32 unsigned int
@@ -32,7 +29,9 @@
 // defn of registers not reqd, treat (SstRegs *) as (void *)
 typedef void SstRegs;
 #endif
- 
+*/
+struct sstregs; /* see cvgregs.h */
+
 #define MAX_NUM_TMUS 3
 
 // Video timing data structure
@@ -68,7 +67,8 @@ typedef void (*FxSet32Proc)(volatile FxU32* const addr, const FxU32 val);
 // Initialization and configuration data structure
 typedef struct {
     FxU32 size;                     // size of this structure
-    SstRegs *virtAddr[2];           // virtual memory base address 
+    volatile 
+    struct sstregs *virtAddr[2];    // virtual memory base address 
     FxU32 physAddr[2];              // physical memory base address 
     FxU32 deviceNumber;             // PCI device number 
     FxU32 vendorID;                 // PCI vendor ID 
@@ -132,9 +132,8 @@ typedef struct {
     FxU32 mtrrUncacheable;          /* 3d register space (all wraps) */
     FxU32 mtrrWriteCombine;         /* command fifo/3d lfb           */
 
-
-    SstRegs *sstCSIM;
-    SstRegs *sstHW;                 // pointer to HW
+    volatile struct sstregs *sstCSIM;
+    volatile struct sstregs *sstHW; // pointer to HW
 } sst1DeviceInfoStruct;
 
 typedef sst1DeviceInfoStruct FxDeviceInfo;

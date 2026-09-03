@@ -17,7 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/h5/glide3/src/diglide.c,v 1.3.4.10 2005/05/25 08:51:50 jwrdegoede Exp $
 ** $Log:
 **  3    3dfx      1.0.1.0.1.0 10/11/00 Brent           Forced check in to enforce
 **       branching.
@@ -353,6 +352,13 @@ GR_DIENTRY(grGlideInit, void, (void))
 #if GDBG_INFO_ON
   GDBG_ERROR_SET_CALLBACK(_grErrorCallback);
 #endif
+
+  /* In case of error, _GlideInitEnvironment() calls GrErrorCallback() which is
+   * supposed to be a noreturn function, but it really is not for non-windows..
+   * Eww... */
+  if (!_GlideRoot.hwConfig.num_sst) {
+    return;
+  }
 
   if (_GlideRoot.initialized) {
     /* allocate the TLS index */

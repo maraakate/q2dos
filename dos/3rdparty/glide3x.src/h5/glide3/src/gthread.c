@@ -17,13 +17,7 @@
 **
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVE
 **
-**
-**
-** $Revision: 1.3.4.9 $ 
-** $Date: 2007/05/13 09:16:10 $ 
-**
 */
-
 
 /* NOTE: This file is compiled to naught if we aren't
    running under Win32 */
@@ -50,8 +44,8 @@ static DWORD            tlsIndex;
 static FxBool threadInit;
 static FxBool criticalSectionInit;
 
-void 
-initThreadStorage( void ) 
+void
+initThreadStorage( void )
 {
   if ( !threadInit ) {
     threadInit = 1;
@@ -60,14 +54,14 @@ initThreadStorage( void )
     if (_GlideRoot.tlsIndex == TLS_OUT_OF_INDEXES)
       GrErrorCallback( "initThreadStorage:  Failed to allocate TLS index.", FXTRUE );
 
-    /* pray the index is lower than 64 */
-    if ((_GlideRoot.tlsIndex < 0) ||
-        (_GlideRoot.tlsIndex > 63)) /* TLS_MINIMUM_AVAILABLE = 64 */
+    /* pray the index is lower than 64 -- TLS_MINIMUM_AVAILABLE = 64 */
+    if (_GlideRoot.tlsIndex >= TLS_MINIMUM_AVAILABLE)
       GrErrorCallback( "initThreadStorage:  TLS index higher than 64.", FXTRUE );
 #if !USE_STANDARD_TLS_FUNC
-    if ( hwcIsOSWin9x() ) {
+    if (hwcIsOSWin9x()) {
       _GlideRoot.tlsOffset = W95_TLS_INDEX_TO_OFFSET(_GlideRoot.tlsIndex);
-    } else {
+    }
+    else {
       _GlideRoot.tlsOffset = WNT_TLS_INDEX_TO_OFFSET(_GlideRoot.tlsIndex);
     }
 #endif
@@ -79,18 +73,18 @@ void setThreadValue( unsigned long value ) {
     TlsSetValue( _GlideRoot.tlsIndex, (void*)value );
 }
 
-unsigned long getThreadValueSLOW(void)
+unsigned long getThreadValueSLOW( void )
 {
-  GR_CHECK_F( "getThreadValue", !threadInit, "Thread storage not initialized\n" );
+    GR_CHECK_F( "getThreadValue", !threadInit, "Thread storage not initialized\n" );
 
-  return getThreadValueFast();
+    return getThreadValueFast();
 }
 
 #if USE_STANDARD_TLS_FUNC
 /* used in gdraw.c (grDrawTriangle) and xos.inc */
-FxU32 getThreadValue(void)
+unsigned long getThreadValue(void)
 {
-  return (FxU32)TlsGetValue(_GlideRoot.tlsIndex);
+  return (unsigned long)TlsGetValue(_GlideRoot.tlsIndex);
 }
 #endif
 
@@ -128,7 +122,7 @@ void endCriticalSection( void ) {
 
 #elif defined(macintosh)
 
-FxU32 _threadValueMacOS;
+unsigned long _threadValueMacOS;
 
 void initThreadStorage(void)
 {
@@ -139,7 +133,7 @@ void setThreadValue( unsigned long value )
 	_threadValueMacOS = value;
 }
 
-FxU32 getThreadValueSLOW( void )
+unsigned long getThreadValueSLOW( void )
 {
 	return _threadValueMacOS;
 }
@@ -172,8 +166,6 @@ void initThreadStorage(void)
 {
 }
 
-
-
 void setThreadValue( unsigned long value )
 {
 	threadValueLinux = value;
@@ -202,22 +194,22 @@ void endCriticalSection(void)
 
 #elif (GLIDE_PLATFORM & GLIDE_OS_DOS32)
 
-FxU32 GR_CDECL threadValueDJGPP;
+unsigned long GR_CDECL threadValueDJGPP;
 
 void initThreadStorage(void)
 {
 }
 
-void setThreadValue( FxU32 value )
+void setThreadValue( unsigned long value )
 {
 	threadValueDJGPP = value;
 }
 
-FxU32 getThreadValueSLOW( void )
+unsigned long getThreadValueSLOW( void )
 {
 	return threadValueDJGPP;
 }
- 
+
 void initCriticalSection(void)
 {
 }

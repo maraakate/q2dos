@@ -39,10 +39,8 @@ void Cmd_Summon_f(edict_t *ent);
 void Cmd_Teleport_f(edict_t *ent);
 void Cmd_NoSummon_f(edict_t *ent);
 void Cmd_Runrun_f(edict_t *ent);
-void Cmd_Angles_Verbose_f(edict_t *self);
 void Blinky_OnClientTerminate(edict_t *self);
 void Blinky_CalcViewOffsets(edict_t * ent, vec3_t v);
-void Blinky_SpawnEntities();
 
 void stopBlinkyCam (edict_t *ent);
 

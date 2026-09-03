@@ -17,15 +17,12 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-**
-** $Revision: 1.2.8.2 $ 
-** $Date: 2005/06/09 18:32:27 $ 
-**
 ** Routines to detect memory size, strapping pin, and other initialization
 ** configuration information.
 **
 */
-#ifdef __WIN32__
+#undef FX_DLL_ENABLE /* so that we don't dllexport the symbols */
+#ifdef _MSC_VER
 #pragma optimize ("",off)
 #endif
 #include <stdio.h>
@@ -46,7 +43,7 @@
 
 static FxBool 
 readAndSum4x4(FxU32 *sstbase, FxU32 x, FxU32 y, 
-    		FxU32 *r_sum, FxU32 *g_sum, FxU32 *b_sum)
+		FxU32 *r_sum, FxU32 *g_sum, FxU32 *b_sum)
 {
     FxU32 rd_x, rd_y;
     FxU32 rd_col = 0;
@@ -85,7 +82,7 @@ readAndSum4x4(FxU32 *sstbase, FxU32 x, FxU32 y,
     }
     INIT_INFO((3,"sums:  r_sum=0x%03x  g_sum=0x%03x  b_sum=0x%03x\n",
 		    *r_sum, *g_sum, *b_sum));
-	return(FXTRUE);
+    return(FXTRUE);
 }
 
 /* xxx - Give these guys some meaningful comments */
@@ -156,7 +153,7 @@ initSumTables(FxU32 *sstbase)
 	}
 	g_tbl[g_sum] = tst_color;
     }
-	return(FXTRUE);
+    return(FXTRUE);
 }
 
 /* remove dither to derive actual 24-bit RGB value */
@@ -169,7 +166,7 @@ unDither(FxU32 r_sum, FxU32 g_sum, FxU32 b_sum, FxU32 *result)
 	return(FXFALSE);
     }
     *result = (rb_tbl[r_sum] << 16) | (g_tbl[g_sum] << 8) | rb_tbl[b_sum];
-	return(FXTRUE);
+    return(FXTRUE);
 }
 
 static FxBool
@@ -178,7 +175,8 @@ getTmuConfigData(FxU32 *sstbase, sst1DeviceInfoStruct *info)
     int x=0, y=0;
     FxU32 r_sum, g_sum, b_sum;
     SstRegs *sst = (SstRegs *) sstbase;
-	FxU32 tmuRevision;
+    FxU32 tmuRevision;
+    const char *envp;
 
     /* set trex's (all 3) to output configuration bits */
     ISET(SST_TREX(sst,0)->trexInit1, info->tmuInit1[0] | (1 << 18));
@@ -194,12 +192,12 @@ getTmuConfigData(FxU32 *sstbase, sst1DeviceInfoStruct *info)
     drawTriangle(sst,x,y,36);
 
     readAndSum4x4(sstbase, x,y, &r_sum,&g_sum,&b_sum);
-	if(GETENV(("SSTV2_TEXMAP_DISABLE"))) {
-		info->tmuConfig = 0x0;
-	} else {
-	    if(unDither(r_sum,g_sum,b_sum,&info->tmuConfig) == FXFALSE)
-			return(FXFALSE);
-	}
+    if(GETENV(("SSTV2_TEXMAP_DISABLE"))) {
+	info->tmuConfig = 0x0;
+    } else {
+	if(unDither(r_sum,g_sum,b_sum,&info->tmuConfig) == FXFALSE)
+	    return(FXFALSE);
+    }
 
 	/////////////////////////
 	// Get new revision...
@@ -218,16 +216,16 @@ getTmuConfigData(FxU32 *sstbase, sst1DeviceInfoStruct *info)
     drawTriangle(sst,x,y,36);
 
     readAndSum4x4(sstbase, x,y, &r_sum,&g_sum,&b_sum);
-	if(unDither(r_sum,g_sum,b_sum,&tmuRevision) == FXFALSE)
-		return(FXFALSE);
+    if(unDither(r_sum,g_sum,b_sum,&tmuRevision) == FXFALSE)
+	return(FXFALSE);
 
-	info->tmuFab[0] = (tmuRevision >> 4) & 0xf;
-	info->tmuFab[1] = (tmuRevision >> 12) & 0xf;
-	info->tmuFab[2] = (tmuRevision >> 20) & 0xf;
+    info->tmuFab[0] = (tmuRevision >> 4) & 0xf;
+    info->tmuFab[1] = (tmuRevision >> 12) & 0xf;
+    info->tmuFab[2] = (tmuRevision >> 20) & 0xf;
 
-	/* Adjust configuration structure for "new" revision ID */
-	info->tmuConfig &= ~(0x7 | (0x7<<7) | (0x7<<14));
-	info->tmuConfig |= (((tmuRevision & 0x7) + 3) |
+    /* Adjust configuration structure for "new" revision ID */
+    info->tmuConfig &= ~(0x7 | (0x7<<7) | (0x7<<14));
+    info->tmuConfig |= (((tmuRevision & 0x7) + 3) |
 	  ((((tmuRevision >> 8) & 0x7) + 3) << 7) |
 	  ((((tmuRevision >> 16) & 0x7) + 3) << 14));
 
@@ -236,14 +234,15 @@ getTmuConfigData(FxU32 *sstbase, sst1DeviceInfoStruct *info)
     ISET(SST_TREX(sst,1)->trexInit1, info->tmuInit1[1]);
     ISET(SST_TREX(sst,2)->trexInit1, info->tmuInit1[2]);
 
-	if(GETENV(("SSTV2_TMUCFG")))
-	{
-	  FxU32 u;
-          if (SSCANF(GETENV(("SSTV2_TMUCFG")), "%u", &u) == 1)
-            info->tmuConfig = u;
-        }
+    envp = GETENV(("SSTV2_TMUCFG"));
+    if(envp)
+    {
+	FxU32 u;
+	if (SSCANF(envp, "%u", &u) == 1)
+	    info->tmuConfig = u;
+    }
 
-	return(FXTRUE);
+    return(FXTRUE);
 }
 
 #define SENSE2 0x92F56EB0
@@ -263,10 +262,10 @@ static FxU32 sense(FxU32 *sstbase, sst1DeviceInfoStruct *info, FxU32 tmu,
 
     ISET(sst->texBaseAddr, 0x200000>>3);	/* set to 2 MB */
     ISET(texAddr[0], SENSE2);		/* write a random value */
-    
+
     ISET(sst->texBaseAddr, 0x100000>>3);	/* set to 1 MB */
     ISET(texAddr[0], SENSE1);		/* write a random value */
-    
+
     ISET(sst->texBaseAddr, 0x000000>>3);	/* set to 0 MB */
     ISET(texAddr[0], SENSE0);		/* write a random value */
 
@@ -290,22 +289,24 @@ sst1InitGetTmuMemory(FxU32 *sstbase, sst1DeviceInfoStruct *info, FxU32 tmu,
 {
     FxU32 i,data;
     SstRegs *sst = (SstRegs *) sstbase;
+    const char *envp;
 
     INIT_INFO((1,"sst1InitGetTmuMemory(0x%x, , %d)\n", sstbase,tmu));
 
-	if(GETENV(("SSTV2_TMU_MEMSIZE"))) {
-		*TmuMemorySize = ATOI(GETENV(("SSTV2_TMU_MEMSIZE")));
-		// If user specifies 2 MBytes on a 4 MBytes board, disable the
-		// second RAS so that apps which may incorrectly store data in the
-		// upper 2 Mbytes will not function properly...
-		if(*TmuMemorySize == 2) {
-			info->tmuInit0[tmu] &= ~SST_EN_TEX_MEM_SECOND_RAS;
-    		sst1InitIdle(sstbase);
-		    ISET(SST_TREX(sst,tmu)->trexInit0, info->tmuInit0[tmu]);
-		    sst1InitIdle(sstbase);
-		}
-		return(FXTRUE);
+    envp = GETENV(("SSTV2_TMU_MEMSIZE"));
+    if(envp) {
+	*TmuMemorySize = ATOI(envp);
+	/* If user specifies 2 MBytes on a 4 MBytes board, disable the
+	 * second RAS so that apps which may incorrectly store data in the
+	 * upper 2 Mbytes will not function properly... */
+	if (*TmuMemorySize == 2) {
+	    info->tmuInit0[tmu] &= ~SST_EN_TEX_MEM_SECOND_RAS;
+	    sst1InitIdle(sstbase);
+	    ISET(SST_TREX(sst,tmu)->trexInit0, info->tmuInit0[tmu]);
+	    sst1InitIdle(sstbase);
 	}
+	return(FXTRUE);
+    }
 
     ISET(sst->lfbMode, SST_LFB_RGBALANES_ARGB | SST_LFB_READFRONTBUFFER);
     ISET(sst->fbzMode, SST_DRAWBUFFER_FRONT | SST_RGBWRMASK);
@@ -336,7 +337,7 @@ sst1InitGetTmuMemory(FxU32 *sstbase, sst1DeviceInfoStruct *info, FxU32 tmu,
     if (data == SENSE0) {*TmuMemorySize = 1; return(FXTRUE);}
 
     INIT_PRINTF(("sst1InitGetTmuMemory() ERROR: Could not detect memory size.\n"));
-	return(FXFALSE);
+    return(FXFALSE);
 }
 
 /*---------------------------------------------------------------------------
@@ -347,53 +348,54 @@ sst1InitGetTmuMemory(FxU32 *sstbase, sst1DeviceInfoStruct *info, FxU32 tmu,
 FX_EXPORT FxBool FX_CSTYLE
 sst1InitGetTmuInfo(FxU32 *sstbase, sst1DeviceInfoStruct *info)
 {
+    const char *envp;
     FxU32 trev;
 
     if(initSumTables(sstbase) == FXFALSE)
-		return(FXFALSE);
+	return(FXFALSE);
     if(getTmuConfigData(sstbase,info) == FXFALSE)
-		return(FXFALSE);
+	return(FXFALSE);
 
     info->numberTmus = 1;
-	if(GETENV(("SSTV2_TEXMAP_DISABLE"))) {
-	    info->tmuRevision = 4;
-	    sst1InitGetTmuMemory(sstbase, info, 0, &info->tmuMemSize[0]);
-		info->tmuMemSize[0] = 2;
-	} else {
-	    /* Get TMU memory size */
-	    info->tmuRevision = info->tmuConfig & 0x7;
-	    if(sst1InitGetTmuMemory(sstbase, info, 0, &info->tmuMemSize[0]) ==
-		  FXFALSE)
-			return(FXFALSE);
-	}
+    if(GETENV(("SSTV2_TEXMAP_DISABLE"))) {
+	info->tmuRevision = 4;
+	sst1InitGetTmuMemory(sstbase, info, 0, &info->tmuMemSize[0]);
+	info->tmuMemSize[0] = 2;
+    } else {
+	/* Get TMU memory size */
+	info->tmuRevision = info->tmuConfig & 0x7;
+	if(sst1InitGetTmuMemory(sstbase, info, 0, &info->tmuMemSize[0]) == FXFALSE)
+	  return(FXFALSE);
+    }
 
     INIT_INFO((1,"TMU0 memory = %d MB\n", info->tmuMemSize[0]));
     if (info->tmuConfig & FXBIT(6)) {		/* if TMU 1 exists */
 	info->numberTmus++;			/* increment TMU count */
 	trev = (info->tmuConfig>>7) & 0x7;	/* get its revision */
-#if 0 // Ignore for now...
+#if 0 /* Ignore for now... */
 	if (info->tmuRevision != trev) {
 	    INIT_PRINTF(("sst1InitGetDeviceInfo: ERROR, multiple different TMU revision IDs detected\n"));
 	    return(FXFALSE);
 	}
 #endif
-    if(sst1InitGetTmuMemory(sstbase, info, 1, &info->tmuMemSize[1]) == FXFALSE)
-		return(FXFALSE);
+	if (sst1InitGetTmuMemory(sstbase, info, 1, &info->tmuMemSize[1]) == FXFALSE)
+	    return(FXFALSE);
     }
     if (info->tmuConfig & FXBIT(13)) {		/* if TMU 2 exists */
 	info->numberTmus++;			/* increment TMU count */
 	trev = (info->tmuConfig>>14) & 0x7;	/* get its revision */
-#if 0 // Ignore for now...
+#if 0 /* Ignore for now... */
 	if (info->tmuRevision != trev) {
 	    INIT_PRINTF(("sst1InitGetDeviceInfo: ERROR, multiple different TMU revision IDs detected\n"));
 	    return(FXFALSE);
 	}
 #endif
-    if(sst1InitGetTmuMemory(sstbase, info, 2, &info->tmuMemSize[2]) == FXFALSE)
-		return(FXFALSE);
+	if(sst1InitGetTmuMemory(sstbase, info, 2, &info->tmuMemSize[2]) == FXFALSE)
+	    return(FXFALSE);
     }
-	if(GETENV(("SSTV2_NUM_TMUS")))
-	  info->numberTmus = ATOI(GETENV(("SSTV2_NUM_TMUS")));
+    envp = GETENV(("SSTV2_NUM_TMUS"));
+    if (envp)
+	info->numberTmus = ATOI(envp);
 
     INIT_INFO((1,"numberTMus = %d\n", info->numberTmus));
     return(FXTRUE);
@@ -419,14 +421,15 @@ static int fbiMemSize(FxU32 *sstbase)
 	FxU32 init1Save = IGET(sst->fbiInit1);
 	FxU32 init2Save = IGET(sst->fbiInit2);
 	int retval = 0;
+	const char *envp = GETENV(("SSTV2_FBI_MEMSIZE"));
 
-	if(GETENV(("SSTV2_FBI_MEMSIZE")))
-		return(ATOI(GETENV(("SSTV2_FBI_MEMSIZE"))));
+	if(envp)
+		return ATOI(envp);
 
 	/* Enable dram refresh, disable memory fifo, and setup memory */
 	/* for rendering */
 	ISET(sst->fbiInit0, IGET(sst->fbiInit0) & ~SST_MEM_FIFO_EN);
-    ISET(sst->fbiInit2, IGET(sst->fbiInit2) | SST_EN_DRAM_REFRESH);
+	ISET(sst->fbiInit2, IGET(sst->fbiInit2) | SST_EN_DRAM_REFRESH);
 	sst1InitIdleFBI(sstbase);
 
 	/* Setup Basic rendering datapath */
@@ -435,7 +438,7 @@ static int fbiMemSize(FxU32 *sstbase)
 	ISET(sst->fbzMode, SST_RGBWRMASK | SST_ZAWRMASK | SST_DRAWBUFFER_FRONT);
 	sst1InitIdleFBI(sstbase);
 
-    sst1InitSetResolution(sstbase, &SST_VREZ_800X600_60, 1);
+	sst1InitSetResolution(sstbase, &SST_VREZ_800X600_60, 1);
 	sst1InitIdleFBI(sstbase);
 
 	ISET(sst->lfbMode, SST_LFB_ZZ | SST_LFB_WRITEFRONTBUFFER |
@@ -453,7 +456,7 @@ static int fbiMemSize(FxU32 *sstbase)
 	sst1InitIdleFBI(sstbase);
 	if((LFB_GETPIXEL(128, 100) == 0xdead) &&
 	   (LFB_GETPIXEL(200, 200) == 0x55aa)) {
-   		retval = 4;
+		retval = 4;
 		ISET(sst->lfbMode, (SST_LFB_565 | SST_LFB_READBACKBUFFER));
 		sst1InitIdleFBI(sstbase);
 		goto fbiMemSizeDone;
@@ -461,7 +464,7 @@ static int fbiMemSize(FxU32 *sstbase)
 
 	/* Check for 2 MBytes... */
 	/* Write to color buffer in 640x480 resolution */
-    sst1InitSetResolution(sstbase, &SST_VREZ_640X480_60, 0);
+	sst1InitSetResolution(sstbase, &SST_VREZ_640X480_60, 0);
 	ISET(sst->lfbMode, SST_LFB_565 | SST_LFB_WRITEFRONTBUFFER |
 		SST_LFB_READFRONTBUFFER);
 	sst1InitIdleFBI(sstbase);
@@ -480,7 +483,7 @@ static int fbiMemSize(FxU32 *sstbase)
 	ISET(sst->lfbMode, (SST_LFB_565 | SST_LFB_READBACKBUFFER));
 	sst1InitIdleFBI(sstbase);
 	if(LFB_GETPIXEL(178, 436) == 0xaa55) {
-   		retval = 2;
+		retval = 2;
 		goto fbiMemSizeDone;
 	}
 
@@ -497,7 +500,7 @@ check1MByte:
 	sst1InitIdleFBI(sstbase);
 	if((LFB_GETPIXEL(10, 10) == 0xdead) &&
 	   (LFB_GETPIXEL(100, 200) == 0x5a5a))
-   		retval = 1;
+		retval = 1;
 
 fbiMemSizeDone:
 	/* Restore init registers to original state */
@@ -514,26 +517,27 @@ sst1InitGetFbiInfo(FxU32 *sstbase, sst1DeviceInfoStruct *info)
 {
 	FxU32 u;
 	SstRegs *sst = (SstRegs *) sstbase;
+	const char *envp;
 
 	info->fbiMemSize = fbiMemSize(sstbase);
-  
+
 	/* Detect board identification and memory speed */
-	if(GETENV(("SSTV2_FBICFG")) &&
-	   (SSCANF(GETENV(("SSTV2_FBICFG")), "%u", &u) == 1))
+	envp = GETENV(("SSTV2_FBICFG"));
+	if(envp && (SSCANF(envp, "%u", &u) == 1))
 		info->fbiConfig = u;
 	else
-		info->fbiConfig = (IGET(sst->fbiInit3) & SST_FBI_MEM_TYPE) >>
+	  info->fbiConfig = (IGET(sst->fbiInit3) & SST_FBI_MEM_TYPE) >>
 			SST_FBI_MEM_TYPE_SHIFT;
-  
+
 	info->fbiBoardID = (IGET(sst->fbiInit5) >> 5) & 0xf;
 	if(IGET(sst->fbiInit7) & BIT(0))
 		info->fbiBoardID |= 0x10;
-  
+
 	/* Detect scanline interleaving */
 	info->sliPaired   = sst1InitSliPaired(sstbase);
-  info->sliDetected = sst1InitSliDetect(sstbase);
-  
-  return FXTRUE;
+	info->sliDetected = sst1InitSliDetect(sstbase);
+
+	return FXTRUE;
 }
 
 /*
@@ -543,8 +547,7 @@ sst1InitGetFbiInfo(FxU32 *sstbase, sst1DeviceInfoStruct *info)
 **        been allocated
 **
 */
-FX_EXPORT FxBool FX_CSTYLE sst1InitGetDeviceInfo(FxU32 *sstbase,
-  sst1DeviceInfoStruct *info)
+FX_EXPORT FxBool FX_CSTYLE sst1InitGetDeviceInfo(FxU32 *sstbase, sst1DeviceInfoStruct *info)
 {
     FxBool retval;
 
@@ -563,7 +566,7 @@ FX_EXPORT FxBool FX_CSTYLE sst1InitGetDeviceInfo(FxU32 *sstbase,
 FxBool sst1InitFillDeviceInfo(FxU32 *sstbase, sst1DeviceInfoStruct *info)
 {
     FxU32 u;
-    
+
     if(!sstbase)
         return(FXFALSE);
 
@@ -572,97 +575,102 @@ FxBool sst1InitFillDeviceInfo(FxU32 *sstbase, sst1DeviceInfoStruct *info)
 
     if(GETENV(("SSTV2_NODEVICEINFO"))) {
         /* fill device info struct with sane values... */
-    	INIT_PRINTF(("sst1DeviceInfo: Filling info Struct with default values...\n"));
+	const char *envp;
+	INIT_PRINTF(("sst1DeviceInfo: Filling info Struct with default values...\n"));
 
-		if(GETENV(("SSTV2_FBICFG")) &&
-		   (SSCANF(GETENV(("SSTV2_FBICFG")), "%u", &u) == 1))
-        	  info->fbiConfig = u;
-		else
-	          info->fbiConfig = 0x0;
+	envp = GETENV(("SSTV2_FBICFG"));
+	if(envp && (SSCANF(envp, "%u", &u) == 1))
+	  info->fbiConfig = u;
+	else
+	  info->fbiConfig = 0x0;
 
-		if(GETENV(("SSTV2_TMUCFG")) &&
-        	   (SSCANF(GETENV(("SSTV2_TMUCFG")), "%u", &u) == 1))
-        	  info->tmuConfig = u;
-		else
-	          info->tmuConfig = 0x0;
+	envp = GETENV(("SSTV2_TMUCFG"));
+	if(envp && (SSCANF(envp, "%u", &u) == 1))
+	  info->tmuConfig = u;
+	else
+	  info->tmuConfig = 0x0;
 
-        info->numberTmus = 1;
-    	if (info->tmuConfig & FXBIT(6)) /* if TMU 1 exists */
-			info->numberTmus++;
-	    if (info->tmuConfig & FXBIT(13)) /* if TMU 2 exists */
-			info->numberTmus++;
+	info->numberTmus = 1;
+	if (info->tmuConfig & FXBIT(6)) /* if TMU 1 exists */
+	  info->numberTmus++;
+	if (info->tmuConfig & FXBIT(13)) /* if TMU 2 exists */
+	  info->numberTmus++;
 
-    	info->tmuRevision = info->tmuConfig & 0x7;
+	info->tmuRevision = info->tmuConfig & 0x7;
 
-		if(GETENV(("SSTV2_FBI_MEMSIZE")))
-			info->fbiMemSize = ATOI(GETENV(("SSTV2_FBI_MEMSIZE")));
-		else
-	        info->fbiMemSize = 2;
+	envp = GETENV(("SSTV2_FBI_MEMSIZE"));
+	if(envp)
+	  info->fbiMemSize = ATOI(envp);
+	else
+	  info->fbiMemSize = 2;
 
-		if(GETENV(("SSTV2_TMU_MEMSIZE")))
-			info->tmuMemSize[0] = ATOI(GETENV(("SSTV2_TMU_MEMSIZE")));
-		else
-        	info->tmuMemSize[0] = 2;
-		info->tmuMemSize[1] = info->tmuMemSize[0];
-		info->tmuMemSize[2] = info->tmuMemSize[0];
-    } else {
-		int i;
-
-		for(i=0; i<5; i++) {
-			if(i)
-				INIT_PRINTF(("sst1InitFillDeviceInfo(): Retry #%d for chip GetInfo()...\n", i));
-        	/* GetFbiInfo() must be called before GetTmuInfo() */
-	        if(sst1InitGetFbiInfo(sstbase, info) == FXFALSE)
-				continue;
-	        /* get the revision ID of each TMU and verify that they are all the
-			   same */
-	        if(sst1InitGetTmuInfo(sstbase, info) == FXFALSE)
-				continue;
-			break;
-		}
-		if(i == 5)
-			return(FXFALSE);
+	envp = GETENV(("SSTV2_TMU_MEMSIZE"));
+	if(envp)
+	  info->tmuMemSize[0] = ATOI(envp);
+	else
+	  info->tmuMemSize[0] = 2;
+	info->tmuMemSize[1] = info->tmuMemSize[0];
+	info->tmuMemSize[2] = info->tmuMemSize[0];
     }
-	// Measure silicon performance
-    sst1InitMeasureSiProcess(sstbase, 0); // measure NAND-tree
-    sst1InitMeasureSiProcess(sstbase, 1); // measure NOR-tree
+    else {
+	int i;
 
-	INIT_PRINTF(("sst1DeviceInfo: Board ID: %d\n", info->fbiBoardID));
+	for (i=0; i<5; i++) {
+	  if (i)
+	    INIT_PRINTF(("sst1InitFillDeviceInfo(): Retry #%d for chip GetInfo()...\n", i));
+	  /* GetFbiInfo() must be called before GetTmuInfo() */
+	  if (sst1InitGetFbiInfo(sstbase, info) == FXFALSE)
+	    continue;
+	  /* get the revision ID of each TMU and verify that they are all the
+	     same */
+	  if (sst1InitGetTmuInfo(sstbase, info) == FXFALSE)
+	    continue;
+	  break;
+	}
+	if (i == 5)
+	  return(FXFALSE);
+    }
+    /* Measure silicon performance */
+    sst1InitMeasureSiProcess(sstbase, 0); /* measure NAND-tree */
+    sst1InitMeasureSiProcess(sstbase, 1); /* measure NOR-tree  */
+
+    INIT_PRINTF(("sst1DeviceInfo: Board ID: %d\n", info->fbiBoardID));
     INIT_PRINTF(("sst1DeviceInfo: FbiConfig:0x%x, TmuConfig:0x%x\n",
-        info->fbiConfig, info->tmuConfig));
+	        info->fbiConfig, info->tmuConfig));
     INIT_PRINTF(("sst1DeviceInfo: FBI Revision:%d, TMU Revison:%d, Num TMUs:%d\n",
-        info->fbiRevision, info->tmuRevision, info->numberTmus));
+	        info->fbiRevision, info->tmuRevision, info->numberTmus));
     INIT_PRINTF(("sst1DeviceInfo: FBI Memory:%d, TMU[0] Memory:%d",
-        info->fbiMemSize, info->tmuMemSize[0]));
-    if(info->numberTmus > 1)
+	        info->fbiMemSize, info->tmuMemSize[0]));
+    if (info->numberTmus > 1)
         INIT_PRINTF((", TMU[1] Memory:%d", info->tmuMemSize[1]));
-    if(info->numberTmus > 2)
+    if (info->numberTmus > 2)
         INIT_PRINTF((", TMU[2] Memory:%d", info->tmuMemSize[2]));
     INIT_PRINTF(("\n"));
-    if(sst1InitUseVoodooFile == FXTRUE) {
-        if(iniDac == (sst1InitDacStruct *) NULL)
-			INIT_PRINTF(("sst1DeviceInfo: Dac Type: Unknown"));
-		else
-	    	INIT_PRINTF(("sst1DeviceInfo: Dac Type: %s %s\n", 
+    if (sst1InitUseVoodooFile == FXTRUE) {
+        if(iniDac == NULL)
+	  INIT_PRINTF(("sst1DeviceInfo: Dac Type: Unknown"));
+	else
+	  INIT_PRINTF(("sst1DeviceInfo: Dac Type: %s %s\n", 
 			  iniDac->dacManufacturer, iniDac->dacDevice));
-	} else {
-	    INIT_PRINTF(("sst1DeviceInfo: Dac Type: "));
-	    if(info->fbiVideoDacType == SST_FBI_DACTYPE_ATT)
-	        INIT_PRINTF(("AT&T ATT20C409\n"));
-	    else if(info->fbiVideoDacType == SST_FBI_DACTYPE_ICS)
-	        INIT_PRINTF(("ICS ICS5342\n"));
-	    else if(info->fbiVideoDacType == SST_FBI_DACTYPE_TI)
-	        INIT_PRINTF(("TI TVP3409\n"));
-	    else if(info->fbiVideoDacType == SST_FBI_DACTYPE_PROXY)
-                INIT_PRINTF(("(SLI PROXY)\n"));
-            else
-	        INIT_PRINTF(("Unknown\n"));
-	}
+    }
+    else {
+      INIT_PRINTF(("sst1DeviceInfo: Dac Type: "));
+      if(info->fbiVideoDacType == SST_FBI_DACTYPE_ATT)
+	INIT_PRINTF(("AT&T ATT20C409\n"));
+      else if(info->fbiVideoDacType == SST_FBI_DACTYPE_ICS)
+	INIT_PRINTF(("ICS ICS5342\n"));
+      else if(info->fbiVideoDacType == SST_FBI_DACTYPE_TI)
+	INIT_PRINTF(("TI TVP3409\n"));
+      else if(info->fbiVideoDacType == SST_FBI_DACTYPE_PROXY)
+	INIT_PRINTF(("(SLI PROXY)\n"));
+      else
+	INIT_PRINTF(("Unknown\n"));
+    }
     INIT_PRINTF(("sst1DeviceInfo: SLI Detected:%d\n", info->sliDetected));
 
     return(FXTRUE);
 }
 
-#ifdef __WIN32__
+#ifdef _MSC_VER
 #pragma optimize ("",on)
 #endif

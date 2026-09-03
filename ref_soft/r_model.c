@@ -30,7 +30,6 @@ char	loadname[32];	// for hunk tags
 void Mod_LoadSpriteModel (model_t *mod, void *buffer);
 void Mod_LoadBrushModel (model_t *mod, void *buffer);
 void Mod_LoadAliasModel (model_t *mod, void *buffer);
-model_t *Mod_LoadModel (model_t *mod, qboolean crash);
 
 byte	mod_novis[MAX_MAP_LEAFS/8];
 
@@ -1190,7 +1189,7 @@ void R_BeginRegistration (char *model)
 	// explicitly free the old map if different
 	// this guarantees that mod_known[0] is the world map
 	flushmap = ri.Cvar_Get ("flushmap", "0", 0);
-	if ( strcmp(mod_known[0].name, fullname) || flushmap->value)
+	if ((strcmp(mod_known[0].name, fullname) != 0) || flushmap->intValue)
 		Mod_Free (&mod_known[0]);
 	r_worldmodel = R_RegisterModel (fullname);
 	R_NewMap ();

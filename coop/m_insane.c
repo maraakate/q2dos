@@ -644,7 +644,7 @@ insane_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
 
 	gi.sound(self, CHAN_VOICE, gi.soundindex(va("player/male/pain%i_%i.wav", l, r)), 1, ATTN_IDLE, 0);
 
-	if (skill->value == 3)
+	if (skill->intValue == 3)
 	{
 		return; /* no pain anims in nightmare */
 	}
@@ -851,7 +851,7 @@ SP_misc_insane(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;

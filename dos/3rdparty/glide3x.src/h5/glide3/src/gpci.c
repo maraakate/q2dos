@@ -17,7 +17,6 @@
 **
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVE
 **
-** $Header: /cvsroot/glide/glide3x/h5/glide3/src/gpci.c,v 1.4.2.31 2007/06/23 09:22:41 koolsmoky Exp $
 ** $Log:
 **  44   3dfx      1.34.1.2.1.511/08/00 Drew McMinn     Create initialise read and
 **       use useAppGamma flag, to allow us to disable applications changing gamma

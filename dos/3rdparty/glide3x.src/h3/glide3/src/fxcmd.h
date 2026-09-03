@@ -18,9 +18,6 @@
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
 **
-** $Revision: 1.1.1.1.6.4 $ 
-** $Date: 2006/01/16 21:22:42 $ 
-** $Log: fxcmd.h,v $
 ** Revision 1.1.1.1.6.4  2006/01/16 21:22:42  jwrdegoede
 ** Fix gcc 4.1 new type-punned ptr breaks antialias. warnings
 **

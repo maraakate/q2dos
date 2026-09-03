@@ -16,7 +16,7 @@ MoveClientToIntermission(edict_t *ent)
 		return;
 	}
 
-	if (deathmatch->value || coop->value)
+	if (deathmatch->intValue || coop->intValue)
 	{
 		ent->client->showscores = true;
 	}
@@ -54,7 +54,7 @@ MoveClientToIntermission(edict_t *ent)
 	ent->s.modelindex = 0;
 	ent->s.modelindex2 = 0;
 	ent->s.modelindex3 = 0;
-	ent->s.modelindex = 0;
+	ent->s.modelindex4 = 0;
 	ent->s.effects = 0;
 	ent->s.sound = 0;
 	ent->solid = SOLID_NOT;
@@ -62,7 +62,7 @@ MoveClientToIntermission(edict_t *ent)
 	gi.linkentity(ent);
 
 	/* add the layout */
-	if (deathmatch->value || coop->value)
+	if (deathmatch->intValue || coop->intValue)
 	{
 		DeathmatchScoreboardMessage(ent, NULL);
 		gi.unicast(ent, true);
@@ -88,7 +88,7 @@ BeginIntermission(edict_t *targ)
 	game.autosaved = false;
 
 	/* respawn any dead clients */
-	for (i = 0; i < maxclients->value; i++)
+	for (i = 0; i < maxclients->intValue; i++)
 	{
 		client = g_edicts + 1 + i;
 
@@ -108,17 +108,17 @@ BeginIntermission(edict_t *targ)
 
 	if (game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
 	{
-		if (Q_stricmp(level.mapname, "zboss") == 0 && !deathmatch->value)
+		if (Q_stricmp(level.mapname, "zboss") == 0 && !deathmatch->intValue)
 		{
 			level.fadeFrames = 50;
 		}
 	}
 
-	if (level.changemap && strstr(level.changemap, "*"))
+	if (level.changemap && strchr(level.changemap, '*'))
 	{
-		if (coop->value)
+		if (coop->intValue)
 		{
-			for (i = 0; i < maxclients->value; i++)
+			for (i = 0; i < maxclients->intValue; i++)
 			{
 				client = g_edicts + 1 + i;
 
@@ -128,19 +128,21 @@ BeginIntermission(edict_t *targ)
 				}
 
 				/* strip players of all keys between units */
-				for (n = 0; n < MAX_ITEMS; n++)
+				for (n = 0; n < game.num_items; n++)
 				{
 					if (itemlist[n].flags & IT_KEY)
 					{
 						client->client->pers.inventory[n] = 0;
 					}
 				}
+
+				client->client->pers.power_cubes = 0;
 			}
 		}
 	}
 	else
 	{
-		if (!deathmatch->value)
+		if (!deathmatch->intValue)
 		{
 			level.exitintermission = 1; /* go immediately to the next level */
 			return;
@@ -182,7 +184,7 @@ BeginIntermission(edict_t *targ)
 	VectorCopy(ent->s.angles, level.intermission_angle);
 
 	/* move all clients to the intermission point */
-	for (i = 0; i < maxclients->value; i++)
+	for (i = 0; i < maxclients->intValue; i++)
 	{
 		client = g_edicts + 1 + i;
 
@@ -198,8 +200,8 @@ BeginIntermission(edict_t *targ)
 void
 DeathmatchScoreboardMessage(edict_t *ent, edict_t *killer /* can be NULL */)
 {
-	char entry[1024];
-	char string[1400];
+	char entry[LAYOUT_MAX_LENGTH];
+	char string[LAYOUT_MAX_LENGTH];
 	int stringlength;
 	int i, j, k;
 	int sorted[MAX_CLIENTS];
@@ -283,7 +285,7 @@ DeathmatchScoreboardMessage(edict_t *ent, edict_t *killer /* can be NULL */)
 
 		/* FS: Coop: Xatrix specific */
 		/* allow new DM games to override the tag picture */
-		if (gamerules && gamerules->value)
+		if (gamerules && gamerules->intValue)
 		{
 			if (DMGame.DogTag)
 			{
@@ -352,15 +354,15 @@ HelpComputerMessage(edict_t *ent)
 		return;
 	}
 
-	if (skill->value == 0)
+	if (skill->intValue == 0)
 	{
 		sk = "easy";
 	}
-	else if (skill->value == 1)
+	else if (skill->intValue == 1)
 	{
 		sk = "medium";
 	}
-	else if (skill->value == 2)
+	else if (skill->intValue == 2)
 	{
 		sk = "hard";
 	}
@@ -475,7 +477,12 @@ G_SetStats(edict_t *ent)
 	if (power_armor_type && (!index || (level.framenum & 8)))
 	{
 		/* flash between power armor and other armor icon */
-		ent->client->ps.stats[STAT_ARMOR_ICON] = gi.imageindex("i_powershield");
+		/* Knightmare- show correct icon for power screen */
+		if (power_armor_type == POWER_ARMOR_SHIELD)
+			ent->client->ps.stats[STAT_ARMOR_ICON] = gi.imageindex("i_powershield");
+		else
+			ent->client->ps.stats[STAT_ARMOR_ICON] = gi.imageindex ("i_powerscreen");
+		/* end Knightmare */
 		ent->client->ps.stats[STAT_ARMOR] = cells;
 	}
 	else if (index)
@@ -568,7 +575,8 @@ G_SetStats(edict_t *ent)
 	{
 		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex("p_ir");
 		ent->client->ps.stats[STAT_TIMER] =
-			(ent->client->ir_framenum - level.framenum) / 10; }
+			(ent->client->ir_framenum - level.framenum) / 10;
+	}
 	else
 	{
 		ent->client->ps.stats[STAT_TIMER_ICON] = 0;
@@ -590,7 +598,7 @@ G_SetStats(edict_t *ent)
 	/* layouts */
 	ent->client->ps.stats[STAT_LAYOUTS] = 0;
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		if ((ent->client->pers.health <= 0) || level.intermissiontime || ent->client->showscores)
 		{
@@ -629,7 +637,7 @@ G_SetStats(edict_t *ent)
 		cvar_t *gun;
 		gun = gi.cvar("cl_gun", "2", 0);
 
-		if (gun->value != 2)
+		if (gun->intValue != 2)
 		{
 			ent->client->ps.stats[STAT_HELPICON] = gi.imageindex(ent->client->pers.weapon->icon);
 		}
@@ -680,7 +688,7 @@ G_CheckChaseStats(edict_t *ent)
 		return;
 	}
 
-	for (i = 1; i <= maxclients->value; i++)
+	for (i = 1; i <= maxclients->intValue; i++)
 	{
 		cl = g_edicts[i].client;
 

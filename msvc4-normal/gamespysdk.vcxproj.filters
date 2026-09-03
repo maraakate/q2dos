@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{6ab47dc8-972e-4f7b-ac44-0d5e042451f0}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;for;f90</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{cef2d81c-f3ff-4531-b1d6-c4b1876457b8}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;fi;fd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{12d2a7c9-c2d2-4a0b-8082-275a377999e4}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Goa\CEngine\darray.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Goa\CEngine\gserver.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Goa\CEngine\gserverlist.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Goa\CEngine\gutil.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Goa\CEngine\hashtable.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Goa\nonport.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Goa\gamespy.def">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Goa\CEngine\darray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Goa\CEngine\goaceng.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Goa\CEngine\gserver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Goa\gspy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Goa\CEngine\gutil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Goa\CEngine\hashtable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Goa\nonport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

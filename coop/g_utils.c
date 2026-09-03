@@ -297,7 +297,7 @@ G_UseTargets(edict_t *ent, edict_t *activator)
 	/* print the message */
 	if ((activator) && (ent->message) && !(activator->svflags & SVF_MONSTER))
 	{
-		if(coop->intValue && activator->client && activator->client->pers.netname && strcmp("This item must be activated to use it.", ent->message)) /* FS: Coop: Print any use target stuff as global map message to all players */
+		if(coop->intValue && activator->client && activator->client->pers.netname[0] && strcmp("This item must be activated to use it.", ent->message) != 0) /* FS: Coop: Print any use target stuff as global map message to all players */
 		{
 			gi.bprintf(PRINT_HIGH, "\x02[MAPMSG][%s]: ", activator->client->pers.netname);
 			gi.bprintf(PRINT_HIGH, "%s\n", ent->message);
@@ -751,9 +751,9 @@ G_Spawn(void)
 	int i;
 	edict_t *e;
 
-	e = &g_edicts[(int)maxclients->value + 1];
+	e = &g_edicts[maxclients->intValue + 1];
 
-	for (i = maxclients->value + 1; i < globals.num_edicts; i++, e++)
+	for (i = maxclients->intValue + 1; i < globals.num_edicts; i++, e++)
 	{
 		/* the first couple seconds of server time can involve a lot of
 		   freeing and allocating, so relax the replacement policy */
@@ -789,16 +789,16 @@ G_FreeEdict(edict_t *ed)
 
 	gi.unlinkentity(ed); /* unlink from world */
 
-	if (deathmatch->value || coop->value)
+	if (deathmatch->intValue || coop->intValue)
 	{
-		if ((ed - g_edicts) <= (maxclients->value + BODY_QUEUE_SIZE))
+		if ((ed - g_edicts) <= (maxclients->intValue + BODY_QUEUE_SIZE))
 		{
 			return;
 		}
 	}
 	else
 	{
-		if ((ed - g_edicts) <= maxclients->value)
+		if ((ed - g_edicts) <= maxclients->intValue)
 		{
 			return;
 		}
@@ -1015,10 +1015,10 @@ edict_t *Find_LikePlayer (edict_t *ent, char *name, qboolean exactMatch) /* FS: 
 		return NULL;
 	}
 
-	if(!strncmp(name, "LIKE ", 5))
+	if (!strncmp(name, "LIKE ", 5))
 	{
-		name+=5;
-		if(!name || !name[0])
+		name += 5;
+		if (!name || !name[0])
 		{
 			gi.cprintf(ent, PRINT_HIGH, "No name specified after LIKE.  Aborting search!\n");
 			return NULL;
@@ -1028,7 +1028,7 @@ edict_t *Find_LikePlayer (edict_t *ent, char *name, qboolean exactMatch) /* FS: 
 	i = count = 0;
 
 	nameLwrd = Q_strlwr(name);
-	if(!nameLwrd)
+	if (!nameLwrd)
 	{
 		gi.cprintf(ent, PRINT_HIGH, "Name is NULL.  Aborting search!\n");
 		return NULL;
@@ -1037,9 +1037,9 @@ edict_t *Find_LikePlayer (edict_t *ent, char *name, qboolean exactMatch) /* FS: 
 	for (i = 0; i < maxclients->intValue; i++)
 	{
 		char *netName;
-		player = &g_edicts[i+1];
+		player = &g_edicts[i + 1];
 
-		if(!player || !player->inuse || !player->client)
+		if (!player || !player->inuse || !player->client)
 		{
 			continue;
 		}
@@ -1048,9 +1048,9 @@ edict_t *Find_LikePlayer (edict_t *ent, char *name, qboolean exactMatch) /* FS: 
 
 		netName = Q_strlwr(netName);
 
-		if(exactMatch)
+		if (exactMatch)
 		{
-			if(!Q_stricmp(netName, nameLwrd))
+			if (!Q_stricmp(netName, nameLwrd))
 			{
 				foundPlayer = player;
 				count++;
@@ -1058,14 +1058,14 @@ edict_t *Find_LikePlayer (edict_t *ent, char *name, qboolean exactMatch) /* FS: 
 		}
 		else
 		{
-			if(strstr(netName, nameLwrd))
+			if (netName && strstr(netName, nameLwrd))
 			{
 				foundPlayer = player;
 				count++;
 			}
 		}
 
-		if(netName)
+		if (netName)
 		{
 			free(netName);
 			netName = NULL;
@@ -1085,4 +1085,42 @@ edict_t *Find_LikePlayer (edict_t *ent, char *name, qboolean exactMatch) /* FS: 
 
 	gi.cprintf(ent, PRINT_HIGH, "no player name matches found.\n");
 	return NULL;
+}
+
+/* FS: This is needed so trouble makers can't spam dropping ammo on respawn.
+ *     If that happens nobody can connect.
+ *     So make sure we have at least 256 free entities.  Should be enough room
+ *     and not too many people use this in coop anyways because of the shared
+ *     inventory.
+ */
+qboolean G_SpawnCheck(int cap)
+{
+	int i;
+	edict_t *e;
+
+	e = &g_edicts[maxclients->intValue + 1];
+
+	if (!cap)
+		cap = 1;
+
+	for (i = maxclients->intValue + 1; i < globals.num_edicts; i++, e++)
+	{
+		/* the first couple seconds of server time can involve a lot of
+		   freeing and allocating, so relax the replacement policy */
+		if (!e->inuse &&
+			((e->freetime < 2) || (level.time - e->freetime > 0.5))
+			&& (i <= game.maxentities - cap))
+		{
+//			Com_Printf("%d / %d / %d\n", i, game.maxentities-cap, game.maxentities);
+			return true;
+		}
+	}
+
+//	Com_Printf("%d / %d / %d\n", i, game.maxentities-cap, game.maxentities);
+	if (i >= game.maxentities - cap)
+	{
+		return false;
+	}
+
+	return true;
 }

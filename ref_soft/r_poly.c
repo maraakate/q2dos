@@ -608,7 +608,7 @@ void R_PolygonDrawSpans(espan_t *pspan, int iswater )
 	s_spanletvars.izistep = (int)(d_zistepu * 0x8000 * 0x10000);
 	s_spanletvars.izistep_times_2 = s_spanletvars.izistep * 2;
 
-	s_spanletvars.pz = 0;
+	s_spanletvars.pz = NULL;
 
 	do
 	{
@@ -926,7 +926,7 @@ void R_ClipAndDrawPoly ( float alpha, int isturbulent, qboolean textured )
 		}
 		else
 		{
-			if ( sw_stipplealpha->value )
+			if ( sw_stipplealpha->intValue)
 			{
 				if ( isturbulent )
 				{
@@ -1190,6 +1190,8 @@ static void R_DrawPoly( int iswater )
 	R_PolygonScanRightEdge ();
 
 	R_PolygonDrawSpans( s_polygon_spans, iswater );
+
+	s_polygon_spans = NULL; /* silence -Wdangling-pointer warnings */
 }
 
 /*
@@ -1270,4 +1272,3 @@ void R_IMFlatShadedQuad( vec3_t a, vec3_t b, vec3_t c, vec3_t d, int color, floa
 
 	R_ClipAndDrawPoly( alpha, false, false );
 }
-

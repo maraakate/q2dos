@@ -74,6 +74,8 @@
 #define yyconst
 #endif
 
+#include "wattcp.h"		/* hand-edit: moved from below */
+#if defined(USE_LANGUAGE)	/* hand-edit: moved from below */
 
 #ifdef YY_USE_PROTOS
 #define YY_PROTO(proto) proto
@@ -442,12 +444,12 @@ char *yytext;
 #include <ctype.h>
 #include <setjmp.h>
 
-#include "wattcp.h"
+/*#include "wattcp.h" */	/* hand-edit: moved to above */
 #include "strings.h"
 #include "sock_ini.h"
 #include "misc.h"
 
-#if defined(USE_LANGUAGE)
+/*#if defined(USE_LANGUAGE)*/	/* hand-edit: moved to above */
 
 #if defined(TEST_PROG)
   #include <conio.h>

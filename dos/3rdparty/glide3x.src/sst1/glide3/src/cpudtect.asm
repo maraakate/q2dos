@@ -17,8 +17,6 @@
 ;; 
 ;; COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 ;;
-;; $Header: /cvsroot/glide/glide3x/sst1/glide3/src/Attic/cpudtect.asm,v 1.1.2.1 2004/03/02 07:55:29 dborca Exp $
-;; $Log: cpudtect.asm,v $
 ;; Revision 1.1.2.1  2004/03/02 07:55:29  dborca
 ;; Bastardised Glide3x for SST1
 ;;
@@ -46,7 +44,7 @@ CPUTypeP6       equ 6h
         
 ;;; References to external data:
     
-segment		TEXT
+segment		SEG_TEXT
 ;;
 ;;  _cpu_detect_asm - detect the type of CPU 
 ;; 

@@ -17,14 +17,11 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-**
-** $Revision: 1.1.2.3 $ 
-** $Date: 2005/06/09 18:32:38 $ 
-**
 ** Parsing code for grabbing information from "voodoo.ini" initialization file
 **
 */
-#ifndef __GNUC__
+#undef FX_DLL_ENABLE /* so that we don't dllexport the symbols */
+#ifdef _MSC_VER
 #pragma optimize ("",off)
 #endif
 #include <stdio.h>
@@ -137,22 +134,24 @@ FX_ENTRY FxBool FX_CALL sst1InitVoodooFile()
         }
         if(inCfg) {
             if(!sst1InitParseFieldCfg(buffer)) {
-                if(helper)
-                    INIT_PRINTF(("sst1InitVoodooFile(): ERROR in [CFG] section of .ini file...\n"));
-                return(FXFALSE);
+                tmpPtr = "[CFG]";
+                goto _fail;
             }
         } else if(inDac) {
             if(!sst1InitParseFieldDac(buffer)) {
-                if(helper)
-                    INIT_PRINTF(("sst1InitVoodooFile(): ERROR in [DAC] section of .ini file...\n"));
-                return(FXFALSE);
+                tmpPtr = "[DAC]";
+                goto _fail;
             }
         }
     }
     fclose(file);
-    INIT_PRINTF(("sst1Init Routines(): Using Initialization file '%s'\n", filename));
-
+    INIT_PRINTF(("INIT: Using .ini file '%s'\n", filename));
     return(FXTRUE);
+ _fail:
+    if(helper)
+        INIT_PRINTF(("ERROR in %s section of .ini file.\n", tmpPtr));
+    fclose(file);
+    return(FXFALSE);
 #endif
 }
 
@@ -220,7 +219,7 @@ FX_ENTRY FxBool FX_CALL sst1InitVoodooFile() {
       break;
     }
   }
-  INIT_PRINTF(("sst1Init Routines(): Using Initialization file '%s'\n", filename));
+  INIT_PRINTF(("INIT: Using .ini file '%s'\n", filename));
 
 __errExit:
   if (file) fclose(file);
@@ -967,6 +966,6 @@ myGetenv(const char* envKey)
           : NULL);
 }
 
-#ifndef __GNUC__
+#ifdef _MSC_VER
 #pragma optimize ("",on)
 #endif

@@ -16,9 +16,6 @@
 # THE UNITED STATES.  
 # 
 # COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-#
-# $Revision: 1.10.4.1 $
-# $Date: 2003/06/29 18:28:55 $
 
 #
 # If we call make recursively, we may want to print the subdirectory to which

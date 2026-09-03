@@ -16,17 +16,11 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-** $Header: /cvsroot/glide/glide3x/cvg/incsrc/sst1vid.h,v 1.1.1.1 1999/12/07 21:42:43 joseph Exp $
-** $Log: sst1vid.h,v $
-** Revision 1.1.1.1  1999/12/07 21:42:43  joseph
-** Initial checkin into SourceForge.
-**
 ** 
 ** 1     10/08/98 11:30a Brent
-** 
+**
 ** 6     7/24/98 1:41p Hohn
-** 
+**
 ** 5     3/10/98 2:33p Psmith
 ** separating cvg tree from h3/h4 trees
  * 

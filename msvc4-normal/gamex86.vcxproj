@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{DB3F7625-D1AD-4C8B-8A11-A26B91A154C1}</ProjectGuid>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>15.0.28307.799</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>.\Debug\</OutDir>
+    <IntDir>.\Debug\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>.\Release\</OutDir>
+    <IntDir>.\Release\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>.\Debug\</OutDir>
+    <IntDir>.\Debug\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>.\Release\</OutDir>
+    <IntDir>.\Release\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\Debug/gamex86.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;id386=1;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <BrowseInformation>true</BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x1009</Culture>
+    </ResourceCompile>
+    <Link>
+      <OutputFile>$(OutDir)gamex86.dll</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ModuleDefinitionFile>..\GAME\game.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\Debug/gamex86.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\Release/gamex86.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <OmitFramePointers>true</OmitFramePointers>
+      <PreprocessorDefinitions>WIN32;id386=1;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x1009</Culture>
+    </ResourceCompile>
+    <Link>
+      <OutputFile>$(OutDir)gamex86.dll</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ModuleDefinitionFile>..\GAME\game.def</ModuleDefinitionFile>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\Release/gamex86.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>X64</TargetEnvironment>
+      <TypeLibraryName>.\Debug/gamex86.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;id386=0;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <BrowseInformation>true</BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x1009</Culture>
+    </ResourceCompile>
+    <Link>
+      <OutputFile>$(OutDir)gamex64.dll</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ModuleDefinitionFile>..\GAME\game.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+    <Bscmake>
+      <OutputFile>.\Debug/gamex86.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>X64</TargetEnvironment>
+      <TypeLibraryName>.\Release/gamex86.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <OmitFramePointers>true</OmitFramePointers>
+      <PreprocessorDefinitions>WIN32;id386=0;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DisableSpecificWarnings>4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x1009</Culture>
+    </ResourceCompile>
+    <Link>
+      <OutputFile>$(OutDir)gamex64.dll</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ModuleDefinitionFile>..\GAME\game.def</ModuleDefinitionFile>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+    <Bscmake>
+      <OutputFile>.\Release/gamex86.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\GAME\g_ai.c" />
+    <ClCompile Include="..\GAME\g_chase.c" />
+    <ClCompile Include="..\GAME\g_cmds.c" />
+    <ClCompile Include="..\GAME\g_combat.c" />
+    <ClCompile Include="..\GAME\g_func.c" />
+    <ClCompile Include="..\GAME\g_items.c" />
+    <ClCompile Include="..\GAME\g_main.c" />
+    <ClCompile Include="..\GAME\g_misc.c" />
+    <ClCompile Include="..\GAME\g_monster.c" />
+    <ClCompile Include="..\GAME\g_phys.c" />
+    <ClCompile Include="..\GAME\g_save.c" />
+    <ClCompile Include="..\GAME\g_spawn.c" />
+    <ClCompile Include="..\GAME\g_svcmds.c" />
+    <ClCompile Include="..\GAME\g_target.c" />
+    <ClCompile Include="..\GAME\g_trigger.c" />
+    <ClCompile Include="..\GAME\g_turret.c" />
+    <ClCompile Include="..\GAME\g_utils.c" />
+    <ClCompile Include="..\GAME\g_weapon.c" />
+    <ClCompile Include="..\GAME\m_actor.c" />
+    <ClCompile Include="..\GAME\m_berserk.c" />
+    <ClCompile Include="..\GAME\m_boss2.c" />
+    <ClCompile Include="..\GAME\m_boss3.c" />
+    <ClCompile Include="..\GAME\m_boss31.c" />
+    <ClCompile Include="..\GAME\m_boss32.c" />
+    <ClCompile Include="..\GAME\m_brain.c" />
+    <ClCompile Include="..\GAME\m_chick.c" />
+    <ClCompile Include="..\GAME\m_flash.c" />
+    <ClCompile Include="..\GAME\m_flipper.c" />
+    <ClCompile Include="..\GAME\m_float.c" />
+    <ClCompile Include="..\GAME\m_flyer.c" />
+    <ClCompile Include="..\GAME\m_gladiator.c" />
+    <ClCompile Include="..\GAME\m_gunner.c" />
+    <ClCompile Include="..\GAME\m_hover.c" />
+    <ClCompile Include="..\GAME\m_infantry.c" />
+    <ClCompile Include="..\GAME\m_insane.c" />
+    <ClCompile Include="..\GAME\m_medic.c" />
+    <ClCompile Include="..\GAME\m_move.c" />
+    <ClCompile Include="..\GAME\m_mutant.c" />
+    <ClCompile Include="..\GAME\m_parasite.c" />
+    <ClCompile Include="..\GAME\m_soldier.c" />
+    <ClCompile Include="..\GAME\m_supertank.c" />
+    <ClCompile Include="..\GAME\m_tank.c" />
+    <ClCompile Include="..\GAME\p_client.c" />
+    <ClCompile Include="..\GAME\p_hud.c" />
+    <ClCompile Include="..\GAME\p_trail.c" />
+    <ClCompile Include="..\GAME\p_view.c" />
+    <ClCompile Include="..\GAME\p_weapon.c" />
+    <ClCompile Include="..\GAME\q_shared.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\GAME\game.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\game\game.h" />
+    <ClInclude Include="..\game\g_local.h" />
+    <ClInclude Include="..\game\m_actor.h" />
+    <ClInclude Include="..\game\m_berserk.h" />
+    <ClInclude Include="..\game\m_boss2.h" />
+    <ClInclude Include="..\game\m_boss31.h" />
+    <ClInclude Include="..\game\m_boss32.h" />
+    <ClInclude Include="..\game\m_brain.h" />
+    <ClInclude Include="..\game\m_chick.h" />
+    <ClInclude Include="..\game\m_flipper.h" />
+    <ClInclude Include="..\game\m_float.h" />
+    <ClInclude Include="..\game\m_flyer.h" />
+    <ClInclude Include="..\game\m_gladiator.h" />
+    <ClInclude Include="..\game\m_gunner.h" />
+    <ClInclude Include="..\game\m_hover.h" />
+    <ClInclude Include="..\game\m_infantry.h" />
+    <ClInclude Include="..\game\m_insane.h" />
+    <ClInclude Include="..\game\m_medic.h" />
+    <ClInclude Include="..\game\m_mutant.h" />
+    <ClInclude Include="..\game\m_parasite.h" />
+    <ClInclude Include="..\game\m_player.h" />
+    <ClInclude Include="..\game\m_rider.h" />
+    <ClInclude Include="..\game\m_soldier.h" />
+    <ClInclude Include="..\game\m_supertank.h" />
+    <ClInclude Include="..\game\m_tank.h" />
+    <ClInclude Include="..\game\q_shared.h" />
+    <ClInclude Include="..\game\tables\clientfields.h" />
+    <ClInclude Include="..\game\tables\fields.h" />
+    <ClInclude Include="..\game\tables\gamefunc_decs.h" />
+    <ClInclude Include="..\game\tables\gamefunc_list.h" />
+    <ClInclude Include="..\game\tables\gamemmove_decs.h" />
+    <ClInclude Include="..\game\tables\gamemmove_list.h" />
+    <ClInclude Include="..\game\tables\levelfields.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

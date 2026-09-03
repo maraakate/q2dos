@@ -720,12 +720,7 @@ void PM_CatagorizePosition (void)
 				pm->groundentity = trace.ent;
 			}
 		}
-		else if (!trace.ent)
-		{ 
 // end Jitspoe's fix
-			pm->groundentity = NULL;
-			pm->s.pm_flags &= ~PMF_ON_GROUND;
-		}
 		else
 		{
 			pm->groundentity = trace.ent;
@@ -1271,7 +1266,7 @@ void Pmove (pmove_t *pmove)
 	pm->numtouch = 0;
 	VectorClear (pm->viewangles);
 	pm->viewheight = 0;
-	pm->groundentity = 0;
+	pm->groundentity = NULL;
 	pm->watertype = 0;
 	pm->waterlevel = 0;
 

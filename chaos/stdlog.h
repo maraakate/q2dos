@@ -29,7 +29,7 @@ extern void sl_LogDate( game_import_t  *gi );
 extern void sl_LogTime( game_import_t  *gi );
 
 extern void sl_LogDeathFlags( game_import_t  *gi,
-                              unsigned long   dmFlags);
+                              unsigned int   dmFlags);
 
 extern void sl_LogMapName( game_import_t  *gi,
                            char           *pMapName );

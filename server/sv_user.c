@@ -411,7 +411,7 @@ void SV_BeginDownload_f (void)
 			// r1ch: \ is bad in general, client won't even write properly if we do sent it
 			|| strchr (name, '\\')
 			// MUST be in a subdirectory, unless a pk3	
-			|| (!strstr (name, "/") )
+			|| (!strchr(name, '/'))
 			// r1ch: another bug, maps/. will fopen(".") -> crash
 			|| !IsValidChar(name[length-1]) )
 /*	if (strstr (name, "..") || !allow_download->value
@@ -643,6 +643,9 @@ void SV_ExecuteUserCommand (char *s)
 	if (sv_client->state < cs_spawned)
 		return;
 
+	/* FS: From R1Q2.  Reset idle time. */
+	sv_client->idletime = 0;
+
 	if (!u->name && sv.state == ss_game)
 		ge->ClientCommand (sv_player);
 
@@ -728,7 +731,10 @@ void SV_ExecuteClientMessage (client_t *cl)
 			break;
 
 		case clc_userinfo:
+			s = Info_ValueForKey(cl->userinfo, "ip");
 			strncpy (cl->userinfo, MSG_ReadString (&net_message), sizeof(cl->userinfo)-1);
+			if (s)
+				Info_SetValueForKey(cl->userinfo, "ip", s);
 			SV_UserinfoChanged (cl);
 			break;
 
@@ -773,7 +779,7 @@ void SV_ExecuteClientMessage (client_t *cl)
 				return;
 			}
 
-			if (!sv_paused->value)
+			if (!sv_paused->intValue)
 			{
 				net_drop = cl->netchan.dropped;
 				if (net_drop < 20)
@@ -796,6 +802,14 @@ void SV_ExecuteClientMessage (client_t *cl)
 
 				}
 				SV_ClientThink (cl, &newcmd);
+			}
+
+			/* FS: From R1Q2.  Reset idle time */
+			if (newcmd.buttons != oldcmd.buttons ||
+				newcmd.forwardmove != oldcmd.forwardmove ||
+				newcmd.upmove != oldcmd.upmove)
+			{
+				cl->idletime = 0;
 			}
 
 			cl->lastcmd = newcmd;

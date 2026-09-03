@@ -134,8 +134,6 @@ void CL_ClipMoveToEntities ( vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end,
 			else
 				*tr = trace;
 		}
-		else if (trace.startsolid)
-			tr->startsolid = true;
 	}
 }
 
@@ -213,10 +211,10 @@ void CL_PredictMovement (void)
 	if (cls.state != ca_active)
 		return;
 
-	if (cl_paused->value)
+	if (cl_paused->intValue)
 		return;
 
-	if (!cl_predict->value || (cl.frame.playerstate.pmove.pm_flags & PMF_NO_PREDICTION))
+	if (!cl_predict->intValue || (cl.frame.playerstate.pmove.pm_flags & PMF_NO_PREDICTION))
 	{	// just set angles
 		for (i=0 ; i<3 ; i++)
 		{
@@ -231,7 +229,7 @@ void CL_PredictMovement (void)
 	// if we are too far out of date, just freeze
 	if (current - ack >= CMD_BACKUP)
 	{
-		if (cl_showmiss->value)
+		if (cl_showmiss->intValue)
 			Com_Printf ("exceeded CMD_BACKUP\n");
 		return;	
 	}
@@ -249,7 +247,7 @@ void CL_PredictMovement (void)
 
 	frame = 0;
 #ifdef CLIENT_SPLIT_NETFRAME
-	if (cl_async->value)
+	if (cl_async->intValue)
 	{
 		// run frames
 		while (++ack <= current) // Changed '<' to '<=' cause current is our pending cmd

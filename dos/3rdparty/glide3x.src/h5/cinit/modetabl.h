@@ -21,9 +21,6 @@
 **
 ** Description: Mode table that contains modes and related register values.
 **
-** $Revision: 1.1.2.1 $
-** $Date: 2003/08/21 08:32:12 $
-**
 ** $History: modetabl.h $
 ** 
 ** *****************  Version 1  *****************

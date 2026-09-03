@@ -1,0 +1,167 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{0cdd3b6c-1a77-426f-ab4c-c20ea73d1b23}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;for;f90</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{27800580-c6b3-4b97-abe3-16fb9c9e23ac}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;fi;fd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{b29afb04-17db-41c5-a663-a242516be05a}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\chaos\c_base.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chaos\c_botai.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chaos\c_botmisc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chaos\c_botnav.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chaos\c_cam.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chaos\c_item.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chaos\c_weapon.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chaos\g_cmds.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chaos\g_combat.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chaos\g_ctf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chaos\g_func.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chaos\g_items.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chaos\g_main.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chaos\g_misc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chaos\g_phys.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chaos\g_save.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chaos\g_spawn.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chaos\g_svcmds.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chaos\g_target.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chaos\g_trigger.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chaos\g_utils.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chaos\g_weapon.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chaos\gslog.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chaos\m_move.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chaos\p_client.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chaos\p_hud.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chaos\p_menu.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chaos\p_view.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chaos\p_weapon.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chaos\q_shared.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chaos\stdlog.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\chaos\game.def">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\chaos\c_base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\chaos\c_botai.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\chaos\c_botnav.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\chaos\c_cam.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\chaos\c_item.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\chaos\c_weapon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\chaos\classes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\chaos\effects.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\chaos\g_ctf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\chaos\g_local.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\chaos\game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\chaos\gslog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\chaos\m_player.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\chaos\p_menu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\chaos\q_shared.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\chaos\stdlog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

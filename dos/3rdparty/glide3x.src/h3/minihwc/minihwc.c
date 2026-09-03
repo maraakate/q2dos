@@ -17,8 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/h3/minihwc/minihwc.c,v 1.1.1.1.6.10 2005/05/25 08:56:24 jwrdegoede Exp $
-** $Log: minihwc.c,v $
 ** Revision 1.1.1.1.6.10  2005/05/25 08:56:24  jwrdegoede
 ** Make h5 and h3 tree 64 bit clean. This is ported over from the non-devel branch so this might be incomplete
 **
@@ -525,17 +523,11 @@
 ** WinGlide
 ** 
 ** 1     3/04/98 4:13p Dow
-**
 */
-#if !defined(GDBG_INFO_ON) || (GDBG_INFO_ON == 0)
-#if defined(GDBG_INFO_ON)
-#undef GDBG_INFO_ON
-#endif /* defined(GDBG_INFO_ON) */
-#define GDBG_INFO_ON
-#endif /* !defined(GDBG_INFO_ON) || (GDBG_INFO_ON == 0) */
 
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 
 #include <3dfx.h>
@@ -558,13 +550,68 @@
 
 #include <ddraw.h>
 #include "qmodes.h"
+#ifdef HAVE_WIN9X_DDK
 #define IS_32
 #define Not_VxD
 #include <minivdd.h>
 #include <vmm.h>
 #include <configmg.h>
+#else
+#define CM_REGISTRY_HARDWARE 0
+#define CM_REGISTRY_SOFTWARE 1
+#define CR_FAILURE 0x00000013
+#define ___CONFIGMG_Get_DevNode_Key 0x0033003d
+struct _CMIOCTLPACKET {
+ DWORD dwStack;
+ DWORD dwServiceNumber;
+};
+static DWORD WINAPI CMIOCTLHandler(struct _CMIOCTLPACKET *pkt)
+{
+  HANDLE hCONFIGMG;
+  DWORD crReturnValue = CR_FAILURE;
+  DWORD dwReturnSize = 0;
 
+  hCONFIGMG = CreateFileA(
+    "\\\\.\\CONFIGMG",
+    GENERIC_READ|GENERIC_WRITE,
+    FILE_SHARE_READ|FILE_SHARE_WRITE,
+    NULL, OPEN_EXISTING, 0, NULL);
+
+  if (hCONFIGMG == INVALID_HANDLE_VALUE) {
+      return CR_FAILURE;
+  }
+  if (!DeviceIoControl(
+        hCONFIGMG, pkt->dwServiceNumber,
+        &(pkt->dwStack), sizeof(pkt->dwStack),
+        &crReturnValue, sizeof(crReturnValue),
+        &dwReturnSize, NULL)) {
+    crReturnValue = CR_FAILURE;
+  }
+  CloseHandle(hCONFIGMG);
+  if (dwReturnSize != sizeof(crReturnValue)) {
+      crReturnValue = CR_FAILURE;
+  }
+  return crReturnValue;
+}
+static DWORD __cdecl CM_Get_DevNode_Key (DWORD devnode, char *subkey, void *buffer, ULONG bufferlen, ULONG flags)
+{
+    struct _CMIOCTLPACKET packet;
+    DWORD dwStack;
+    #if defined(_MSC_VER)
+    _asm {mov dwStack, ebp};
+    #elif defined(__GNUC__)
+    dwStack = (DWORD) __builtin_frame_address(0);
+    #else
+    #error Add support for your compiler here.
+    #endif
+    dwStack += 8;
+    packet.dwStack = dwStack;
+    packet.dwServiceNumber = 0x80000000 + (___CONFIGMG_Get_DevNode_Key & 0xFFFF);
+    return CMIOCTLHandler(&packet);
+}
 #endif
+
+#endif /* __WIN32__ */
 
 #ifdef macintosh
 #include <GraphicsPrivHwc.h>
@@ -599,10 +646,9 @@ static FxU32 __attribute_used fenceVar;
 
 /*static FxU32 ProcessID;*/
 
-#if defined(__WATCOMC__)
 /*
  *  P6 Fence
- * 
+ *
  *  Here's the stuff to do P6 Fencing.  This is required for the
  *  certain things on the P6
  *
@@ -610,20 +656,18 @@ static FxU32 __attribute_used fenceVar;
  * This was yoinked from sst1/include/sst1init.h, and should be
  * merged back into something if we decide that we need it later.
  */
-void 
-p6Fence(void);
+#if defined(__WATCOMC__)
+void p6Fence(void);
 #pragma aux p6Fence = \
-"xchg eax, fenceVar" \
-modify [eax];
-
-
+ "xchg eax, fenceVar" \
+ modify [eax];
 #define P6FENCE p6Fence()
 #elif defined(__MSC__)
-#define P6FENCE { __asm xchg eax, fenceVar }
+#define P6FENCE {_asm xchg eax, fenceVar}
 #elif defined(__POWERPC__) && defined(__MWERKS__)
 #define P6FENCE __eieio()
-#elif defined(__DJGPP__)
-#define P6FENCE __asm __volatile ("xchg %%eax, _fenceVar":::"%eax");
+#elif defined(__DJGPP__) || defined (__MINGW32__)
+#define P6FENCE __asm __volatile ("xchg %%eax, _fenceVar":::"%eax")
 #elif defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__))
 #define P6FENCE __asm __volatile ("xchg %%eax, fenceVar":::"%eax")
 #elif defined(__GNUC__) && defined(__ia64__)
@@ -675,14 +719,16 @@ static FxBool resolutionSupported[HWC_MAX_BOARDS][0xF];
 #ifdef HWC_EXT_INIT
 static hwcBoardInfo *curBI;
 
-typedef void *HMONITOR;
+#if (WINVER < 0x0500) && !defined(HMONITOR_DECLARED) /* <--- HACK */
+DECLARE_HANDLE(HMONITOR);
+#define HMONITOR_DECLARED
+#endif
 typedef BOOL (CALLBACK* MONITORENUMPROC)(HMONITOR, HDC, LPRECT, LPARAM);
-typedef WINUSERAPI BOOL WINAPI
-EnumDisplayMonitors_func( HDC             hdc,
+typedef BOOL (WINAPI *EnumDisplayMonitors_func)
+                        ( HDC             hdc,
                           LPCRECT         lprcClip,
                           MONITORENUMPROC lpfnEnum,
                           LPARAM          dwData);
-
 
 typedef struct {
   HDC dc;
@@ -860,23 +906,22 @@ hwcInit(FxU32 vID, FxU32 dID)
       num_monitor = 0;
 
       if ( user32 ) {
-        EnumDisplayMonitors_func*
-          enumDisplayMonitors = (void*)GetProcAddress( user32, "EnumDisplayMonitors" );
-        
+        EnumDisplayMonitors_func enumDisplayMonitors =
+          (EnumDisplayMonitors_func)GetProcAddress( user32, "EnumDisplayMonitors" );
+
         if ( enumDisplayMonitors ) { 
-          HWND
-            curWindow = GetActiveWindow();
-          
+          HWND curWindow = GetActiveWindow();
+
           GDBG_INFO(80, "%s:  multi-monitor capable OS ( NT5/W98 )\n", FN_NAME);
           enumDisplayMonitors( hdc, 0, monitorEnum, (LPARAM)data );
-          
+
           /*
           ** use the active window display (if there is one yet
           ** associated w/ the current thread) as sst 0 
           */
           if (curWindow != NULL) {
             HDC curWindowDC = GetDC(curWindow);
-            
+
             if (curWindowDC != NULL) {
               enumDisplayMonitors( curWindowDC, 0, displayMonitor, (LPARAM)data );
               ReleaseDC(curWindow, curWindowDC);
@@ -905,7 +950,7 @@ hwcInit(FxU32 vID, FxU32 dID)
       int 
         status;
 
-      /* Allocate a context with the Driver */      
+      /* Allocate a context with the Driver */
       ctxReq.which = HWCEXT_ALLOCCONTEXT;
       ctxReq.optData.allocContextReq.protocolRev = HWCEXT_PROTOCOLREV;
       ctxReq.optData.allocContextReq.appType = HWCEXT_ABAPPTYPE_FSEM;
@@ -1057,7 +1102,11 @@ hwcInit(FxU32 vID, FxU32 dID)
                          (void *) hInfo.boardInfo[i].hMon);
       }
     }
-  
+    if (!hInfo.nBoards) {
+      const char *error = pciGetErrorCode() ? pciGetErrorString() :
+                            "Voodoo3 or Banshee not detected\n";
+      strcpy(errorString, error);
+    }
   }
 #endif /* HWC_EXT_INIT */
   if (hInfo.nBoards)
@@ -1140,12 +1189,12 @@ hwcMapBoard(hwcBoardInfo *bInfo, FxU32 bAddrMask)
     bInfo->linearInfo.linearAddress[3] = 0;
     
     /* Kludge.  Pass boardInfo to acceleration stuff. */
-#if GLIDE3      
+#if GLIDE3
     {
       extern hwcBoardInfo *acceleratorBoardInfo;
       acceleratorBoardInfo = bInfo;
     }
-#endif  
+#endif
   }
 #else
   {
@@ -1175,25 +1224,25 @@ hwcMapBoard(hwcBoardInfo *bInfo, FxU32 bAddrMask)
                                0x1000000, &bInfo->deviceNum, bInfo->boardNum, 3);
     }
   }
-#endif  
+#endif
   
   return FXTRUE;
 #undef FN_NAME
 } /* hwcMapBoard */
 
 FxBool
-hwcInitRegisters(hwcBoardInfo *bInfo) 
+hwcInitRegisters(hwcBoardInfo *bInfo)
 {
-#define FN_NAME hwcInitRegisters
+#define FN_NAME "hwcInitRegisters"
   FxU32
     grxSpeedInMHz, memSpeedInMHz,
     sgramMode, sgramMask, sgramColor;
-  
+
   if (bInfo->linearInfo.initialized == FXFALSE) {
-    printf(errorString, "%s:  Called before hwcMapBoard\n", FN_NAME);
+    sprintf(errorString, "%s:  Called before hwcMapBoard\n", FN_NAME);
     return FXFALSE;
   }
-      
+
   bInfo->regInfo.initialized = FXTRUE;
 
   bInfo->regInfo.ioMemBase =
@@ -1208,7 +1257,7 @@ hwcInitRegisters(hwcBoardInfo *bInfo)
     bInfo->linearInfo.linearAddress[0] + SST_LFB_OFFSET;
   bInfo->regInfo.rawLfbBase =
     bInfo->linearInfo.linearAddress[1];
-#if __POWERPC__    
+#if __POWERPC__
   bInfo->regInfo.ioPortBase = bInfo->pciInfo.pciBaseAddr[2] & ~0x1;
 #else
   bInfo->regInfo.ioPortBase = (FxU16) bInfo->pciInfo.pciBaseAddr[2] & ~0x1;
@@ -1853,7 +1902,7 @@ hwcGetSurfaceInfo(const hwcBoardInfo* bInfo,
   retVal = (ddErr == DD_OK);
   if (!retVal) {
     sprintf(errorString, "%s: IDirectDrawSurface2_Lock (0x%X)\n", 
-            FN_NAME, ddErr);
+            FN_NAME,(unsigned)ddErr);
     GDBG_INFO(80, "%s", errorString);
     goto __errExit;
   }
@@ -1874,7 +1923,7 @@ hwcGetSurfaceInfo(const hwcBoardInfo* bInfo,
   retVal = (ret->depth != 0x00UL);
   if (!retVal) {
     sprintf(errorString, "%s: Invalid surface pixel format (0x%X)\n", 
-            FN_NAME, desc.ddpfPixelFormat.dwFlags);
+            FN_NAME, (unsigned)desc.ddpfPixelFormat.dwFlags);
     GDBG_INFO(80, "%s", errorString);
     goto __errExit;    
   }
@@ -3564,7 +3613,7 @@ hwcRestoreVideo(hwcBoardInfo *bInfo)
 #undef FN_NAME
 } /* hwcRestoreVideo */
 
-char *
+const char *
 hwcGetErrorString()
 {
 #define FN_NAME "hwcGetErrorString"
@@ -4052,6 +4101,7 @@ FxBool
 hwcResolutionSupported(hwcBoardInfo *bInfo, GrScreenResolution_t res)
 {
 #define FN_NAME "hwcResolutionSupported"
+#if GDBG_INFO_ON
   static char *resNames[] = {
     "GR_RESOLUTION_320x200",
     "GR_RESOLUTION_320x240",
@@ -4078,7 +4128,7 @@ hwcResolutionSupported(hwcBoardInfo *bInfo, GrScreenResolution_t res)
     "GR_RESOLUTION_2048x1536",
     "GR_RESOLUTION_2048x2048"
   };
-
+#endif
 #if 0
   struct WidthHeight_s {
     FxU32 width; 
@@ -4109,13 +4159,14 @@ hwcResolutionSupported(hwcBoardInfo *bInfo, GrScreenResolution_t res)
     {2048, 1536},               /* GR_RESOLUTION_2048x1536 */
     {2048, 2048}                /* GR_RESOLUTION_2048x2048 */
   };
-#endif  
+#endif
 
+#if GDBG_INFO_ON
   GDBG_INFO(80, FN_NAME ":  res == %s (0x%x), supported == %s\n",
             resNames[res], resolutionSupported[bInfo->boardNum][res],
             resolutionSupported[bInfo->boardNum][res] ? "FXTRUE" : "FXFALSE");
+#endif
   
-
   /* Glide has very good checking to see if the memory required is
   available, so we'll just return whether the driver can do it. */
   return resolutionSupported[bInfo->boardNum][res];
@@ -4181,7 +4232,7 @@ hwcGetenv(char *a)
   static char strval[255];
 
   /* This should work for both NT and Win95/98 (getRegPath works) */
-  if (retVal = getenv(a))
+  if ((retVal = getenv(a)) != NULL)
     return retVal;
   
   szData = sizeof(strval);
@@ -4287,27 +4338,33 @@ hwcShareContextData(hwcBoardInfo *bInfo, FxU32 **data)
 
 
       /* Now for the NASTY stuff: */
+#ifdef __GNUC__
+      __asm __volatile (" xor %%eax, %%eax; mov %%cs, %%ax; mov %%eax, %0":"=g"(ohWell));
+#else
       __asm  mov eax, 0;
       __asm  mov ax, cs;
       __asm  mov ohWell, eax;
+#endif
 
       ctxReq.optData.contextDwordNTReq.codeSegment = ohWell;
 
+#ifdef __GNUC__
+      __asm __volatile (" xor %%eax, %%eax; mov %%ds, %%ax; mov %%eax, %0":"=g"(ohWell));
+#else
       __asm  mov eax, 0;
       __asm  mov ax, ds;
       __asm  mov ohWell, eax;
-    
+#endif
+
       ctxReq.optData.contextDwordNTReq.dataSegment = ohWell;
 
       /* oh, yeah */
     }
     
-    
     GDBG_INFO(80, FN_NAME ":  Calling ExtEscape(HWCEXT_CONTEXT_DWORD_NT)\n");  
 
     ExtEscape((HDC) bInfo->hdc, bInfo->hwcEscape, sizeof(ctxReq), (void *) &ctxReq,
               sizeof(ctxRes), (void *) &ctxRes);
-    
     
     *data = (FxU32 *) ctxRes.optData.contextDwordNTRes.dwordOffset;
 

@@ -19,11 +19,9 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-** $Revision: 1.3.4.3 $
-** $Date: 2005/06/09 18:32:34 $
 */
 
+/*
 #if defined(__unix__) && ! defined(__H3REGS_H__)
 // basic data types
 #define FxU8  unsigned char
@@ -33,6 +31,8 @@
 // defn of registers not reqd, treat (SstRegs *) as (void *)
 typedef void SstRegs;
 #endif
+*/
+struct sstregs; /* see h3regs.h */
 
 /*
 ** H3 Device Information Structure
@@ -45,9 +45,9 @@ typedef void SstRegs;
 #endif
 
 typedef struct {		// H3 Device Information Structure
-
     FxU32 size;                 // size of this structure
-    SstRegs *virtAddr[2];	    // virtual memory base address
+    volatile 
+    struct sstregs *virtAddr[2];    // virtual memory base address
     FxU32 physAddr[2];		    // physical memory base address
     FxU16 virtPort;             // virtual i/o port base address
     FxU16 physPort;             // physical i/o port base address
@@ -89,8 +89,8 @@ typedef struct {		// H3 Device Information Structure
     FxU32 initGrxClkDone;
 
     // CSIM specific
-    SstRegs *sstCSIM;		// pointer to CSIM structure
-    SstRegs *sstHW;		// pointer to HW
+    volatile struct sstregs *sstCSIM;		// pointer to CSIM structure
+    volatile struct sstregs *sstHW;		// pointer to HW
 } FxDeviceInfo;
 
 #endif /* !__H3INFO_H__ */

@@ -1,20 +1,15 @@
-# Win32 makefile for Glide3/H5 and Texus2
+# Win32 makefile for Glide3/H5 and Texus2, using Visual Studio (cl.exe)
 # This makefile MUST be processed by GNU make!!!
 #
 #  Copyright (c) 2004 - Daniel Borca
 #  Email : dborca@users.sourceforge.net
 #  Web   : http://www.geocities.com/dborca
 #
-# $Header: /cvsroot/glide/glide3x/h5/glide3/src/Attic/Makefile.win32,v 1.1.2.4 2005/05/25 08:49:29 jwrdegoede Exp $
-#
-
 
 #
 #  Available options:
 #
 #    Environment variables:
-#	FX_GLIDE_HW	build for the given ASIC (h5).
-#			default = h5
 #	H4=1		High speed Avenger/Napalm.
 #			default = no
 #	OPTFLAGS	pass given optimization flags to compiler
@@ -43,10 +38,8 @@
 #	realclean:	remove all generated files
 #
 
-
-
 .PHONY: all glide3x clean realclean
-.INTERMEDIATE: fxgasm.exe gendate.exe fxbldno.exe
+.INTERMEDIATE: fxgasm.exe fxbldno.exe
 .SUFFIXES: .c .obj .rc .res
 
 ###############################################################################
@@ -58,7 +51,6 @@ GLIDE_DLL = glide3x.dll
 GLIDE_IMP = glide3x.lib
 TEXUS_EXE = texus2.exe
 
-FX_GLIDE_HW ?= h5
 FX_GLIDE_SW = ../../../swlibs
 GLIDE_LIBDIR = ../../lib
 TEXUS_EXEDIR = $(FX_GLIDE_SW)/bin
@@ -85,6 +77,7 @@ endif
 # platform
 CDEFS = -D__WIN32__ -DFX_DLL_ENABLE -DHWC_ACCESS_DDRAW=1 -DHWC_EXT_INIT=1 -DGLIDE_ALT_TAB=1
 CDEFS += -DBETA=1 -DHWC_MINIVDD_HACK=1 -DWIN40COMPAT=1 -DWINXP_ALT_TAB_FIX=1 -DWINXP_SAFER_ALT_TAB_FIX=1 -DNEED_MSGFILE_ASSIGN
+#CDEFS += -DHAVE_WIN9X_DDK=1
 
 # general
 CDEFS += -DGLIDE3 -DGLIDE3_ALPHA -DGLIDE_HW_TRI_SETUP=1 -DGLIDE_INIT_HWC -DGLIDE_PACKED_RGB=0 -DGLIDE_PACKET3_TRI_SETUP=1 -DGLIDE_TRI_CULLING=1 -DUSE_PACKET_FIFO=1
@@ -310,22 +303,16 @@ xtexdl_sse2.obj: xtexdl.asm
 $(GLIDE_OBJECTS): fxinline.h fxgasm.h fxbldno.h
 
 fxinline.h: fxgasm.exe
-	./$< -inline > $@
+	.\$< -inline > $@
 
 fxgasm.h: fxgasm.exe
-	./$< -hex > $@
+	.\$< -hex > $@
 
-fxgasm.exe: fxgasm.c ../../incsrc/gendate.h
+fxgasm.exe: fxgasm.c
 	$(CC) -o $@ $(CFLAGS) $<
-
-../../incsrc/gendate.h: gendate.exe
-	./$< > $@
 
 fxbldno.h: fxbldno.exe
-	./$< > $@
-
-gendate.exe: ../../incsrc/gendate.c
-	$(CC) -o $@ $(CFLAGS) $<
+	.\$< > $@
 
 fxbldno.exe: fxbldno.c
 	$(CC) -o $@ $(CFLAGS) $<
@@ -339,7 +326,6 @@ clean:
 	-$(call UNLINK,../../minihwc/*.obj)
 	-$(call UNLINK,fxinline.h)
 	-$(call UNLINK,fxgasm.h)
-	-$(call UNLINK,../../incsrc/gendate.h)
 	-$(call UNLINK,fxbldno.h)
 	-$(call UNLINK,$(FX_GLIDE_SW)/texus2/lib/*.obj)
 	-$(call UNLINK,$(GLIDE_RES))

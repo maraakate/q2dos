@@ -16,9 +16,7 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-** $Header: /cvsroot/glide/glide3x/h5/minihwc/hwcio.c,v 1.3.4.2 2003/06/05 08:23:58 koolsmoky Exp $
-** $Log: 
+** 
 **  3    3dfx      1.0.1.0.1.0 10/11/00 Brent           Forced check in to enforce
 **       branching.
 **  2    3dfx      1.0.1.0     06/20/00 Joseph Kain     Changes to support the
@@ -28,11 +26,10 @@
 ** $
 ** 
 ** 1     3/04/98 4:13p Dow
-**
 */
 
-
-char * ioRegNames[] = {     
+#if GDBG_INFO_ON
+const char * ioRegNames[] = {
   "status",
   "pciInit0",
   "sipMonitor",
@@ -99,7 +96,7 @@ char * ioRegNames[] = {
   "vidCurrOverlayStartAddr"
 };
 
-char *cmdAGPRegNames[] = {
+const char *cmdAGPRegNames[] = {
   // AGP
   "agpReqSize",
   "hostAddrLow",
@@ -175,7 +172,7 @@ char *cmdAGPRegNames[] = {
   "yuvStride"
 };
 
-char *waxRegNames[] = {
+const char *waxRegNames[] = {
   "status",
   "unused0",
   "clip0min",
@@ -562,7 +559,7 @@ char *waxRegNames[] = {
   "colorTransLut0FF"
 };
 
-char *sstRegNames[] = {
+const char *sstRegNames[] = {
   "status",
   "intrCtrl",
   "vAx",
@@ -780,7 +777,7 @@ char *sstRegNames[] = {
   "texBaseAddr38",
   "trexInit0",
   "trexInit1",
-   
+
   "nccTable000",
   "nccTable001",
   "nccTable002",
@@ -810,3 +807,4 @@ char *sstRegNames[] = {
   "tChromaKeyMin",
   "tChromaKeyMax"
 };
+#endif /* GDBG_INFO_ON */

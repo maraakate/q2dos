@@ -12,6 +12,12 @@ stalker
 #ifdef __DJGPP__ /* FS: From IEEEFP.H  Not sure if this is proper, but there it is... */
 #define _isnan(x) (((*(long *)&(x) & 0x7f800000L)==0x7f800000L) && \
 		   ((*(long *)&(x) & 0x007fffffL)!=0000000000L))
+#elif !defined(_WIN32)
+#define _isnan(x) (isnan(x))
+#endif
+
+#if defined(LINUX) && !defined(_WIN32) //QW//
+#define _isnan isnan
 #endif
 
 static int sound_pain;
@@ -428,11 +434,11 @@ stalker_heal(edict_t *self)
 		return;
 	}
 
-	if (skill->value == 2)
+	if (skill->intValue == 2)
 	{
 		self->health += 2;
 	}
-	else if (skill->value == 3)
+	else if (skill->intValue == 3)
 	{
 		self->health += 3;
 	}
@@ -552,7 +558,7 @@ stalker_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
 		self->s.skinnum = 1;
 	}
 
-	if (skill->value == 3)
+	if (skill->intValue == 3)
 	{
 		return; /* no pain anims in nightmare */
 	}
@@ -577,7 +583,7 @@ stalker_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
 
 	if ((self->health > 0) && (self->health < (self->max_health / 4)))
 	{
-		if (random() < (0.2 * skill->value))
+		if (random() < (0.2 * skill->intValue))
 		{
 			if (!STALKER_ON_CEILING(self) || stalker_ok_to_transition(self))
 			{
@@ -649,7 +655,7 @@ stalker_shoot_attack(edict_t *self)
 
 	VectorSubtract(self->enemy->s.origin, start, dir);
 
-	if (random() < (0.20 + 0.1 * skill->value))
+	if (random() < (0.20 + 0.1 * skill->intValue))
 	{
 		dist = VectorLength(dir);
 		time = dist / 1000;
@@ -677,7 +683,7 @@ stalker_shoot_attack2(edict_t *self)
 		return;
 	}
 
-	if (random() < (0.4 + (0.1 * (float)skill->value)))
+	if (random() < (0.4 + (0.1 * (float)skill->intValue)))
 	{
 		stalker_shoot_attack(self);
 	}
@@ -711,7 +717,7 @@ stalker_attack_ranged(edict_t *self)
 	}
 
 	/* circle strafe stuff */
-	if (random() > (1.0 - (0.5 / (float)(skill->value))))
+	if (random() > (1.0 - (0.5 / (float)(skill->intValue))))
 	{
 		self->monsterinfo.attack_state = AS_STRAIGHT;
 	}
@@ -1030,7 +1036,7 @@ stalker_do_pounce(edict_t *self, vec3_t dest)
 		VectorNormalize(forward);
 
 		VectorScale(forward, velocity * cos(DEG2RAD(jumpAngles[0])), self->velocity);
-		self->velocity[2] = velocity * sin(DEG2RAD(jumpAngles[0])) + (0.5 * sv_gravity->value * FRAMETIME);
+		self->velocity[2] = velocity * sin(DEG2RAD(jumpAngles[0])) + (0.5 * sv_gravity->intValue * FRAMETIME);
 		return 1;
 	}
 
@@ -1040,7 +1046,7 @@ stalker_do_pounce(edict_t *self, vec3_t dest)
 		VectorNormalize(forward);
 
 		VectorScale(forward, velocity * cos(DEG2RAD(jumpAngles[1])), self->velocity);
-		self->velocity[2] = velocity * sin(DEG2RAD(jumpAngles[1])) + (0.5 * sv_gravity->value * FRAMETIME);
+		self->velocity[2] = velocity * sin(DEG2RAD(jumpAngles[1])) + (0.5 * sv_gravity->intValue * FRAMETIME);
 		return 1;
 	}
 
@@ -1200,7 +1206,7 @@ stalker_jump_wait_land(edict_t *self)
 		return;
 	}
 
-	if ((random() < (0.3 + (0.1 * (float)(skill->value)))) &&
+	if ((random() < (0.3 + (0.1 * (float)(skill->intValue)))) &&
 		(level.time >= self->monsterinfo.attack_finished))
 	{
 		self->monsterinfo.attack_finished = level.time + 0.3;
@@ -1308,7 +1314,7 @@ stalker_blocked(edict_t *self, float dist)
 
 	if (!onCeiling)
 	{
-		if (blocked_checkshot(self, 0.25 + (0.05 * skill->value)))
+		if (blocked_checkshot(self, 0.25 + (0.05 * skill->intValue)))
 		{
 			return true;
 		}
@@ -1332,7 +1338,7 @@ stalker_blocked(edict_t *self, float dist)
 	}
 	else
 	{
-		if (blocked_checkshot(self, 0.25 + (0.05 * skill->value)))
+		if (blocked_checkshot(self, 0.25 + (0.05 * skill->intValue)))
 		{
 			return true;
 		}
@@ -1434,6 +1440,7 @@ stalker_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /*
 	}
 
 	/* regular death */
+	self->s.skinnum |= 1;	// Knightmare- make sure pain skin is set if we got one-shotted
 	gi.sound(self, CHAN_VOICE, sound_die, 1, ATTN_NORM, 0);
 	self->deadflag = DEAD_DEAD;
 	self->takedamage = DAMAGE_YES;
@@ -1454,7 +1461,7 @@ SP_monster_stalker(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;
@@ -1491,6 +1498,8 @@ SP_monster_stalker(edict_t *self)
 	self->monsterinfo.dodge = stalker_dodge;
 	self->monsterinfo.blocked = stalker_blocked;
 	self->monsterinfo.melee = stalker_attack_melee;
+
+	self->blood_type = 3;	// Knightmare- use sparks and blood type
 
 	gi.linkentity(self);
 

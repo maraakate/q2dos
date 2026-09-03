@@ -17,13 +17,13 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
-//
-// vregset.h: header file for video register-setting interpreter
-//
 
-//
+// vregset.h: header file for video register-setting interpreter
+
+#ifndef __VREGSET_H
+#define __VREGSET_H
+
 // registers & subregisters
-//
 #define MISC_OUTPUT	0x3C2
 
 #define SC_INDEX		0x3C4
@@ -54,3 +54,4 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 void VideoRegisterSet (const int *pregset);
 
+#endif // __VREGSET_H

@@ -167,7 +167,7 @@ void BeginIntermission (edict_t *targ)
 		{
 			ent = g_edicts + 1 + i;
 
-			if (ent->client && ent->inuse & !ent->ai)
+			if (ent->client && ent->inuse && !ent->ai)
 			{
 				Write_Player_Stats(ent);
 			}

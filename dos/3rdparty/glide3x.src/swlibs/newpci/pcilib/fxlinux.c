@@ -78,7 +78,7 @@ const FxPlatformIOProcs ioProcsLinux = {
   pciSetPassThroughBaseLinux
 };
 
-#if 0
+#if 0 /* unused */
 static const FxU32 PCI_VENDOR_ID_LINUX = 0x0;
 static const FxU32 PCI_DEVICE_ID_LINUX = 0x2;
 static const FxU32 PCI_COMMAND_LINUX = 0x4;
@@ -184,7 +184,7 @@ pciIdentifyLinux(void)
 static FxBool 
 pciOutputStringLinux(const char *msg) 
 {
-  printf(msg);
+  printf("%s", msg);
   return FXTRUE;
 }
 

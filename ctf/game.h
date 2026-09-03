@@ -37,7 +37,7 @@
 #ifndef CTF_GAME_H
 #define CTF_GAME_H
 
-#define GAME_API_VERSION 3
+#define GAME_API_VERSION 4
 
 /* edict->svflags */
 #define SVF_NOCLIENT 0x00000001             /* don't send entity to clients, even if it has effects */
@@ -109,10 +109,10 @@ struct edict_s
 typedef struct
 {
 	/* special messages */
-	void (*bprintf)(int printlevel, char *fmt, ...) __fp_attribute__((__format__(__printf__,2,3)));
-	void (*dprintf) (unsigned long developerFlags, char *fmt, ...) __fp_attribute__((__format__(__printf__,2,3))); /* FS: Added developer flags */
-	void (*cprintf)(edict_t *ent, int printlevel, char *fmt, ...) __fp_attribute__((__format__(__printf__,3,4)));
-	void (*centerprintf)(edict_t *ent, char *fmt, ...) __fp_attribute__((__format__(__printf__,2,3)));
+	void (*bprintf)(int printlevel, const char *fmt, ...) __fp_attribute__((__format__(__printf__,2,3)));
+	void (*dprintf)(unsigned int developerFlags, const char *fmt, ...) __fp_attribute__((__format__(__printf__,2,3))); /* FS: Added developer flags */
+	void (*cprintf)(edict_t *ent, int printlevel, const char *fmt, ...) __fp_attribute__((__format__(__printf__,3,4)));
+	void (*centerprintf)(edict_t *ent, const char *fmt, ...) __fp_attribute__((__format__(__printf__,2,3)));
 	void (*sound)(edict_t *ent, int channel, int soundindex, float volume,
 			float attenuation, float timeofs);
 	void (*positioned_sound)(vec3_t origin, edict_t *ent, int channel,
@@ -120,7 +120,7 @@ typedef struct
 
 	void (*configstring)(int num, char *string);
 
-	void (*error)(char *fmt, ...) __fp_attribute__((__noreturn__, __format__(__printf__,1,2)));
+	void (*error)(const char *fmt, ...) __fp_attribute__((__noreturn__, __format__(__printf__,1,2)));
 
 	/* the *index functions create configstrings and some internal server state */
 	int (*modelindex)(char *name);
@@ -166,6 +166,7 @@ typedef struct
 	cvar_t *(*cvar)(char *var_name, char *value, int flags);
 	cvar_t *(*cvar_set)(char *var_name, char *value);
 	cvar_t *(*cvar_forceset)(char *var_name, char *value);
+	void	(*cvar_setdescription) (char *var_name, const char *description); /* FS */
 
 	/* ClientCommand and ServerCommand parameter access */
 	int (*argc)(void);

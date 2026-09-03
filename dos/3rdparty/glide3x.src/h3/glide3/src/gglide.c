@@ -17,8 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/h3/glide3/src/Attic/gglide.c,v 1.1.2.4 2005/06/09 18:32:28 jwrdegoede Exp $
-** $Log: gglide.c,v $
 ** Revision 1.1.2.4  2005/06/09 18:32:28  jwrdegoede
 ** Fixed all warnings with gcc4 -Wall -W -Wno-unused-parameter, except for a couple I believe to be a gcc bug. This has been reported to gcc.
 **
@@ -458,9 +456,6 @@
 #include <lindri.h>
 #endif
 
-#include "rcver.h"
-static char glideIdent[] = "@#%" VERSIONSTR ;
-
 #if GLIDE_HW_TRI_SETUP
 static void
 _grUpdateTriPacketHdr(FxU32 paramMask, 
@@ -483,9 +478,6 @@ GR_STATE_ENTRY(grAlphaBlendFunction, void,
   GR_BEGIN_NOFIFOCHECK("_grAlphaBlendFunction", 85);
   GDBG_INFO_MORE(gc->myLevel, "(%d,%d,%d,%d)\n",
                  rgb_sf, rgb_df, alpha_sf, alpha_df);
-
-  /* Watcom warning suppressor */
-  glideIdent[0] = glideIdent[0];
 
   alphamode = gc->state.shadow.alphaMode;
   if (alpha_sf != GR_BLEND_ONE && alpha_sf != GR_BLEND_ZERO) {
@@ -1077,8 +1069,8 @@ GR_ENTRY(grBufferSwap, void, (FxU32 swapInterval))
     if (swapInterval > 1) 
       swapInterval = ((swapInterval - 1) << 1) | 1; /* Format for hw */
   }
-  
-  while(_grBufferNumPending() > _GlideRoot.environment.swapPendingCount);
+  while(_grBufferNumPending() > _GlideRoot.environment.swapPendingCount)
+   ;
 
   /* Cycle the buffer indices */
   {
@@ -1198,8 +1190,8 @@ GR_ENTRY(grDRIBufferSwap, void, (FxU32 swapInterval))
     if (swapInterval > 1) 
       swapInterval = ((swapInterval - 1) << 1) | 1; /* Format for hw */
   }
-  
-  while(_grBufferNumPending() > _GlideRoot.environment.swapPendingCount);
+  while(_grBufferNumPending() > _GlideRoot.environment.swapPendingCount)
+   ;
 
 #if USE_PACKET_FIFO
   {

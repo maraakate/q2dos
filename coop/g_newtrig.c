@@ -134,6 +134,20 @@ SP_trigger_teleport(edict_t *self)
 		return;
 	}
 
+	if (!self->target)
+	{
+		gi.dprintf(DEVELOPER_MSG_GAME, "SP_trigger_teleport: teleporter without a target.\n");
+		G_FreeEdict(self);
+		return;
+	}
+
+	if (!self->model)
+	{
+		gi.dprintf(DEVELOPER_MSG_GAME, "SP_trigger_teleport: teleporter without a model.\n");
+		G_FreeEdict(self);
+		return;
+	}
+
 	if (!self->wait)
 	{
 		self->wait = 0.2;

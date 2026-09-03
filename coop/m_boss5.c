@@ -558,7 +558,8 @@ boss5_pain(edict_t *self, edict_t *other /* unused */,
 
 	if (self->health < (self->max_health / 2))
 	{
-		self->s.skinnum = 1;
+		self->s.skinnum |= 1;
+		self->blood_type = 3;	// Knightmare- sparks and blood
 	}
 
 	if (level.time < self->pain_debounce_time)
@@ -576,7 +577,7 @@ boss5_pain(edict_t *self, edict_t *other /* unused */,
 	}
 
 	/* Don't go into pain if he's firing his rockets */
-	if (skill->value >= 2)
+	if (skill->intValue >= 2)
 	{
 		if ((self->s.frame >= FRAME_attak2_1) &&
 			(self->s.frame <= FRAME_attak2_14))
@@ -825,6 +826,9 @@ boss5_die(edict_t *self, edict_t *inflictor /* unused */,
 	self->deadflag = DEAD_DEAD;
 	self->takedamage = DAMAGE_NO;
 	self->count = 0;
+	self->s.skinnum |= 1;	// Knightmare- make sure pain skin is set if we got one-shotted
+	self->blood_type = 3;	// Knightmare- sparks and blood
+
 	self->monsterinfo.currentmove = &boss5_move_death;
 }
 
@@ -839,7 +843,7 @@ SP_monster_boss5(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;
@@ -874,6 +878,8 @@ SP_monster_boss5(edict_t *self)
 	self->monsterinfo.search = boss5_search;
 	self->monsterinfo.melee = NULL;
 	self->monsterinfo.sight = NULL;
+
+	self->blood_type = 2; // Knightmare- use sparks blood type
 
 	gi.linkentity(self);
 

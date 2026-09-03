@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "../qcommon/qcommon.h"
 #include "winquake.h"
+#include "service.h"
 #include "resource.h"
 #include <errno.h>
 #include <float.h>
@@ -51,6 +52,7 @@ unsigned int	sys_frame_time;
 int		argc;
 char	*argv[MAX_NUM_ARGVS];
 
+char cmdline[4096] = { "\0" };
 
 /*
 ===============================================================================
@@ -62,7 +64,7 @@ SYSTEM IO
 
 // Knightmare- replaced by new dedicated console
 #ifndef NEW_DED_CONSOLE
-void Sys_Error (char *error, ...)
+void Sys_Error (const char *error, ...)
 {
 	va_list		argptr;
 	char		text[1024];
@@ -71,11 +73,11 @@ void Sys_Error (char *error, ...)
 	Qcommon_Shutdown ();
 
 	va_start (argptr, error);
-	_vsnprintf (text, sizeof(text), error, argptr);
+	_vsnprintf(text, sizeof(text), error, argptr);
 	va_end (argptr);
 	text[sizeof(text)-1] = 0;
 
-	MessageBox(NULL, text, "Error", 0 /* MB_OK */ );
+	MessageBoxA(NULL, text, "Error", 0 /* MB_OK */);
 
 	exit (1);
 }
@@ -83,7 +85,7 @@ void Sys_Error (char *error, ...)
 
 void Sys_Quit (void)
 {
-	timeEndPeriod( 1 );
+	timeEndPeriod(1);
 
 	CL_Shutdown();
 	Qcommon_Shutdown ();
@@ -95,7 +97,12 @@ void Sys_Quit (void)
 		FreeConsole ();
 #endif
 
-	exit (0);
+	Cvar_Shutdown(); /* FS: Free our CVAR memory too */
+
+#ifdef DEDICATED_ONLY
+	if (!bRunningAsService)
+#endif
+		exit (0);
 }
 
 
@@ -103,18 +110,18 @@ void WinError (void)
 {
 	LPVOID lpMsgBuf;
 
-	FormatMessage(
+	FormatMessageA(
 		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
 		NULL,
 		GetLastError(),
 		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-		(LPTSTR) &lpMsgBuf,
+		(LPSTR) &lpMsgBuf,
 		0,
 		NULL
 	);
 
 	// Display the string.
-	MessageBox( NULL, lpMsgBuf, "GetLastError", MB_OK|MB_ICONINFORMATION );
+	MessageBoxA(NULL, (const char *)lpMsgBuf, "GetLastError", MB_OK|MB_ICONINFORMATION);
 
 	// Free the buffer.
 	LocalFree(lpMsgBuf);
@@ -158,14 +165,14 @@ char *Sys_ScanForCD (void)
 		if (f)
 		{
 			fclose (f);
-			if (GetDriveType (drive) == DRIVE_CDROM)
+			if (GetDriveTypeA(drive) == DRIVE_CDROM)
 				return cddir;
 		}
 	}
 #endif
 
 	cddir[0] = 0;
-	
+
 	return NULL;
 }
 
@@ -181,7 +188,7 @@ void Sys_CopyProtect (void)
 	char	*cddir;
 
 	cddir = Sys_ScanForCD();
-	if (!cddir[0])
+	if (!cddir || !cddir[0])
 		Com_Error (ERR_FATAL, "You must have the Quake2 CD in the drive to play.");
 #endif
 }
@@ -387,11 +394,17 @@ char *Sys_GetClipboardData (void)
 	{
 		HANDLE hClipboardData;
 
-		if ( (hClipboardData = GetClipboardData(CF_TEXT)) != 0)
+		if ((hClipboardData = GetClipboardData(CF_TEXT)) != NULL)
 		{
-			if ( (cliptext = GlobalLock(hClipboardData)) != 0) 
+			if ((cliptext = (char *)GlobalLock(hClipboardData)) != NULL)
 			{
-				data = malloc(GlobalSize(hClipboardData) + 1);
+				data = (char *)malloc(GlobalSize(hClipboardData) + 1);
+				if (!data)
+				{
+					Sys_Error("Sys_GetClipboardData:  Failed to allocate memory.\n");
+					return NULL;
+				}
+
 				strcpy(data, cliptext);
 				GlobalUnlock(hClipboardData);
 			}
@@ -400,6 +413,7 @@ char *Sys_GetClipboardData (void)
 	}
 	return data;
 }
+
 
 /*
 ==============================================================================
@@ -465,7 +479,6 @@ void *Sys_GetGameAPI (void *parms)
 	char	*path;
 	char	cwd[MAX_OSPATH];
 
-
 #if defined(_M_X64) || defined(_M_AMD64) || defined(__x86_64__)
 	const char *gamename = "gamex64.dll";
 	#ifdef NDEBUG
@@ -473,7 +486,6 @@ void *Sys_GetGameAPI (void *parms)
 	#else
 	const char *debugdir = "debugx64";
 	#endif
-
 #elif defined(_M_IX86) || defined(__i386__)
 	const char *gamename = "gamex86.dll";
 	#ifdef NDEBUG
@@ -481,7 +493,6 @@ void *Sys_GetGameAPI (void *parms)
 	#else
 	const char *debugdir = "debug";
 	#endif
-
 #elif defined _M_ALPHA
 	const char *gamename = "gameaxp.dll";
 	#ifdef NDEBUG
@@ -489,16 +500,15 @@ void *Sys_GetGameAPI (void *parms)
 	#else
 	const char *debugdir = "debugaxp";
 	#endif
-
 #endif
 
 	if (game_library)
-		Com_Error (ERR_FATAL, "Sys_GetGameAPI without Sys_UnloadingGame");
+		Com_Error (ERR_FATAL, "Sys_GetGameAPI without Sys_UnloadGame");
 
 	// check the current debug directory first for development purposes
 	_getcwd (cwd, sizeof(cwd));
 	Com_sprintf (name, sizeof(name), "%s/%s/%s", cwd, debugdir, gamename);
-	game_library = LoadLibrary ( name );
+	game_library = LoadLibraryA(name);
 	if (game_library)
 	{
 		Com_DPrintf(DEVELOPER_MSG_STANDARD, "LoadLibrary (%s)\n", name);
@@ -507,7 +517,7 @@ void *Sys_GetGameAPI (void *parms)
 	{
 		// check the current directory for other development purposes
 		Com_sprintf (name, sizeof(name), "%s/%s", cwd, gamename);
-		game_library = LoadLibrary ( name );
+		game_library = LoadLibraryA(name);
 		if (game_library)
 		{
 			Com_DPrintf(DEVELOPER_MSG_STANDARD, "LoadLibrary (%s)\n", name);
@@ -522,7 +532,7 @@ void *Sys_GetGameAPI (void *parms)
 				if (!path)
 					return NULL;		// couldn't find one anywhere
 				Com_sprintf (name, sizeof(name), "%s/%s", path, gamename);
-				game_library = LoadLibrary (name);
+				game_library = LoadLibraryA(name);
 				if (game_library)
 				{
 					Com_DPrintf(DEVELOPER_MSG_STANDARD, "LoadLibrary (%s)\n",name);
@@ -532,7 +542,7 @@ void *Sys_GetGameAPI (void *parms)
 		}
 	}
 
-	GetGameAPI = (void *)GetProcAddress (game_library, "GetGameAPI");
+	GetGameAPI = (void* (*)(void*))GetProcAddress (game_library, "GetGameAPI");
 	if (!GetGameAPI)
 	{
 		Sys_UnloadGame ();
@@ -554,8 +564,9 @@ ParseCommandLine
 */
 void ParseCommandLine (LPSTR lpCmdLine)
 {
+	static char exe[] = "exe";
 	argc = 1;
-	argv[0] = "exe";
+	argv[0] = exe;
 
 	while (*lpCmdLine && (argc < MAX_NUM_ARGVS))
 	{
@@ -595,7 +606,7 @@ static void Sys_SetHighDPIMode(void)
 	/* Win8.1 and later */
 	HRESULT(WINAPI *SetProcessDpiAwareness)(Q2_PROCESS_DPI_AWARENESS dpiAwareness) = NULL;
 
-	userDLL = LoadLibrary("USER32.DLL");
+	userDLL = LoadLibraryA("USER32.DLL");
 
 	if (userDLL)
 	{
@@ -604,7 +615,7 @@ static void Sys_SetHighDPIMode(void)
 	}
 
 
-	shcoreDLL = LoadLibrary("SHCORE.DLL");
+	shcoreDLL = LoadLibraryA("SHCORE.DLL");
 
 	if (shcoreDLL)
 	{
@@ -621,7 +632,7 @@ static void Sys_SetHighDPIMode(void)
 	}
 }
 
-void Detect_WinNT() /* FS: Detect if we're using Windows XP for alt+tab appcompat */
+void Detect_WinNT (void) /* FS: Detect if we're using Windows XP for alt+tab appcompat */
 {
 	DWORD WinVersion;
 	DWORD WinLowByte, WinHiByte;
@@ -662,6 +673,43 @@ void Detect_WinNT() /* FS: Detect if we're using Windows XP for alt+tab appcompa
 	}
 }
 
+static void WinParseEarlyParms (void)
+{
+	int i;
+
+	for (i = 1; i < argc; i++)
+	{
+		if (argv[i])
+		{
+#ifdef DEDICATED_ONLY
+			if (!strnicmp(argv[i], "-cwd", 4) && argv[i+1])
+			{
+				if (_chdir(argv[i+1]))
+				{
+					switch (errno)
+					{
+						case ENOENT:
+							printf( "Unable to locate the directory: %s\n", argv[i+1] );
+							break;
+						case EINVAL:
+							printf( "Invalid buffer.\n");
+							break;
+						default:
+							printf( "Unknown error.\n");
+					}
+				}
+				else
+				{
+					char buff[250];
+					_getcwd(buff, sizeof(buff)-1);
+					printf("CWD set to %s\n", buff);
+				}
+			}
+#endif
+		}
+	}
+}
+
 /*
 ==================
 WinMain
@@ -674,15 +722,32 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	int				time, oldtime, newtime;
 	char			*cddir;
 
-    /* previous instances do not exist in Win32 */
-    if (hPrevInstance)
-        return 0;
+	/* previous instances do not exist in Win32 */
+	if (hPrevInstance)
+		return 0;
+
+	if (hInstance)
+		strncpy (cmdline, lpCmdLine, sizeof(cmdline) - 1);
 
 	global_hInstance = hInstance;
 
 	Detect_WinNT(); /* FS */
 
 	ParseCommandLine (lpCmdLine);
+	WinParseEarlyParms();
+
+//hInstance is empty when we are back here with service code
+#ifdef DEDICATED_ONLY
+	if (hInstance && argc > 1)
+	{
+		if (!strcmp(argv[1], "-service"))
+		{
+			bRunningAsService = true;
+			return main();
+		}
+	}
+#endif
+
 // Knightmare added- new dedicated console
 #ifdef NEW_DED_CONSOLE
 	Sys_InitDedConsole ();
@@ -703,8 +768,10 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 
 		if (i == argc)
 		{
-			argv[argc++] = "+set";
-			argv[argc++] = "cddir";
+			static char arg_set[] = "+set";
+			static char arg_cddir[] = "cddir";
+			argv[argc++] = arg_set;
+			argv[argc++] = arg_cddir;
 			argv[argc++] = cddir;
 		}
 	}
@@ -742,14 +809,17 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 #endif
 		Qcommon_Frame (time);
 		oldtime = newtime;
+#ifdef DEDICATED_ONLY
+		Sys_DedConsoleCheckHostname();
+#endif
 	}
 
 	// never gets here
-    return TRUE;
+	return TRUE;
 }
 
+//===============================================================================
 #ifdef GAMESPY
-
 #ifndef GAMESPY_HARD_LINKED /* dynamic linking */
 static HINSTANCE	gamespy_library;
 #else
@@ -764,7 +834,7 @@ void *Sys_GetGameSpyAPI(void *parms)
 
 	Com_Printf("------- Loading %s -------\n", dllname);
 
-	if ((gamespy_library = LoadLibrary(dllname)) == NULL)
+	if ((gamespy_library = LoadLibraryA(dllname)) == NULL)
 	{
 		Com_Printf( "LoadLibrary(\"%s\") failed\n", dllname);
 		return NULL;
@@ -789,5 +859,4 @@ void Sys_UnloadGameSpy(void)
 	gamespy_library = NULL;
 #endif
 }
-
 #endif /* GAMESPY ... */

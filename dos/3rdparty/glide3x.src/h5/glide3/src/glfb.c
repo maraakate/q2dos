@@ -17,8 +17,6 @@
 **
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVE
 **
-** $Header: /cvsroot/glide/glide3x/h5/glide3/src/glfb.c,v 1.7.4.24 2005/08/13 21:07:03 jwrdegoede Exp $
-** $Log: glfb.c,v $
 ** Revision 1.7.4.24  2005/08/13 21:07:03  jwrdegoede
 ** Last needed 64 bit fixes for h5/h3, complete 64 bit support for cvg
 **
@@ -2456,12 +2454,14 @@ GR_ENTRY(grLfbWriteRegion, FxBool, (GrBuffer_t dst_buffer,
                  src_stride, src_data);
   
 #if defined(GLIDE3) && defined(GLIDE3_ALPHA)
+  /*
   if ((_GlideRoot.hwConfig.SSTs[_GlideRoot.current_sst].type == GR_SSTTYPE_SST96) && (pixelPipeline == FXTRUE))
     rv = FXFALSE;
   else
-    rv = _grLfbWriteRegion(pixelPipeline, dst_buffer, dst_x, dst_y,
-                           src_format, src_width, src_height,
-                           src_stride, src_data);
+  */
+  rv = _grLfbWriteRegion(pixelPipeline, dst_buffer, dst_x, dst_y,
+                         src_format, src_width, src_height,
+                         src_stride, src_data);
 #else
   rv = _grLfbWriteRegion(FXFALSE, dst_buffer, dst_x, dst_y,
                          src_format, src_width, src_height,

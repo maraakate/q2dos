@@ -17,7 +17,6 @@
  * 
  * COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
  *
- * $Header: /cvsroot/glide/glide3x/h5/glide3/src/fxbldno.c,v 1.3.4.5 2005/06/09 18:32:31 jwrdegoede Exp $
  * $Log: 
  *  3    3dfx      1.0.1.0.1.0 10/11/00 Brent           Forced check in to enforce
  *       branching.
@@ -26,10 +25,10 @@
  *       comments and new legal headers.
  *  1    3dfx      1.0         09/11/99 StarTeam VTS Administrator 
  * $
- * 
+ *
  * 1     1/16/98 4:29p Atai
  * create glide 3 src
- * 
+ *
  * 1     7/25/97 9:05a Pgj
  * generate fxbldno.h which defines BUILD_NUMBER
  *
@@ -39,7 +38,7 @@
 #include <stdio.h>
 #include <time.h>
 
-int main (void)
+int main(void)
 {
     struct tm	locTime;
     time_t	sysTime;

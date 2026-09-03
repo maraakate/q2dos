@@ -16,11 +16,6 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-**
-** $Revision: 1.2.8.1 $ 
-** $Date: 2003/04/06 18:30:26 $ 
-**
 */
 
 #ifndef __FX_W32_H__

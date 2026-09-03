@@ -39,7 +39,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #pragma warning(disable : 4996)		/* FS: Shut up about VS2005 shit */
 
 //r1ch
-#define	snprintf _snprintf
+//#define	snprintf _snprintf
 
 #endif
 #include <stdio.h>
@@ -213,7 +213,7 @@ extern vec3_t vec3_origin;
 //float Q_fabs (float f);
 //#define	fabs(f) Q_fabs(f)
 #if defined(_MSC_VER) && defined(_M_IX86) && !defined(C_ONLY)
-extern long Q_ftol( float f );
+extern int Q_ftol( float f );
 #else
 #define Q_ftol( f ) ( long ) (f)
 #endif
@@ -1058,7 +1058,6 @@ typedef struct
 		short  stats[MAX_STATS];  // fast status bar updates
 	}
 player_state_t;
-
 
 
 /* FS: Developer flags for developer cvar and DPrintf's */

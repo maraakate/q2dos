@@ -410,8 +410,7 @@ BUFFER.  Return NULL if successful, and an error string if not.  */
 extern const char *re_compile_pattern
 	_RE_ARGS((const char *pattern, int length,
 			  struct re_pattern_buffer *buffer));
-	          
-	          
+
 /* Compile a fastmap for the compiled pattern in BUFFER; used to
 accelerate searches.  Return 0 if successful and -2 if was an
 internal error.  */
@@ -426,30 +425,26 @@ information in REGS (if REGS and BUFFER->no_sub are nonzero).  */
 extern int re_search
 	_RE_ARGS((struct re_pattern_buffer *buffer, const char *string,
 			  int length, int start, int range, struct re_registers *regs));
-	          
-	          
+
 /* Like `re_search', but search in the concatenation of STRING1 and
 STRING2.  Also, stop searching at index START + STOP.  */
 extern int re_search_2
 	_RE_ARGS((struct re_pattern_buffer *buffer, const char *string1,
 			  int length1, const char *string2, int length2,
 			  int start, int range, struct re_registers *regs, int stop));
-	          
-	          
+
 /* Like `re_search', but return how many characters in STRING the regexp
 in BUFFER matched, starting at position START.  */
 extern int re_match
 	_RE_ARGS((struct re_pattern_buffer *buffer, const char *string,
 			  int length, int start, struct re_registers *regs));
-	          
-	          
+
 /* Relates to `re_match' as `re_search_2' relates to `re_search'.  */
 extern int re_match_2
 	_RE_ARGS ((struct re_pattern_buffer *buffer, const char *string1,
 			   int length1, const char *string2, int length2,
 			   int start, struct re_registers *regs, int stop));
-	           
-	           
+
 /* Set REGS to hold NUM_REGS registers, storing them in STARTS and
 ENDS.  Subsequent matches using BUFFER and REGS will use this memory
 for recording register information.  STARTS and ENDS must be
@@ -465,7 +460,7 @@ freeing the old data.  */
 extern void re_set_registers
 	_RE_ARGS((struct re_pattern_buffer *buffer, struct re_registers *regs,
 			  unsigned num_regs, regoff_t *starts, regoff_t *ends));
-	          
+
 /* 4.2 bsd compatibility.  */
 extern char *re_comp _RE_ARGS((const char *));
 extern int re_exec _RE_ARGS((const char *));

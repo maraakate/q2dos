@@ -16,9 +16,6 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-** $Revision: 1.2.8.2 $
-** $Date: 2004/10/04 09:41:24 $
 */
 #ifndef __FX64_H__
 #define __FX64_H__
@@ -33,7 +30,15 @@
 ** WATCOMC
 */
 #if defined(__WATCOMC__)
+#if (__WATCOMC__ < 1100)
    #define FX_BIT64(n) ( FX_SHL64( i64_one, n ) )
+#else
+   typedef signed long long FxI64;
+   typedef unsigned long long FxU64;
+   #define NATIVE_64_SUPPORT 1
+   #define FX_MASK64(n) (0xFFFFFFFFFFFFFFFFLL >> (64-(n)))
+   #define FX_BIT64(n) (((FxI64)1) << (n))
+#endif
 /*
 ** GCC
 */
@@ -263,4 +268,3 @@ float __FX_64TOFLOAT( FxI64 );
 #define FX_SGNEXT64( a, n ) (FX_OR64((a), FX_NEG64(FX_AND64((a), FX_SHL64(FX_CREATE64(0,1), (n))))))
 
 #endif /* __FX64_H__ */
-

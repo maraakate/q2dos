@@ -1,13 +1,9 @@
-/*
- * Select the syntax appropriate to the 386 assembler being used.
+/* Select the syntax appropriate to the 386 assembler being used.
  *
  *  Copyright (c) 2002 - Borca Daniel
  *  Email : dborca@users.sourceforge.net
  *  Web   : http://www.geocities.com/dborca
- *
- * $Header: /cvsroot/glide/glide3x/h3/glide3/src/Attic/assyntax.h,v 1.1.2.2 2003/07/29 10:04:32 dborca Exp $
  */
-
 
 #ifndef ASSYNTAX_H_included
 #define ASSYNTAX_H_included

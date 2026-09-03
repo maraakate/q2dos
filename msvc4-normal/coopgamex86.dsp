@@ -104,6 +104,10 @@ SOURCE=..\coop\dm_tag.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\coop\flashlight.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\coop\g_ai.c
 # End Source File
 # Begin Source File
@@ -356,6 +360,10 @@ SOURCE=..\coop\p_client.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\coop\p_hook.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\coop\p_hud.c
 # End Source File
 # Begin Source File
@@ -453,6 +461,10 @@ SOURCE=..\coop\tables\clientfields.h
 # Begin Source File
 
 SOURCE=..\coop\tables\fields.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\flashlight.h
 # End Source File
 # Begin Source File
 

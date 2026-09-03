@@ -91,6 +91,8 @@ _d_pzbuffer dd 0
 _d_zrowbytes dd 0	
 _d_zwidth dd 0	
 
+_s_prefetch_address dd 0
+
 
 ;-------------------------------------------------------
 ; ASM-only variables

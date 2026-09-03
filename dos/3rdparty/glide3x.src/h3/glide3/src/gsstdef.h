@@ -16,12 +16,6 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-** $Header: /cvsroot/glide/glide3x/h3/glide3/src/gsstdef.h,v 1.1.1.1 1999/11/24 21:44:57 joseph Exp $
-** $Log: gsstdef.h,v $
-** Revision 1.1.1.1  1999/11/24 21:44:57  joseph
-** Initial checkin for SourceForge
-**
 ** 
 ** 4     4/06/99 3:54p Dow
 ** Alt tab again.

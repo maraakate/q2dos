@@ -38,8 +38,8 @@
 #define	NUM_CHATSECTIONS		4
 #define	MAX_LINES_PER_SECTION		64
 
-char	*chat_text[NUM_CHATSECTIONS][MAX_LINES_PER_SECTION];
-int		chat_linecount[NUM_CHATSECTIONS];
+extern char	*chat_text[NUM_CHATSECTIONS][MAX_LINES_PER_SECTION];
+extern int		chat_linecount[NUM_CHATSECTIONS];
  
 //Quake 2 functions
 void SelectSpawnPoint(edict_t *ent, vec3_t origin, vec3_t angles);

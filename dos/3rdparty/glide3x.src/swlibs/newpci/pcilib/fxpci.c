@@ -17,12 +17,9 @@
  ** 
  ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
  **
- **
- ** $Revision: 1.9.4.8 $ 
- ** $Date: 2005/08/13 21:07:03 $ 
- **
  */
 
+#undef FX_DLL_ENABLE /* so that we don't dllexport the symbols */
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -500,7 +497,8 @@ pciOpen( void )
     }
 
   }
-  
+
+#if 0
   if ( !busDetected )  { 
     /* Try Configuration Mechanism 2 (only 16 devices) */
     /* Since Configuration Mech#2 is obsolete this does not
@@ -512,7 +510,8 @@ pciOpen( void )
       sampleVendorID(deviceNumber,2);
     }
   }
-  
+#endif
+
   if ( busDetected ) {
     pciLibraryInitialized = FXTRUE;
   } else {

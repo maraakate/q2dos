@@ -45,6 +45,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define	CPUSTRING	"AXP"
 #endif
 
+#define CFGFILENAME	"q2dosw.cfg"
+
 #elif defined __linux__
 
 #define BUILDSTRING "Linux"
@@ -57,6 +59,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define CPUSTRING "Unknown"
 #endif
 
+#define CFGFILENAME	"q2dosl.cfg"
+
 #elif defined __sun__
 
 #define BUILDSTRING "Solaris"
@@ -67,6 +71,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define CPUSTRING "sparc"
 #endif
 
+#define CFGFILENAME	"q2doss.cfg"
+
 #else	// !WIN32
 
 #ifdef __DJGPP__
@@ -76,6 +82,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define BUILDSTRING "NON-WIN32"
 #define	CPUSTRING	"NON-WIN32"
 #endif
+
+#define CFGFILENAME	"q2dos.cfg"
 
 #endif
 
@@ -422,6 +430,7 @@ then searches for a command or variable that matches the first token.
 typedef void (*xcommand_t) (void);
 
 void	Cmd_Init (void);
+void	Cmd_Shutdown(void);
 
 void	Cmd_AddCommand (char *cmd_name, xcommand_t function);
 // called by the init functions of other parts of the program to
@@ -437,6 +446,8 @@ qboolean Cmd_Exists (char *cmd_name);
 char 	*Cmd_CompleteCommand (char *partial);
 // attempts to match a partial command for automatic command line completion
 // returns NULL if nothing fits
+
+void Cmd_RemoveAutoComplete (void); /* FS */
 
 int		Cmd_Argc (void);
 char	*Cmd_Argv (int arg);
@@ -501,6 +512,8 @@ void	Cvar_SetValue (char *var_name, float value);
 float	Cvar_VariableValue (char *var_name);
 // returns 0 if not defined or non numeric
 
+int		Cvar_VariableValueInt (char *var_name); /* FS */
+
 char	*Cvar_VariableString (char *var_name);
 // returns an empty string if not defined
 
@@ -521,6 +534,7 @@ void 	Cvar_WriteVariables (char *path);
 // with the archive flag set to true.
 
 void	Cvar_Init (void);
+void	Cvar_Shutdown(void);
 
 char	*Cvar_Userinfo (void);
 // returns an info string containing all the CVAR_USERINFO cvars
@@ -567,6 +581,8 @@ typedef struct
 
 void		NET_Init (void);
 void		NET_Shutdown (void);
+
+char		*NET_ErrorString(void);
 
 void		NET_Config (qboolean multiplayer);
 
@@ -631,7 +647,7 @@ void Netchan_Setup (netsrc_t sock, netchan_t *chan, netadr_t adr, int qport);
 qboolean Netchan_NeedReliable (netchan_t *chan);
 void Netchan_Transmit (netchan_t *chan, int length, byte *data);
 void Netchan_OutOfBand (int net_socket, netadr_t adr, int length, byte *data);
-void Netchan_OutOfBandPrint (int net_socket, netadr_t adr, char *format, ...) __attribute__((__format__(__printf__,3,4)));
+void Netchan_OutOfBandPrint (int net_socket, netadr_t adr, const char *format, ...) __attribute__((__format__(__printf__,3,4)));
 qboolean Netchan_Process (netchan_t *chan, sizebuf_t *msg);
 
 qboolean Netchan_CanReliable (netchan_t *chan);
@@ -756,6 +772,8 @@ void		FS_AddPAKFile (const char *packPath);
 qboolean	FS_LocalFileExists (char *path);
 // end Knightmare
 
+qboolean FS_FileExists (char *filename); /* FS */
+
 /*
 ==============================================================
 
@@ -778,9 +796,9 @@ MISC
 
 void		Com_BeginRedirect (int target, char *buffer, int buffersize, void (*flush));
 void		Com_EndRedirect (void);
-void 		Com_Printf (char *fmt, ...) __attribute__((__format__(__printf__,1,2)));
-void 		Com_DPrintf (unsigned long developerFlags, char *fmt, ...) __attribute__((__format__(__printf__,2,3))); /* FS: Added developer flags */
-void 		Com_Error (int code, char *fmt, ...) __attribute__((__noreturn__, __format__(__printf__,2,3)));
+void 		Com_Printf (const char *fmt, ...) __attribute__((__format__(__printf__,1,2)));
+void 		Com_DPrintf (unsigned int developerFlags, const char *fmt, ...) __attribute__((__format__(__printf__,2,3))); /* FS: Added developer flags */
+void 		Com_Error (int code, const char *fmt, ...) __attribute__((__noreturn__, __format__(__printf__,2,3)));
 void 		Com_Quit (void) __attribute__((__noreturn__));
 
 int			Com_ServerState (void);		// this should have just been a cvar...
@@ -846,7 +864,7 @@ void	*Sys_GetGameAPI (void *parms);
 char	*Sys_ConsoleInput (void);
 void	Sys_ConsoleOutput (char *string);
 void	Sys_SendKeyEvents (void);
-void	Sys_Error (char *error, ...) __attribute__((__noreturn__, __format__(__printf__,1,2)));
+void	Sys_Error (const char *error, ...) __attribute__((__noreturn__, __format__(__printf__,1,2)));
 void	Sys_Quit (void) __attribute__((__noreturn__));
 char	*Sys_GetClipboardData( void );
 void	Sys_CopyProtect (void);

@@ -235,6 +235,7 @@ void gl_vector1ui_free( GLvector1ui *v )
 
 
 
+#if 0 /**/
 void gl_vector4f_print( GLvector4f *v, GLubyte *cullmask, GLboolean culling )
 {
    GLfloat c[4] = { 0, 0, 0, 1 };
@@ -304,3 +305,4 @@ void gl_vector3f_print( GLvector3f *v, GLubyte *cullmask, GLboolean culling )
 	 printf( "%u:\t%f, %f, %f\n", i, d[0], d[1], d[2]);      
    }
 }
+#endif /**/

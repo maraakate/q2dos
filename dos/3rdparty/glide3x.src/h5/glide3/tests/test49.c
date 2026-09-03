@@ -16,23 +16,16 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
 */
 
 #include <stdlib.h>
 #include <stdio.h>
-#ifndef __linux__
-#include <conio.h>
-#else
-#include <linutil.h>
-#endif
 #include <assert.h>
 #include <string.h>
 
 #include <glide.h>
 #include <g3ext.h>
 #include "tlib.h"
-
 
 
 /*-------------------------------------------------
@@ -162,7 +155,7 @@ static const char name[]    = "test49";
 static const char purpose[] = "renders a series of triangles with different stenciling";
 static const char usage[]   = "-n <frames> -r <res> -d <filename> -p <pixel format>";
 
-void 
+int 
 main( int argc, char **argv) 
 {
   char match; 
@@ -186,13 +179,13 @@ main( int argc, char **argv)
   assert( hwconfig = tlVoodooType() );
 
   /* Process Command Line Arguments */
-  while( rv = tlGetOpt( argc, argv, "nrdp", &match, &remArgs ) ) {
+  while((rv = tlGetOpt(argc, argv, "nrdp", &match, &remArgs)) != 0) {
     if ( rv == -1 ) {
       printf( "Unrecognized command line argument\n" );
       printf( "%s %s\n", name, usage );
       printf( "Available resolutions:\n%s\n",
              tlGetResolutionList() );
-      return;
+      return -1;
     }
     switch( match ) {
     case 'n':
@@ -434,5 +427,5 @@ main( int argc, char **argv)
   
  __errExit:   
   grGlideShutdown();
-  return;
+  return 0;
 }

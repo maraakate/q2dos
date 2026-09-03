@@ -53,7 +53,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib ws2_32.lib winmm.lib /nologo /subsystem:windows /pdb:none /machine:I386 /nodefaultlib:"libcmtd.lib" /out:".\Release/q2.exe"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib ws2_32.lib winmm.lib libcurl.lib libvorbis.lib libogg.lib /nologo /subsystem:windows /pdb:none /machine:I386 /nodefaultlib:"libcmtd.lib" /out:".\Release/q2.exe" /libpath:"../win32/lib"
 
 !ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
 
@@ -79,7 +79,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib ws2_32.lib winmm.lib /nologo /subsystem:windows /debug /machine:I386 /nodefaultlib:"LIBCMT" /out:".\Debug/q2.exe"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib ws2_32.lib winmm.lib libcurl.lib libvorbis.lib libogg.lib /nologo /subsystem:windows /debug /machine:I386 /nodefaultlib:"LIBCMT" /out:".\Debug/q2.exe" /libpath:"../win32/lib"
 
 !ENDIF 
 
@@ -272,6 +272,10 @@ SOURCE=..\CLIENT\cl_view.c
 # Begin Source File
 
 SOURCE=..\QCOMMON\cmd.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\QCOMMON\cmd_auto.c
 # End Source File
 # Begin Source File
 
@@ -526,17 +530,5 @@ SOURCE=..\win32\q2.ico
 SOURCE=..\win32\q2.rc
 # End Source File
 # End Group
-# Begin Source File
-
-SOURCE=..\win32\libcurl.lib
-# End Source File
-# Begin Source File
-
-SOURCE=..\win32\libogg.lib
-# End Source File
-# Begin Source File
-
-SOURCE=..\win32\libvorbis.lib
-# End Source File
 # End Target
 # End Project

@@ -849,7 +849,7 @@ void Weapon_SonicCannon (edict_t *ent)
 
 	if (ent->client->ps.gunframe == 0)
 	{
-		if (deathmatch->value)
+		if (deathmatch->intValue)
 		{
 			if (!is_silenced)
 			{
@@ -866,7 +866,7 @@ void Weapon_SonicCannon (edict_t *ent)
 	}
 	else if (ent->client->ps.gunframe == 53)
 	{
-		if (deathmatch->value)
+		if (deathmatch->intValue)
 		{
 			if (!is_silenced)
 			{
@@ -1085,8 +1085,8 @@ void flare_flash(edict_t *ent)
 
 			target->client->flashBase = 30;
 
-			if (deathmatch->value &&
-				!(((int)zdmflags->value) & ZDM_NO_GL_POLYBLEND_DAMAGE))
+			if (deathmatch->intValue &&
+				!((zdmflags->intValue) & ZDM_NO_GL_POLYBLEND_DAMAGE))
 			{
 				T_Damage(target, ent, ent->owner, vec3_origin, target->s.origin, vec3_origin, (int)(10.0*ratio), 0, 0, MOD_GL_POLYBLEND);
 			}
@@ -1206,7 +1206,7 @@ void Weapon_FlareLauncher_Fire (edict_t *ent)
 	// play quad sound
 	playQuadSound(ent);
 
-	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
+	if (! ( dmflags->intValue & DF_INFINITE_AMMO ) )
 	{
 		ent->client->pers.inventory[ent->client->ammo_index]--;
 	}
@@ -1306,7 +1306,7 @@ void fire_sniper_bullet (edict_t *self, vec3_t start, vec3_t aimdir, int damage,
 	gi.WritePosition (tr.endpos);
 	gi.multicast (tr.endpos, MULTICAST_PHS);
 
-	if (tr.ent->takedamage)
+	if (tr.ent && tr.ent->takedamage)
 	{
 		T_Damage (tr.ent, self, self, aimdir, tr.endpos, tr.plane.normal, damage, kick, DAMAGE_NO_ARMOR, MOD_SNIPERRIFLE);
 	}
@@ -1324,7 +1324,7 @@ void weapon_sniperrifle_fire (edict_t *ent)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{	// normal damage is too extreme in dm
 		damage = 150;
 		kick = 300;
@@ -1401,7 +1401,7 @@ void Weapon_SniperRifle(edict_t *ent)
 			// back to old fov
 			ent->client->ps.fov = atoi(Info_ValueForKey(ent->client->pers.userinfo, "fov")); /* FS: Changed from 90 */
 ;	
-			if (deathmatch->value)
+			if (deathmatch->intValue)
 				gi.sound(ent, CHAN_WEAPON2, gi.soundindex("weapons/sniper/snip_bye.wav"), 1, ATTN_NORM, 0);
 		}
 		else if (ent->client->ps.gunframe == deactivateEnd)
@@ -1419,17 +1419,17 @@ void Weapon_SniperRifle(edict_t *ent)
 		if (ent->client->ps.gunframe == activateStart)
 		{
 			// play the activation sound
-			if (deathmatch->value)
+			if (deathmatch->intValue)
 				gi.sound(ent, CHAN_WEAPON, gi.soundindex("weapons/sniper/snip_act.wav"), 1, ATTN_NORM, 0);
 		}
 		else if (ent->client->ps.gunframe == activateEnd)
 		{
 			ent->client->weaponstate = WEAPON_READY;
-			ent->client->ps.gunindex = (deathmatch->value ? 
+			ent->client->ps.gunindex = (deathmatch->intValue ? 
 				gi.modelindex("models/weapons/v_sniper/dmscope/tris.md2") :
 				gi.modelindex("models/weapons/v_sniper/scope/tris.md2") );
 			ent->client->ps.gunframe = 0;
-			ent->client->ps.fov = (deathmatch->value ? dmFov : spFov);
+			ent->client->ps.fov = (deathmatch->intValue ? dmFov : spFov);
 			ent->client->sniperFramenum = level.framenum + SNIPER_CHARGE_TIME;
 			return;
 		}
@@ -1449,11 +1449,11 @@ void Weapon_SniperRifle(edict_t *ent)
 
 	if (ent->client->weaponstate == WEAPON_READY)
 	{
-		ent->client->ps.gunindex = (deathmatch->value ? 
+		ent->client->ps.gunindex = (deathmatch->intValue ? 
 			gi.modelindex("models/weapons/v_sniper/dmscope/tris.md2") :
 			gi.modelindex("models/weapons/v_sniper/scope/tris.md2") );
 		
-		ent->client->ps.fov = (deathmatch->value ? dmFov : spFov);
+		ent->client->ps.fov = (deathmatch->intValue ? dmFov : spFov);
 
 		// beep if the sniper frame num is a multiple of 10
 		if (ent->client->sniperFramenum >= level.framenum)
@@ -1500,11 +1500,11 @@ void Weapon_SniperRifle(edict_t *ent)
 
 	if (ent->client->weaponstate == WEAPON_FIRING)
 	{
-		ent->client->ps.gunindex = (deathmatch->value ? 
+		ent->client->ps.gunindex = (deathmatch->intValue ? 
 				gi.modelindex("models/weapons/v_sniper/dmscope/tris.md2") :
 				gi.modelindex("models/weapons/v_sniper/scope/tris.md2") );
 			
-		ent->client->ps.fov = (deathmatch->value ? dmFov : spFov);
+		ent->client->ps.fov = (deathmatch->intValue ? dmFov : spFov);
 
 		// fire
 		weapon_sniperrifle_fire(ent);

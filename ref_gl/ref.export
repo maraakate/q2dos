@@ -1,0 +1,12 @@
+# Export file for ref_gl.dylib
+_GetRefAPI
+_RW_IN_Init
+_RW_IN_Shutdown
+_RW_IN_Activate
+_RW_IN_Commands
+_RW_IN_Move
+_RW_IN_Frame
+_RW_KBD_Init
+_RW_KBD_Update
+_RW_KBD_Close
+#_RW_Sys_GetClipboardData

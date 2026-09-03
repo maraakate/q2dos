@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -m64 -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
 CFLAGS+= -ffast-math
-CPPFLAGS =
+CPPFLAGS = -DNDEBUG
 LDFLAGS = -m64 -shared -Wl,--enable-auto-image-base -Wl,--no-undefined
 
 GAME = m_tank.o \

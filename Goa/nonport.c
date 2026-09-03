@@ -51,7 +51,7 @@ void SocketShutDown(void)
 
 #if !defined(GAMESPY_HARD_LINKED)
 char * /* from OpenBSD */
-strtok_r(char *s, const char *delim, char **last)
+gs_strtok (char *s, const char *delim, char **last)
 {
 	const char *spanp;
 	int c, sc;

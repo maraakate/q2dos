@@ -560,17 +560,15 @@ sage_open (int db_flag,
     /* Finish driver setup */
     tex_bound_mask = (hardware < GR_SSTTYPE_Banshee) ? 0x1fffff : -1U;
 
-    if (tm_init() != 0) {
-	goto exit_error2;
-    }
+    /** FS: moved tm_init() to sage_bind(), see comments in there. **/
 
     if (vb_init() != 0) {
-	goto exit_error3;
+	goto exit_error2;
     }
 
     fogtable = malloc(getInteger(GR_FOG_TABLE_ENTRIES) * sizeof(GrFog_t));
     if (fogtable == NULL) {
-	goto exit_error4;
+	goto exit_error3;
     }
 
     /* XXX getInteger(GR_GLIDE_STATE_SIZE) */
@@ -615,10 +613,8 @@ sage_open (int db_flag,
 
     return ctx;
 
-  exit_error4:
-    free_a(vb);
   exit_error3:
-    tm_fini();
+    free_a(vb);
   exit_error2:
     ctx_fini();
   exit_error1:
@@ -674,6 +670,13 @@ sage_bind (sageContext *ctx, void *win, int width, int height)
 				GR_ORIGIN_LOWER_LEFT, 2, 1);
     }
     if (ctx->gr_ctx == 0) {
+	return -1;
+    }
+
+    /* FS: This has to be moved here, otherwise grTexMaxAddress() will fail
+     * on Windows, because context needs creating from grSstWinOpen() first.
+     * See GLIDE_CHECK_CONTEXT in glide3x. */
+    if (tm_init() != 0) {
 	return -1;
     }
     ctx->drawable = win;

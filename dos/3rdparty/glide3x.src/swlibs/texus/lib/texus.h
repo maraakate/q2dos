@@ -16,9 +16,6 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-** $Revision: 1.2.6.2 $
-** $Date: 2005/06/09 18:32:40 $
 */
 
 #ifndef __TEXUS_H__

@@ -129,6 +129,7 @@ typedef struct client_s
 	int				lastmessage;		// sv.framenum when packet was last received
 	int				lastconnect;
 
+	int				idletime;			/* FS: From R1Q2.  Kick excessive idlers. */
 	int				challenge;			// challenge of this user, randomly generated
 
 	netchan_t		netchan;
@@ -264,9 +265,9 @@ void SV_Multicast (vec3_t origin, multicast_t to);
 void SV_StartSound (vec3_t origin, edict_t *entity, int channel,
 					int soundindex, float volume,
 					float attenuation, float timeofs);
-void SV_ClientPrintf (client_t *cl, int level, char *fmt, ...) __attribute__((__format__(__printf__,3,4)));
-void SV_BroadcastPrintf (int level, char *fmt, ...) __attribute__((__format__(__printf__,2,3)));
-void SV_BroadcastCommand (char *fmt, ...) __attribute__((__format__(__printf__,1,2)));
+void SV_ClientPrintf (client_t *cl, int level, const char *fmt, ...) __attribute__((__format__(__printf__,3,4)));
+void SV_BroadcastPrintf (int level, const char *fmt, ...) __attribute__((__format__(__printf__,2,3)));
+void SV_BroadcastCommand (const char *fmt, ...) __attribute__((__format__(__printf__,1,2)));
 
 //
 // sv_user.c

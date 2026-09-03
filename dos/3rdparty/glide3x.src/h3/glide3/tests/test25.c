@@ -6,11 +6,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#ifndef __linux__
-#include <conio.h>
-#else
-#include <linutil.h>
-#endif
 #include <assert.h>
 #include <math.h>
 
@@ -152,7 +147,7 @@ static int screenFulls[] = {
 #define NFRAMES 20
 #define NVERTS 3
 
-void main( int argc, char **argv) {
+int main( int argc, char **argv) {
   char match; 
   char **remArgs;
   int  rv;
@@ -175,7 +170,7 @@ void main( int argc, char **argv) {
     y_angle = 0.0f;             /* rotation amount */
     
   int
-    firstTime;                  /* Used for performance calculations */
+    firstTime = 1;              /* Used for performance calculations */
 
   FxBool
     plugging = FXFALSE,         /* Show shameless plug */
@@ -196,7 +191,7 @@ void main( int argc, char **argv) {
     swapDelay = 1,              /* Arg to grBufferSwap */
     trisDrawn,                  /* # triangles drawn */
     trisProcessed,              /* # triangles through pipeline */
-    lastFrame,                  /* Number of last frame we did perf stats */
+    lastFrame = 0,              /* Number of last frame we did perf stats */
     frameNum = 0L;              /* id of each frame drawn */
     
   GrCullMode_t
@@ -231,13 +226,13 @@ void main( int argc, char **argv) {
   assert( hwconfig = tlVoodooType() );
 
   /* Process Command Line Arguments */
-  while( rv = tlGetOpt( argc, argv, "nrbtea", &match, &remArgs ) ) {
+  while ((rv = tlGetOpt(argc, argv, "nrbtea", &match, &remArgs)) != 0) {
     if ( rv == -1 ) {
       printf( "Unrecognized command line argument\n" );
       printf( "%s %s\n", name, usage );
       printf( "Available resolutions:\n%s\n",
              tlGetResolutionList() );
-      return;
+      return -1;
     }
     switch( match ) {
     case 'n':
@@ -872,4 +867,5 @@ void main( int argc, char **argv) {
       break;
   }
   grGlideShutdown();
+  return 0;
 }

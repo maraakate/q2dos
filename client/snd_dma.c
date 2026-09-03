@@ -39,12 +39,13 @@ void S_StopAllSounds(void);
 
 int			s_registration_sequence;
 
-channel_t   channels[MAX_CHANNELS];
+channel_t   *channels;
+size_t		s_max_channels_size;
 
 qboolean	snd_initialized = false;
 int			sound_started=0;
 
-volatile dma_t		dma;
+dma_t		dma;
 
 vec3_t		listener_origin;
 vec3_t		listener_forward;
@@ -71,6 +72,7 @@ playsound_t	s_pendingplays;
 
 int			s_beginofs;
 
+cvar_t		*s_mastervolume; /* FS: Added */
 cvar_t		*s_volume;
 cvar_t		*s_testsound;
 cvar_t		*s_loadas8bit;
@@ -79,11 +81,16 @@ cvar_t		*s_show;
 cvar_t		*s_mixahead;
 cvar_t		*s_primary;
 cvar_t		*s_musicvolume;
+cvar_t		*s_max_channels;
+cvar_t		*s_rawsamples_size_cvar;
 
 int		s_rawend;
-portable_samplepair_t	s_rawsamples[MAX_RAW_SAMPLES];
-extern int	havegus; /* FS: Added */
+portable_samplepair_t	*s_rawsamples;
+size_t	s_rawsamples_size;
 
+int	havegus; /* FS: Added */
+
+byte *s_streamDataPtr;
 
 // ====================================================================
 // User-setable variables
@@ -120,13 +127,17 @@ void S_Init (void)
 	Com_Printf("\n------- sound initialization -------\n");
 
 	cv = Cvar_Get ("s_initsound", "1", 0);
-	if (!cv->value)
+	if (!cv->intValue)
 	{
 		dma.buffer = NULL;/* just in case */
+		s_rawsamples = NULL;
+		s_streamDataPtr = NULL;
+
 		Com_Printf ("not initializing.\n");
 	}
 	else
 	{
+		s_mastervolume = Cvar_Get("s_mastervolume", "1.0", CVAR_ARCHIVE); /* FS: Added */
 		s_volume = Cvar_Get ("s_volume", "0.7", CVAR_ARCHIVE);
 		s_khz = Cvar_Get ("s_khz", "11025", CVAR_ARCHIVE);
 		s_loadas8bit = Cvar_Get ("s_loadas8bit", "0", CVAR_ARCHIVE);
@@ -135,7 +146,9 @@ void S_Init (void)
 		s_testsound = Cvar_Get ("s_testsound", "0", 0);
 		s_primary = Cvar_Get ("s_primary", "0", CVAR_ARCHIVE);	// win32 specific
 		s_musicvolume = Cvar_Get ("s_musicvolume", "1.0", CVAR_ARCHIVE); // Knightmare added
-		s_musicvolume->description = "Volume for music played from WAV and OGG files.";
+		Cvar_SetDescription("s_musicvolume", "Volume for music played from WAV and OGG files.");
+		s_max_channels = Cvar_Get("s_max_channels", "32", CVAR_ARCHIVE);
+		s_rawsamples_size_cvar = Cvar_Get("s_rawsamples_size", va("%d", MAX_RAW_SAMPLES), 0);
 
 		if (s_khz->value < 7000) /* FS: Old config, fix it up */
 			Cvar_SetValue("s_khz", 11025);
@@ -162,7 +175,36 @@ void S_Init (void)
 		soundtime = 0;
 		paintedtime = 0;
 
-		Com_Printf ("sound sampling rate: %i\n", dma.speed);
+		s_rawsamples_size = bound(128, s_rawsamples_size_cvar->intValue, SND_BUFFER_SIZE);
+		s_rawsamples = (portable_samplepair_t *)calloc(1, s_rawsamples_size * sizeof(portable_samplepair_t));
+		if (!s_rawsamples)
+		{
+			dma.buffer = NULL;
+			return;
+		}
+
+		s_streamDataPtr = (byte *)calloc(1, s_rawsamples_size * sizeof(byte));
+		if (!s_streamDataPtr)
+		{
+			free(s_rawsamples);
+			s_rawsamples = NULL;
+			dma.buffer = NULL;
+			return;
+		}
+
+		s_max_channels_size = bound(1, s_max_channels->intValue, 128);
+		channels = (channel_t *)calloc(1, s_max_channels_size * sizeof(channel_t));
+		if (!channels)
+		{
+			free(s_streamDataPtr);
+			s_streamDataPtr = NULL;
+			free(s_rawsamples);
+			s_rawsamples = NULL;
+			dma.buffer = NULL;
+			return;
+		}
+
+		Com_Printf("Channels: %d, Bits: %d, Rate: %d\nRaw Samples Buffer Size: %d\nMaximum Samples: %d\n", dma.channels, dma.samplebits, dma.speed, (int)s_rawsamples_size, (int)s_max_channels_size);
 
 		S_StopAllSounds ();
 	}
@@ -436,7 +478,7 @@ channel_t *S_PickChannel(int entnum, int entchannel)
 // Check for replacement sound, or find the best one to replace
 	first_to_die = -1;
 	life_left = 0x7fffffff;
-	for (ch_idx=0 ; ch_idx < MAX_CHANNELS ; ch_idx++)
+	for (ch_idx=0 ; ch_idx < s_max_channels_size ; ch_idx++)
 	{
 		if (entchannel != 0		// channel 0 never overrides
 		&& channels[ch_idx].entnum == entnum
@@ -602,7 +644,7 @@ void S_IssuePlaysound (playsound_t *ps)
 	channel_t	*ch;
 	sfxcache_t	*sc;
 
-	if (s_show->value)
+	if (s_show->intValue)
 		Com_Printf ("Issue %i\n", ps->begin);
 	// pick a channel to play on
 	ch = S_PickChannel(ps->entnum, ps->entchannel);
@@ -819,11 +861,17 @@ S_ClearBuffer
 void S_ClearBuffer (void)
 {
 	int		clear;
+	int		i;
 
 	if (!sound_started)
 		return;
 
 	s_rawend = 0;
+	for (i = 0; i < s_rawsamples_size; i++) /* FS: Clear out the s_rawsamples too.  Should not matter, but just in case we read ahead of some garbage data on load. */
+	{
+		memset(&s_rawsamples[i], 0, sizeof(portable_samplepair_t));
+		memset(&s_streamDataPtr[i], 0, sizeof(byte));
+	}
 
 	if (dma.samplebits == 8)
 		clear = 0x80;
@@ -866,7 +914,7 @@ void S_StopAllSounds(void)
 	}
 
 	// clear all the channels
-	memset(channels, 0, sizeof(channels));
+	memset(channels, 0, sizeof(channel_t));
 
 	// Stop background track
 	S_StopBackgroundTrack (); // Knightmare added
@@ -895,7 +943,7 @@ void S_AddLoopSounds (void)
 	vec3_t		origin_v;	// Knightmare added
 	entity_state_t	*ent;
 
-	if (cl_paused->value)
+	if (cl_paused->intValue)
 		return;
 
 	if (cls.state != ca_active)
@@ -1017,8 +1065,9 @@ void S_RawSamples (int samples, int rate, int width, int channels, byte *data, q
 
 	scale = (float) rate / dma.speed;
 	if (music)
-		intVolume = (int) (s_musicvolume->value * 256);
-	else	intVolume = (int) (s_volume->value * 256);
+		intVolume = (int) ((s_musicvolume->value * s_mastervolume->value) * 256);
+	else
+		intVolume = (int) ((s_volume->value * s_mastervolume->value) * 256);
 
 	if (channels == 2 && width == 2)
 	{
@@ -1027,7 +1076,7 @@ void S_RawSamples (int samples, int rate, int width, int channels, byte *data, q
 			src = i * scale;
 			if (src >= samples)
 				break;
-			dst = s_rawend & (MAX_RAW_SAMPLES - 1);
+			dst = s_rawend & (s_rawsamples_size - 1);
 			s_rawend++;
 			s_rawsamples [dst].left = ((short *) data)[src * 2] * intVolume;
 			s_rawsamples [dst].right = ((short *) data)[src * 2 + 1] * intVolume;
@@ -1040,7 +1089,7 @@ void S_RawSamples (int samples, int rate, int width, int channels, byte *data, q
 			src = i * scale;
 			if (src >= samples)
 				break;
-			dst = s_rawend & (MAX_RAW_SAMPLES - 1);
+			dst = s_rawend & (s_rawsamples_size - 1);
 			s_rawend++;
 			s_rawsamples [dst].left = ((short *) data)[src] * intVolume;
 			s_rawsamples [dst].right = ((short *) data)[src] * intVolume;
@@ -1055,7 +1104,7 @@ void S_RawSamples (int samples, int rate, int width, int channels, byte *data, q
 			src = i * scale;
 			if (src >= samples)
 				break;
-			dst = s_rawend & (MAX_RAW_SAMPLES - 1);
+			dst = s_rawend & (s_rawsamples_size - 1);
 			s_rawend++;
 		//	s_rawsamples [dst].left = ((signed char *) data)[src * 2] * intVolume;
 		//	s_rawsamples [dst].right = ((signed char *) data)[src * 2 + 1] * intVolume;
@@ -1072,7 +1121,7 @@ void S_RawSamples (int samples, int rate, int width, int channels, byte *data, q
 			src = i * scale;
 			if (src >= samples)
 				break;
-			dst = s_rawend & (MAX_RAW_SAMPLES - 1);
+			dst = s_rawend & (s_rawsamples_size - 1);
 			s_rawend++;
 		//	s_rawsamples [dst].left = ((signed char *) data)[src] * intVolume;
 		//	s_rawsamples [dst].right = ((signed char *) data)[src] * intVolume;
@@ -1100,7 +1149,7 @@ void S_Update(vec3_t origin, vec3_t forward, vec3_t right, vec3_t up)
 	if (!sound_started)
 		return;
 
-	// if the laoding plaque is up, clear everything
+	// if the loading plaque is up, clear everything
 	// out to make sure we aren't looping a dirty
 	// dma buffer while loading
 	if (cls.disable_screen)
@@ -1109,9 +1158,44 @@ void S_Update(vec3_t origin, vec3_t forward, vec3_t right, vec3_t up)
 		return;
 	}
 
+	/* FS: Don't allow dumb values. */
+	if (s_mastervolume->value < 0.0f)
+	{
+		Cvar_ForceSet("s_mastervolume", "0.0");
+	}
+	else if (s_mastervolume->value > 1.0f)
+	{
+		Cvar_ForceSet("s_mastervolume", "1.0");
+	}
+
+	if (s_volume->value < 0.0f)
+	{
+		Cvar_ForceSet("s_volume", "0.0");
+	}
+	else if (s_volume->value > 1.0f)
+	{
+		Cvar_ForceSet("s_volume", "1.0");
+	}
+
+	if (s_musicvolume->value < 0.0f)
+	{
+		Cvar_ForceSet("s_musicvolume", "0.0");
+	}
+	else if (s_musicvolume->value > 1.0f)
+	{
+		Cvar_ForceSet("s_musicvolume", "1.0");
+	}
+
+	if (s_musicvolume->modified || s_mastervolume->modified)
+	{
+		s_musicvolume->modified = false;
+	}
+
 	// rebuild scale tables if volume is modified
-	if (s_volume->modified)
+	if (s_mastervolume->modified || s_volume->modified)
+	{
 		S_InitScaletable ();
+	}
 
 	VectorCopy(origin, listener_origin);
 	VectorCopy(forward, listener_forward);
@@ -1120,7 +1204,7 @@ void S_Update(vec3_t origin, vec3_t forward, vec3_t right, vec3_t up)
 
 	// update spatialization for dynamic sounds	
 	ch = channels;
-	for (i=0 ; i<MAX_CHANNELS; i++, ch++)
+	for (i=0 ; i<s_max_channels_size; i++, ch++)
 	{
 		if (!ch->sfx)
 			continue;
@@ -1143,11 +1227,11 @@ void S_Update(vec3_t origin, vec3_t forward, vec3_t right, vec3_t up)
 	//
 	// debugging output
 	//
-	if (s_show->value)
+	if (s_show->intValue)
 	{
 		total = 0;
 		ch = channels;
-		for (i=0 ; i<MAX_CHANNELS; i++, ch++)
+		for (i=0 ; i<s_max_channels_size; i++, ch++)
 			if (ch->sfx && (ch->leftvol || ch->rightvol) )
 			{
 				Com_Printf ("%3i %3i %s\n", ch->leftvol, ch->rightvol, ch->sfx->name);

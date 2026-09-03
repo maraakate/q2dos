@@ -16,13 +16,6 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-** $Revision: 1.1.1.1 $ 
-** $Date: 1999/11/24 21:45:08 $
-** $Log: tv.h,v $
-** Revision 1.1.1.1  1999/11/24 21:45:08  joseph
-** Initial checkin for SourceForge
-**
 ** 
 ** 3     4/06/99 3:36p Dow
 ** Alt tab stuff

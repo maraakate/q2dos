@@ -16,9 +16,6 @@
 ;; 
 ;; COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 ;;
-;; $Header: /cvsroot/glide/glide3x/cvg/glide3/src/xtexdl.asm,v 1.1.1.1.8.4 2007/06/23 08:50:57 koolsmoky Exp $
-;; $Revision: 1.1.1.1.8.4 $
-;; $Log: xtexdl.asm,v $
 ;; Revision 1.1.1.1.8.4  2007/06/23 08:50:57  koolsmoky
 ;; removed unneeded emms calls
 ;;
@@ -126,7 +123,7 @@ _texData$   equ 24 + STACKOFFSET
 ;
 ;--------------------------------------------------------------------------
 
-segment		TEXT
+segment		SEG_TEXT
 
               ALIGN  32
 
@@ -345,7 +342,7 @@ endp
 ;
 ;--------------------------------------------------------------------------
 
-segment		TEXT
+segment		SEG_TEXT
 
               ALIGN  32
 
@@ -536,7 +533,7 @@ endp
 
 
 
-;segment		TEXT
+;segment		SEG_TEXT
 
               ALIGN  32
 

@@ -20,7 +20,7 @@ int main (int argc, char **argv)
   int    ch, i;
 
   if (argc != 2)
-     Abort ("Usage: %s bin-file [> result]", argv[0]);
+     Abort ("Usage: %s bin-file [> result]\n", argv[0]);
 
   if ((inFile = fopen(argv[1],"rb")) == NULL)
      Abort ("Cannot open %s\n", argv[1]);

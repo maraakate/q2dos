@@ -25,9 +25,9 @@ InitGameRules(void)
 	/* clear out the game rule structure before we start */
 	memset(&DMGame, 0, sizeof(dm_game_rt));
 
-	if (gamerules && gamerules->value)
+	if (gamerules && gamerules->intValue)
 	{
-		gameNum = gamerules->value;
+		gameNum = gamerules->intValue;
 
 		switch (gameNum)
 		{
@@ -44,7 +44,7 @@ InitGameRules(void)
 
 			/* reset gamerules if it's not a valid number */
 			default:
-				gamerules->value = 0;
+				gamerules->intValue = 0;
 				break;
 		}
 	}
@@ -157,7 +157,7 @@ FindSubstituteItem(edict_t *ent)
 		}
 
 		/* don't respawn spheres if they're dmflag disabled. */
-		if ((int)dmflags->value & DF_NO_SPHERES)
+		if (dmflags->intValue & DF_NO_SPHERES)
 		{
 			if (ent->classname &&
 				(!strcmp(ent->classname, "item_sphere_vengeance") ||
@@ -168,14 +168,14 @@ FindSubstituteItem(edict_t *ent)
 			}
 		}
 
-		if (((int)dmflags->value & DF_NO_NUKES) &&
+		if ((dmflags->intValue & DF_NO_NUKES) &&
 			ent->classname &&
 			!strcmp(ent->classname, "ammo_nuke"))
 		{
 			continue;
 		}
 
-		if (((int)dmflags->value & DF_NO_MINES) &&
+		if ((dmflags->intValue & DF_NO_MINES) &&
 			ent->classname &&
 			(!strcmp(ent->classname, "ammo_prox") || !strcmp(ent->classname, "ammo_tesla")))
 		{
@@ -214,14 +214,14 @@ FindSubstituteItem(edict_t *ent)
 			itflags = IT_AMMO;
 		}
 
-		if (((int)dmflags->value & DF_NO_NUKES) &&
+		if ((dmflags->intValue & DF_NO_NUKES) &&
 			ent->classname &&
 			!strcmp(ent->classname, "ammo_nuke"))
 		{
 			continue;
 		}
 
-		if (((int)dmflags->value & DF_NO_MINES) &&
+		if ((dmflags->intValue & DF_NO_MINES) &&
 			ent->classname &&
 			(!strcmp(ent->classname, "ammo_prox") || !strcmp(ent->classname, "ammo_tesla")))
 		{

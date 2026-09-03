@@ -9,6 +9,9 @@
 		<Platform
 			Name="Win32"
 		/>
+		<Platform
+			Name="x64"
+		/>
 	</Platforms>
 	<ToolFiles>
 	</ToolFiles>
@@ -18,7 +21,6 @@
 			OutputDirectory=".\Debug"
 			IntermediateDirectory=".\Debug"
 			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			>
@@ -51,10 +53,8 @@
 				PreprocessorDefinitions="_DEBUG;id386=1;WIN32;_WINDOWS;CLIENT_SPLIT_NETFRAME;GAMESPY;USE_CURL;OGG_SUPPORT;USE_JOYSTICK"
 				MinimalRebuild="true"
 				RuntimeLibrary="1"
-				PrecompiledHeaderFile=".\Debug/quake2.pch"
-				AssemblerListingLocation=".\Debug/"
-				ObjectFile=".\Debug/"
-				ProgramDataBaseFileName=".\Debug/"
+				FloatingPointModel="2"
+				BrowseInformation="1"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
@@ -65,21 +65,22 @@
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG"
-				Culture="4105"
+				Culture="1033"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib ws2_32.lib winmm.lib"
-				OutputFile=".\Debug/q2.exe"
+				AdditionalDependencies="ws2_32.lib winmm.lib libcurl.lib libvorbis.lib libogg.lib"
+				OutputFile="$(OutDir)\q2.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="../win32/lib"
 				IgnoreDefaultLibraryNames="LIBCMT"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\Debug/quake2.pdb"
 				SubSystem="2"
+				OptimizeForWindows98="2"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -110,11 +111,105 @@
 			/>
 		</Configuration>
 		<Configuration
+			Name="Debug|x64"
+			OutputDirectory=".\Debug"
+			IntermediateDirectory=".\Debug"
+			ConfigurationType="1"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="_DEBUG"
+				MkTypLibCompatible="true"
+				SuppressStartupBanner="true"
+				TargetEnvironment="3"
+				TypeLibraryName=".\Debug/quake2.tlb"
+				HeaderFileName=""
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP"
+				Optimization="0"
+				AdditionalIncludeDirectories="../win32/include"
+				PreprocessorDefinitions="_DEBUG;id386=0;WIN32;_WINDOWS;CLIENT_SPLIT_NETFRAME;GAMESPY;USE_CURL;OGG_SUPPORT;USE_JOYSTICK"
+				MinimalRebuild="true"
+				RuntimeLibrary="1"
+				FloatingPointModel="2"
+				BrowseInformation="1"
+				WarningLevel="3"
+				SuppressStartupBanner="true"
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="3"
+				DisableSpecificWarnings="4267"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
+				Culture="1033"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="ws2_32.lib winmm.lib libcurl.lib libvorbis.lib libvorbisfile.lib libogg.lib"
+				OutputFile="$(OutDir)\q2.exe"
+				LinkIncremental="2"
+				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="../win32/lib64"
+				IgnoreDefaultLibraryNames="LIBCMT"
+				GenerateDebugInformation="true"
+				SubSystem="2"
+				OptimizeForWindows98="1"
+				TargetMachine="17"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+				OutputFile=".\Debug/quake2.bsc"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
 			Name="Release|Win32"
 			OutputDirectory=".\Release"
 			IntermediateDirectory=".\Release"
 			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			>
@@ -144,15 +239,12 @@
 				AdditionalOptions="/MP"
 				Optimization="2"
 				InlineFunctionExpansion="1"
+				OmitFramePointers="true"
 				AdditionalIncludeDirectories="../win32/include"
 				PreprocessorDefinitions="NDEBUG;id386=1;WIN32;_WINDOWS;CLIENT_SPLIT_NETFRAME;GAMESPY;OGG_SUPPORT;USE_CURL;USE_JOYSTICK"
 				StringPooling="true"
 				RuntimeLibrary="0"
-				EnableFunctionLevelLinking="true"
-				PrecompiledHeaderFile=".\Release/quake2.pch"
-				AssemblerListingLocation=".\Release/"
-				ObjectFile=".\Release/"
-				ProgramDataBaseFileName=".\Release/"
+				FloatingPointModel="2"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 			/>
@@ -162,19 +254,23 @@
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG"
-				Culture="4105"
+				Culture="1033"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib ws2_32.lib winmm.lib"
-				OutputFile=".\Release/q2.exe"
+				AdditionalDependencies="ws2_32.lib winmm.lib libcurl.lib libvorbis.lib libogg.lib"
+				OutputFile="$(OutDir)\q2.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="../win32/lib"
 				IgnoreDefaultLibraryNames="libcmtd.lib"
 				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				OptimizeForWindows98="2"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -189,6 +285,101 @@
 			<Tool
 				Name="VCBscMakeTool"
 				SuppressStartupBanner="true"
+				OutputFile=".\Release/quake2.bsc"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|x64"
+			OutputDirectory=".\Release"
+			IntermediateDirectory=".\Release"
+			ConfigurationType="1"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="NDEBUG"
+				MkTypLibCompatible="true"
+				SuppressStartupBanner="true"
+				TargetEnvironment="3"
+				TypeLibraryName=".\Release/quake2.tlb"
+				HeaderFileName=""
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP"
+				Optimization="2"
+				InlineFunctionExpansion="1"
+				OmitFramePointers="true"
+				AdditionalIncludeDirectories="../win32/include"
+				PreprocessorDefinitions="NDEBUG;id386=0;WIN32;_WINDOWS;CLIENT_SPLIT_NETFRAME;GAMESPY;OGG_SUPPORT;USE_CURL;USE_JOYSTICK"
+				StringPooling="true"
+				RuntimeLibrary="0"
+				FloatingPointModel="2"
+				WarningLevel="3"
+				SuppressStartupBanner="true"
+				DisableSpecificWarnings="4267"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
+				Culture="1033"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="ws2_32.lib winmm.lib libcurl.lib libvorbis.lib libvorbisfile.lib libogg.lib"
+				OutputFile="$(OutDir)\q2.exe"
+				LinkIncremental="1"
+				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="../win32/lib64"
+				IgnoreDefaultLibraryNames="libcmtd.lib"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				OptimizeForWindows98="1"
+				TargetMachine="17"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
 				OutputFile=".\Release/quake2.bsc"
 			/>
 			<Tool
@@ -225,7 +416,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -247,7 +456,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -269,7 +496,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -291,7 +536,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -313,7 +576,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -335,7 +616,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -357,7 +656,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -379,7 +696,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -401,7 +736,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -423,7 +776,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -445,7 +816,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -467,7 +856,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -489,7 +896,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -511,7 +936,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -533,6 +976,15 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
@@ -541,6 +993,19 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\qcommon\cmd_auto.c"
+				>
 			</File>
 			<File
 				RelativePath="..\QCOMMON\cmodel.c"
@@ -555,7 +1020,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -577,7 +1060,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -599,7 +1100,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -621,7 +1140,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -643,7 +1180,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -665,7 +1220,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -687,7 +1260,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -709,7 +1300,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -731,7 +1340,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -753,7 +1380,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -775,7 +1420,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -797,7 +1460,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -819,7 +1500,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -841,7 +1540,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -863,7 +1580,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -885,7 +1620,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -907,7 +1660,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -929,7 +1700,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -951,7 +1740,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -973,7 +1780,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -995,7 +1820,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1017,7 +1860,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1039,7 +1900,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1061,7 +1940,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1083,7 +1980,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1105,7 +2020,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1127,7 +2060,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1149,7 +2100,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1171,7 +2140,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1193,7 +2180,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1215,7 +2220,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1237,7 +2260,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1259,7 +2300,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1281,7 +2340,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1307,7 +2384,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1333,7 +2428,27 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1357,7 +2472,27 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1381,7 +2516,27 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1405,7 +2560,27 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1429,7 +2604,27 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1453,7 +2648,27 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1481,7 +2696,27 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1505,6 +2740,16 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -1512,6 +2757,52 @@
 							Name="VCCLCompilerTool"
 							AdditionalIncludeDirectories=""
 							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\dos\dosisms.h"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
 						/>
 					</FileConfiguration>
 				</File>
@@ -1529,6 +2820,16 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -1536,6 +2837,268 @@
 							Name="VCCLCompilerTool"
 							AdditionalIncludeDirectories=""
 							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\dos\fx_gamma.c"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\dos\fx_gamma.h"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\dos\gl_dmesa.c"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\dos\gl_fxmesa.c"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\dos\gl_sage.c"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\dos\glimp_dos.c"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\dos\glimp_dos.h"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
 						/>
 					</FileConfiguration>
 				</File>
@@ -1553,7 +3116,27 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1577,6 +3160,16 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -1584,6 +3177,52 @@
 							Name="VCCLCompilerTool"
 							AdditionalIncludeDirectories=""
 							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\dos\no_dxe.c"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
 						/>
 					</FileConfiguration>
 				</File>
@@ -1601,6 +3240,16 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -1608,6 +3257,52 @@
 							Name="VCCLCompilerTool"
 							AdditionalIncludeDirectories=""
 							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\dos\qgl_dos.c"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
 						/>
 					</FileConfiguration>
 				</File>
@@ -1625,7 +3320,27 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1649,7 +3364,27 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1673,7 +3408,27 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1697,7 +3452,27 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1721,7 +3496,27 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1745,6 +3540,16 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -1752,6 +3557,52 @@
 							Name="VCCLCompilerTool"
 							AdditionalIncludeDirectories=""
 							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\dos\swimp_dos.h"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
 						/>
 					</FileConfiguration>
 				</File>
@@ -1769,6 +3620,16 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -1776,6 +3637,52 @@
 							Name="VCCLCompilerTool"
 							AdditionalIncludeDirectories=""
 							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\dos\vgamodes.h"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
 						/>
 					</FileConfiguration>
 				</File>
@@ -1793,6 +3700,16 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -1800,6 +3717,52 @@
 							Name="VCCLCompilerTool"
 							AdditionalIncludeDirectories=""
 							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\dos\vid_dos.h"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
 						/>
 					</FileConfiguration>
 				</File>
@@ -1817,7 +3780,27 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1841,6 +3824,16 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -1848,6 +3841,88 @@
 							Name="VCCLCompilerTool"
 							AdditionalIncludeDirectories=""
 							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\dos\vregset.h"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\dos\vsnprntf.c"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
 						/>
 					</FileConfiguration>
 				</File>
@@ -1865,6 +3940,16 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -1872,6 +3957,52 @@
 							Name="VCCLCompilerTool"
 							AdditionalIncludeDirectories=""
 							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\dos\wss.h"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
 						/>
 					</FileConfiguration>
 				</File>
@@ -2007,7 +4138,25 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCResourceCompilerTool"
+						PreprocessorDefinitions=""
+						AdditionalIncludeDirectories="\PROJ\q2dos\win32"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCResourceCompilerTool"
+						PreprocessorDefinitions=""
+						AdditionalIncludeDirectories="\PROJ\q2dos\win32"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCResourceCompilerTool"
@@ -2021,18 +4170,6 @@
 				>
 			</File>
 		</Filter>
-		<File
-			RelativePath="..\win32\libcurl.lib"
-			>
-		</File>
-		<File
-			RelativePath="..\win32\libogg.lib"
-			>
-		</File>
-		<File
-			RelativePath="..\win32\libvorbis.lib"
-			>
-		</File>
 	</Files>
 	<Globals>
 	</Globals>

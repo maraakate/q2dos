@@ -36,6 +36,9 @@ typedef struct vgamode_s {
 	char menuname[VIDNAME_LEN];
 } vgamode_t;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 extern int vga_nummodes;
 extern vgamode_t vga_modes[MAX_VIDEOMODES];
 
@@ -46,3 +49,6 @@ void VID_InitExtra (void);
 void VGA_UpdatePlanarScreen (void *srcbuffer);
 void VGA_UpdateLinearScreen (void *srcptr, void *destptr, int width,
 	int height, int srcrowbytes, int destrowbytes);
+#ifdef __cplusplus
+}
+#endif

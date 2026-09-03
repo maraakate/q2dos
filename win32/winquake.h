@@ -35,6 +35,7 @@ void IN_MouseEvent (int mstate);
 extern int		window_center_x, window_center_y;
 extern RECT		window_rect;
 
+extern char cmdline[4096];
 
 // win_dedconsole.c
 #define NEW_DED_CONSOLE // enable new dedicated console
@@ -42,4 +43,5 @@ extern RECT		window_rect;
 void Sys_ShowConsole (qboolean show);
 void Sys_ShutdownConsole (void);
 void Sys_InitDedConsole (void);
+void Sys_DedConsoleCheckHostname (void);
 #endif // NEW_DED_CONSOLE

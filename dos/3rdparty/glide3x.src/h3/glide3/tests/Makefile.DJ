@@ -4,9 +4,6 @@
 #  Email : dborca@users.sourceforge.net
 #  Web   : http://www.geocities.com/dborca
 #
-# $Header: /cvsroot/glide/glide3x/h3/glide3/tests/Attic/Makefile.DJ,v 1.1.2.6 2003/08/28 15:34:26 dborca Exp $
-#
-
 
 #
 #  Available options:
@@ -21,17 +18,18 @@
 #	<file.exe>	build a specific file
 #
 
-
-.PHONY: all
+.PHONY: all clean
 .SUFFIXES: .c .o .exe
-.SECONDARY: tlib.o
+.SECONDARY: tlib.o fxos.o
 
 FX_GLIDE_HW = h3
 TOP = ../../..
 CPU ?= pentium
 
+UNLINK = rm -f $(1)
+
 CC = gcc
-CFLAGS = -Wall -O2 -ffast-math -mcpu=$(CPU)
+CFLAGS = -Wall -O2 -ffast-math -mtune=$(CPU)
 CFLAGS += -I$(TOP)/$(FX_GLIDE_HW)/glide3/src -I$(TOP)/$(FX_GLIDE_HW)/incsrc
 CFLAGS += -I$(TOP)/swlibs/fxmisc
 CFLAGS += -D__DOS__ -DH3
@@ -40,9 +38,9 @@ CFLAGS += -D__DOS32__
 LDFLAGS = -s -L$(TOP)/$(FX_GLIDE_HW)/lib
 
 ifdef DXE
-LDLIBS = -lgld3i
+LDLIBS = -lglide3i
 else
-LDLIBS = -lgld3x
+LDLIBS = -lglide3x
 endif
 
 .c.o:
@@ -52,3 +50,13 @@ endif
 
 all:
 	$(error Must specify <filename.exe> to build)
+
+sbench.exe: sbench.o fxos.o tlib.o
+	$(CC) -o $@ $(LDFLAGS) $^ $(LDLIBS)
+
+fxos.o: $(TOP)/swlibs/fxmisc/fxos.c
+	$(CC) -o $@ $(CFLAGS) -c $<
+
+clean:
+	-$(call UNLINK,*.o)
+	-$(call UNLINK,*.exe)

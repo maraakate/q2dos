@@ -18,13 +18,6 @@
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 */
 
-/*  $Header: /cvsroot/glide/glide3x/cvg/glide3/src/xtexdl.S,v 1.1.1.1 1999/12/07 21:42:38 joseph Exp $ */
-/*  $Revision: 1.1.1.1 $ */
-/*  $Log: xtexdl.S,v $
-/*  Revision 1.1.1.1  1999/12/07 21:42:38  joseph
-/*  Initial checkin into SourceForge.
-/* */
-/*   */
 /*  1     10/08/98 11:30a Brent */
 /*   */
 /*  3     10/07/98 9:43p Peter */

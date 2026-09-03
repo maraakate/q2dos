@@ -118,7 +118,7 @@ turret_breach_fire(edict_t *self)
 	}
 
 	damage = 100 + random() * 50;
-	speed = 550 + 50 * skill->value;
+	speed = 550 + 50 * skill->intValue;
 	fire_rocket(self->teammaster->owner, start, f, damage, speed, 150, damage);
 	gi.positioned_sound(start, self, CHAN_WEAPON, gi.soundindex("weapons/rocklf1a.wav"), 1, ATTN_NORM, 0);
 }
@@ -470,11 +470,14 @@ turret_driver_think(edict_t *self)
 		}
 	}
 
-	/* let the turret know where we want it to aim */
-	VectorCopy(self->enemy->s.origin, target);
-	target[2] += self->enemy->viewheight;
-	VectorSubtract(target, self->target_ent->s.origin, dir);
-	vectoangles(dir, self->target_ent->move_angles);
+	if (self->enemy)
+	{
+		/* let the turret know where we want it to aim */
+		VectorCopy(self->enemy->s.origin, target);
+		target[2] += self->enemy->viewheight;
+		VectorSubtract(target, self->target_ent->s.origin, dir);
+		vectoangles(dir, self->target_ent->move_angles);
+	}
 
 	/* decide if we should shoot */
 	if (level.time < self->monsterinfo.attack_finished)
@@ -482,7 +485,7 @@ turret_driver_think(edict_t *self)
 		return;
 	}
 
-	reaction_time = (3 - skill->value) * 1.0;
+	reaction_time = (3 - skill->intValue) * 1.0;
 
 	if ((level.time - self->monsterinfo.trail_time) < reaction_time)
 	{
@@ -542,7 +545,7 @@ SP_turret_driver(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;
@@ -613,7 +616,7 @@ turret_brain_think(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	vec3_t target;
 	vec3_t dir;
-	vec3_t endpos;
+	vec3_t endpos = { 0 };
 	float reaction_time;
 	trace_t trace;
 
@@ -686,7 +689,7 @@ turret_brain_think(edict_t *self) /* FS: Coop: Rogue specific */
 	}
 	else
 	{
-		reaction_time = (3 - skill->value) * 1.0;
+		reaction_time = (3 - skill->intValue) * 1.0;
 	}
 
 	if ((level.time - self->monsterinfo.trail_time) < reaction_time)

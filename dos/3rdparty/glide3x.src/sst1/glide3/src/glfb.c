@@ -17,8 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/sst1/glide3/src/Attic/glfb.c,v 1.1.2.2 2004/10/04 09:36:00 dborca Exp $
-** $Log: glfb.c,v $
 ** Revision 1.1.2.2  2004/10/04 09:36:00  dborca
 ** second cut at Glide3x for Voodoo1/Rush (massive update):
 ** delayed validation, vertex snapping, clip coordinates, strip/fan_continue, bugfixes.
@@ -445,13 +443,7 @@ GR_ENTRY(grLfbLock, FxBool,( GrLock_t type, GrBuffer_t buffer,  GrLfbWriteMode_t
 #endif
   GR_CHECK_SIZE();
   /* We HAVE to idle on Jr., as out-of-order LFBs are unacceptable */
-  if (
-      lockIdle ||
-      (
-       _GlideRoot.hwConfig.SSTs[_GlideRoot.current_sst].type ==
-       GR_SSTTYPE_SST96
-       )
-      )
+  if (lockIdle || (_GlideRoot.hwConfig.SSTs[_GlideRoot.current_sst].type == GR_SSTTYPE_SST96))
     grFinish();
   GR_RETURN( rv );
 } /* grLfbLock */

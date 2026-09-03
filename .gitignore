@@ -12,6 +12,7 @@
 *.dxe
 *.clwbin/
 # ignore all the windows binaries - they shouldn't be committed! 
+.vs/
 _build/
 Debug/
 Dedicated_Debug/
@@ -39,3 +40,5 @@ gendate.h
 # save game header make stuff
 makeheaders.bat
 extractfuncts.exe
+# PVS Studio
+*.PVS-Studio.*

@@ -17,8 +17,6 @@
  ** 
  ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
  **
- ** $Header: /cvsroot/glide/glide3x/h3/glide3/src/distate.c,v 1.2.4.3 2004/10/04 09:26:30 dborca Exp $
- ** $Log: distate.c,v $
  ** Revision 1.2.4.3  2004/10/04 09:26:30  dborca
  ** DOS/OpenWatcom support
  **
@@ -443,12 +441,6 @@ GR_DIENTRY(grChromaRange, void , (GrColor_t color, GrColor_t range, GrChromaRang
 {
 #define FN_NAME "grChromaRange"
   GR_BEGIN_NOFIFOCHECK("grChromaRange\n",85);
-
-  GR_CHECK_F(myName,
-             ((_GlideRoot.hwConfig.SSTs[_GlideRoot.current_sst].type != GR_SSTTYPE_Voodoo2) &&
-              (_GlideRoot.hwConfig.SSTs[_GlideRoot.current_sst].type != GR_SSTTYPE_Banshee) &&
-              (_GlideRoot.hwConfig.SSTs[_GlideRoot.current_sst].type != GR_SSTTYPE_Voodoo3)),
-             "grChromaRange not supported.");
 
   INVALIDATE(chromaKey);
   INVALIDATE(chromaRange);

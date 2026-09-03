@@ -89,7 +89,7 @@ char		*sb_nums[2][11] =
 
 #define	ICON_WIDTH	24
 #define	ICON_HEIGHT	24
-#define	CHAR_WIDTH	16
+#define	CHARACTER_WIDTH	16
 #define	ICON_SPACE	8
 // end Knightmare
 
@@ -592,15 +592,15 @@ void SCR_Init (void)
 
 	 /* FS: cl_draw* friends */
 	cl_drawfps = Cvar_Get ("cl_drawfps", "0", CVAR_ARCHIVE);	// Knightmare
-	cl_drawfps->description = "Draw FPS counter on the screen.";
+	Cvar_SetDescription("cl_drawfps", "Draw FPS counter on the screen.");
 	cl_drawtime = Cvar_Get ("cl_drawtime", "0", CVAR_ARCHIVE);
-	cl_drawtime->description = "Draw current time on the screen.  1 -  Military time.  2 - AM/PM.";
+	Cvar_SetDescription("cl_drawtime", "Draw current time on the screen.  1 -  Military time.  2 - AM/PM.");
 	cl_drawuptime = Cvar_Get ("cl_drawuptime", "0", CVAR_ARCHIVE);
-	cl_drawuptime->description = "Draw current uptime on the screen.  1 - Current level time.  2 - Total uptime of Quake 2.";
+	Cvar_SetDescription("cl_drawuptime", "Draw current uptime on the screen.  1 - Current level time.  2 - Total uptime of Quake 2.");
 	cl_drawaltcolours = Cvar_Get ("cl_drawaltcolours", "0", CVAR_ARCHIVE);
-	cl_drawaltcolours->description = "Draw green text instead of white for the cl_draw*** cvars.";
+	Cvar_SetDescription("cl_drawaltcolours", "Draw green text instead of white for the cl_draw*** cvars.");
 	cl_hide_gun_icon = Cvar_Get ("cl_hide_gun_icon", "0", CVAR_ARCHIVE);
-	cl_hide_gun_icon->description = "Hide the gun/help computer icon.";
+	Cvar_SetDescription("cl_hide_gun_icon", "Hide the gun/help computer icon.");
 
 //
 // register our commands
@@ -638,10 +638,10 @@ void SCR_DrawPause (void)
 {
 	int		w, h;
 
-	if (!scr_showpause->value)		// turn off for screenshots
+	if (!scr_showpause->intValue)		// turn off for screenshots
 		return;
 
-	if (!cl_paused->value)
+	if (!cl_paused->intValue)
 		return;
 
 	re.DrawGetPicSize (&w, &h, "pause");
@@ -676,7 +676,14 @@ Scroll it up or down
 */
 void SCR_RunConsole (void)
 {
-// decide on the height of the console
+	/* src_conspeed must be a positive integer,
+	   otherwise things go wrong. Clamp it. */
+	if (scr_conspeed->value < 0.1f)
+	{
+		Cvar_Set("scr_conspeed", "0.1");
+	}
+
+	// decide on the height of the console
 	if (cls.key_dest == key_console)
 		scr_conlines = 0.5;		// half screen
 	else
@@ -745,7 +752,7 @@ void SCR_BeginLoadingPlaque (void)
 	CDAudio_Stop ();
 	if (cls.disable_screen)
 		return;
-	if (developer->value)
+	if (developer->intValue)
 		return;
 	if (cls.state == ca_disconnected)
 		return;	// if at console, don't bring up the plaque
@@ -876,12 +883,12 @@ void SCR_TileClear (void)
 	int		top, bottom, left, right;
 	dirty_t	clear;
 
-	if (scr_drawall->value)
+	if (scr_drawall->intValue)
 		SCR_DirtyScreen ();	// for power vr or broken page flippers...
 
 	if (scr_con_current == 1.0)
 		return;		// full screen console
-	if (scr_viewsize->value == 100)
+	if (scr_viewsize->intValue == 100)
 		return;		// full screen rendering
 	if (cl.cinematictime > 0)
 		return;		// full screen cinematic
@@ -1051,13 +1058,13 @@ void SCR_DrawField (int x, int y, int color, int width, int value)
 		width = 5;
 
 	SCR_AddDirtyPoint (x, y);
-	SCR_AddDirtyPoint (x+width*CHAR_WIDTH+2, y+23);
+	SCR_AddDirtyPoint (x+width*CHARACTER_WIDTH+2, y+23);
 
 	Com_sprintf (num, sizeof(num), "%i", value);
 	l = strlen(num);
 	if (l > width)
 		l = width;
-	x += 2 + CHAR_WIDTH*(width - l);
+	x += 2 + CHARACTER_WIDTH*(width - l);
 
 	ptr = num;
 	while (*ptr && l)
@@ -1068,7 +1075,7 @@ void SCR_DrawField (int x, int y, int color, int width, int value)
 			frame = *ptr -'0';
 
 		re.DrawPic (x,y,sb_nums[color][frame]);
-		x += CHAR_WIDTH;
+		x += CHARACTER_WIDTH;
 		ptr++;
 		l--;
 	}
@@ -1090,12 +1097,12 @@ void SCR_TouchPics (void)
 		for (j=0 ; j<11 ; j++)
 			re.RegisterPic (sb_nums[i][j]);
 
-	if (crosshair->value)
+	if (crosshair->intValue)
 	{
-		if (crosshair->value > 3 || crosshair->value < 0)
+		if (crosshair->intValue > 3 || crosshair->intValue < 0)
 			crosshair->value = 3;
 
-		Com_sprintf (crosshair_pic, sizeof(crosshair_pic), "ch%i", (int)(crosshair->value));
+		Com_sprintf (crosshair_pic, sizeof(crosshair_pic), "ch%i", crosshair->intValue);
 		re.DrawGetPicSize (&crosshair_width, &crosshair_height, crosshair_pic);
 		if (!crosshair_width)
 			crosshair_pic[0] = 0;
@@ -1185,7 +1192,7 @@ void SCR_ExecuteLayoutString (char *s)
 			value = cl.frame.playerstate.stats[atoi(token)];
 			if (value >= MAX_IMAGES)
 				Com_Error (ERR_DROP, "Pic >= MAX_IMAGES");
-			if (cl.configstrings[CS_IMAGES+value])
+			if (cl.configstrings[CS_IMAGES+value][0])
 			{
 				SCR_AddDirtyPoint (x, y);
 				SCR_AddDirtyPoint (x+23, y+23);
@@ -1392,7 +1399,7 @@ void SCR_ExecuteLayoutString (char *s)
 			value = cl.frame.playerstate.stats[atoi(token)];
 			if (!value)
 			{	// skip to endif
-				while (s && strcmp(token, "endif") )
+				while (s && strcmp(token, "endif") != 0 )
 				{
 					token = COM_Parse (&s);
 				}
@@ -1475,7 +1482,7 @@ void SCR_UpdateScreen (void)
 	else if ( cl_stereo_separation->value < 0 )
 		Cvar_SetValue( "cl_stereo_separation", 0.0 );
 
-	if ( cl_stereo->value )
+	if ( cl_stereo->intValue)
 	{
 		numframes = 2;
 		separation[0] = -cl_stereo_separation->value / 2;
@@ -1563,10 +1570,10 @@ void SCR_UpdateScreen (void)
 			SCR_DrawNet ();
 			SCR_CheckDrawCenterString ();
 
-			if (scr_timegraph->value)
+			if (scr_timegraph->intValue)
 				SCR_DebugGraph (cls.renderFrameTime*300, 0);
 
-			if (scr_debuggraph->value || scr_timegraph->value || scr_netgraph->value)
+			if (scr_debuggraph->intValue || scr_timegraph->intValue || scr_netgraph->intValue)
 				SCR_DrawDebugGraph ();
 
 			SCR_DrawPause ();

@@ -54,7 +54,7 @@ gekk_check_melee(edict_t *self)
 		return false;
 	}
 
-	if (!self->enemy && (self->enemy->health <= 0))
+	if (!self->enemy || (self->enemy->health <= 0))
 	{
 		return false;
 	}
@@ -787,7 +787,7 @@ gekk_check_refire(edict_t *self)
 		return;
 	}
 
-	if (random() < (skill->value * 0.1))
+	if (random() < (skill->intValue * 0.1))
 	{
 		if (range(self, self->enemy) == RANGE_MELEE)
 		{
@@ -1844,7 +1844,7 @@ gekk_dodge(edict_t *self, edict_t *attacker, float eta, trace_t *fake /* unused 
 		return;
 	}
 
-	if (skill->value == 0)
+	if (skill->intValue == 0)
 	{
 		r = random();
 
@@ -1863,7 +1863,7 @@ gekk_dodge(edict_t *self, edict_t *attacker, float eta, trace_t *fake /* unused 
 	self->monsterinfo.pausetime = level.time + eta + 0.3;
 	r = random();
 
-	if (skill->value == 1)
+	if (skill->intValue == 1)
 	{
 		if (r > 0.33)
 		{
@@ -1895,7 +1895,7 @@ gekk_dodge(edict_t *self, edict_t *attacker, float eta, trace_t *fake /* unused 
 		return;
 	}
 
-	if (skill->value == 2)
+	if (skill->intValue == 2)
 	{
 		if (r > 0.66)
 		{
@@ -1950,7 +1950,7 @@ SP_monster_gekk(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;
@@ -2004,6 +2004,8 @@ SP_monster_gekk(edict_t *self)
 	self->monsterinfo.search = gekk_search;
 	self->monsterinfo.idle = gekk_idle;
 	self->monsterinfo.checkattack = gekk_checkattack;
+
+	self->blood_type = 1; // Knightmare- use green blood type
 
 	gi.linkentity(self);
 

@@ -17,13 +17,9 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-**
-** $Revision: 1.1.2.2 $ 
-** $Date: 2005/06/09 18:32:38 $ 
-**
 ** Print functions for SST-1 Initialization routines
 */
-#ifndef __GNUC__
+#ifdef _MSC_VER
 #pragma optimize ("",off)
 #endif
 #include <stdio.h>
@@ -46,6 +42,7 @@ FX_ENTRY void FX_CALL sst1InitPrintf(const char *format, ...)
     static FxBool printIt = FXFALSE;
 
     if(firstPass == FXTRUE) {
+        const char *envf;
         firstPass = FXFALSE;
 	if (sst1InitMsgFile == NULL)
 	{
@@ -54,11 +51,12 @@ FX_ENTRY void FX_CALL sst1InitPrintf(const char *format, ...)
 	}
         if(GETENV(("SST_INITDEBUG")))
             printIt = FXTRUE;
-        if(GETENV(("SST_INITDEBUG_FILE"))) {
-            if((sst1InitMsgFile = fopen(GETENV(("SST_INITDEBUG_FILE")), "w")))
+        envf = GETENV(("SST_INITDEBUG_FILE"));
+        if(envf) {
+            if((sst1InitMsgFile = fopen(envf, "w")) != NULL)
                 printIt = FXTRUE;
             else {
-                fprintf(stderr, "sst1InitPrintf(): Could not open file '%s' for logging...\n", GETENV(("SST_INITDEBUG_FILE")));
+                fprintf(stderr, "sst1InitPrintf(): Could not open file '%s' for logging...\n", envf);
                 printIt = FXFALSE;
             }
         }
@@ -80,7 +78,7 @@ FX_ENTRY void FX_CALL sst1InitVPrintf(const char *format, va_list args)
 
 #endif
 
-#ifndef __GNUC__
+#ifdef _MSC_VER
 #pragma optimize ("",on)
 #endif
 

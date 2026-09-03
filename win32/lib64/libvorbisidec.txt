@@ -1,0 +1,3 @@
+https://github.com/sezero/tremor.git - sezero-lowmem branch
+
+configured with: --enable-64kHz-limit --enable-low-accuracy

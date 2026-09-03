@@ -689,7 +689,7 @@ void CL_Disconnect (void)
 	if (cls.state == ca_disconnected)
 		return;
 
-	if (cl_timedemo && cl_timedemo->value)
+	if (cl.timedemo_start) /* FS: Just check if we got timedemo_start.  Removed isDemo boolean */
 	{
 		int	time;
 		
@@ -897,7 +897,7 @@ void CL_PingServers_f (void)
 	Com_Printf ("pinging broadcast...\n");
 
 	noudp = Cvar_Get ("noudp", "0", CVAR_NOSET);
-	if (!noudp->value)
+	if (!noudp->intValue)
 	{
 		adr.type = NA_BROADCAST;
 		adr.port = BigShort(PORT_SERVER);
@@ -905,7 +905,7 @@ void CL_PingServers_f (void)
 	}
 
 	noipx = Cvar_Get ("noipx", "0", CVAR_NOSET);
-	if (!noipx->value)
+	if (!noipx->intValue)
 	{
 		adr.type = NA_BROADCAST_IPX;
 		adr.port = BigShort(PORT_SERVER);
@@ -1162,7 +1162,7 @@ void CL_FixUpGender(void)
 	char *p;
 	char sk[80];
 
-	if (gender_auto->value) {
+	if (gender_auto->intValue) {
 
 		if (gender->modified) {
 			// was set directly, don't override the user
@@ -1237,7 +1237,7 @@ void CL_ResetPrecacheCheck (void)
 
 	precache_check = CS_MODELS;
 //	precache_spawncount = atoi(Cmd_Argv(1));
-	precache_model = 0;
+	precache_model = NULL;
 	precache_model_skin = 0;
 	precache_pak = 0;	// Knightmare added
 }
@@ -1259,18 +1259,18 @@ void CL_RequestNextDownload (void)
 		localServer = true;
 
 	// skip to loading map if downloads disabled or on local server
-	if ( (localServer || !allow_download->value) && (precache_check < ENV_CNT) )
+	if ( (localServer || !allow_download->intValue) && (precache_check < ENV_CNT) )
 		precache_check = ENV_CNT;
 
 //ZOID
 	if (precache_check == CS_MODELS) { // confirm map
 		precache_check = CS_MODELS+2; // 0 isn't used
-		if (allow_download_maps->value)
+		if (allow_download_maps->intValue)
 			if (!CL_CheckOrDownloadFile(cl.configstrings[CS_MODELS+1]))
 				return; // started a download
 	}
 	if (precache_check >= CS_MODELS && precache_check < CS_MODELS+MAX_MODELS) {
-		if (allow_download_models->value) {
+		if (allow_download_models->intValue) {
 			while (precache_check < CS_MODELS+MAX_MODELS &&
 				cl.configstrings[precache_check][0]) {
 				if (cl.configstrings[precache_check][0] == '*' ||
@@ -1304,7 +1304,7 @@ void CL_RequestNextDownload (void)
 						if (LittleLong(*(unsigned *)precache_model) != IDSPRITEHEADER)
 						{	// not a recognized model
 							FS_FreeFile(precache_model);
-							precache_model = 0;
+							precache_model = NULL;
 							precache_model_skin = 0;
 							precache_check++;
 							continue;
@@ -1315,7 +1315,7 @@ void CL_RequestNextDownload (void)
 							if (LittleLong (spriteheader->version != SPRITE_VERSION))
 							{	// not a recognized sprite
 								FS_FreeFile(precache_model);
-								precache_model = 0;
+								precache_model = NULL;
 								precache_check++;
 								precache_model_skin = 0;
 								continue; // couldn't load it
@@ -1328,16 +1328,16 @@ void CL_RequestNextDownload (void)
 						if (LittleLong (pheader->version) != ALIAS_VERSION)
 						{	// not a recognized md2
 							FS_FreeFile(precache_model);
-							precache_model = 0;
-						precache_check++;
-						precache_model_skin = 0;
-						continue; // couldn't load it
+							precache_model = NULL;
+							precache_check++;
+							precache_model_skin = 0;
+							continue; // couldn't load it
 						}
 					}
 				/*	if (LittleLong(*(unsigned *)precache_model) != IDALIASHEADER)
 					{	// not an alias model
 						FS_FreeFile(precache_model);
-						precache_model = 0;
+						precache_model = NULL;
 						precache_model_skin = 0;
 						precache_check++;
 						continue;
@@ -1382,8 +1382,6 @@ void CL_RequestNextDownload (void)
 						// r1ch: spam warning for models that are broken
 						if (strchr (skinname, '\\'))
 							Com_Printf ("Warning, model %s with incorrectly linked skin: %s\n", cl.configstrings[precache_check], skinname);
-						else if (strlen(skinname) > MAX_SKINNAME-1)
-							Com_Error (ERR_DROP, "Model %s has too long a skin path: %s", cl.configstrings[precache_check], skinname);
 
 						if (!CL_CheckOrDownloadFile(skinname))
 						{
@@ -1394,9 +1392,9 @@ void CL_RequestNextDownload (void)
 					}
 				}
 
-				if (precache_model) { 
+				if (precache_model) {
 					FS_FreeFile(precache_model);
-					precache_model = 0;
+					precache_model = NULL;
 				}
 				precache_model_skin = 0;
 				precache_check++;
@@ -1405,7 +1403,7 @@ void CL_RequestNextDownload (void)
 		precache_check = CS_SOUNDS;
 	}
 	if (precache_check >= CS_SOUNDS && precache_check < CS_SOUNDS+MAX_SOUNDS) { 
-		if (allow_download_sounds->value) {
+		if (allow_download_sounds->intValue) {
 			if (precache_check == CS_SOUNDS)
 				precache_check++; // zero is blank
 			while (precache_check < CS_SOUNDS+MAX_SOUNDS &&
@@ -1436,7 +1434,7 @@ void CL_RequestNextDownload (void)
 	// model, weapon model and skin
 	// so precache_check is now *3
 	if (precache_check >= CS_PLAYERSKINS && precache_check < CS_PLAYERSKINS + MAX_CLIENTS * PLAYER_MULT) {
-		if (allow_download_players->value) {
+		if (allow_download_players->intValue) {
 			while (precache_check < CS_PLAYERSKINS + MAX_CLIENTS * PLAYER_MULT) {
 				int i, n;
 				char model[MAX_QPATH], skin[MAX_QPATH], *p;
@@ -1617,7 +1615,7 @@ void CL_Precache_f (void)
 
 	precache_check = CS_MODELS;
 	precache_spawncount = atoi(Cmd_Argv(1));
-	precache_model = 0;
+	precache_model = NULL;
 	precache_model_skin = 0;
 	precache_pak = 0;	// Knightmare added
 
@@ -1654,50 +1652,50 @@ void CL_InitLocal (void)
 // register our variables
 //
 	cl_stereo_separation = Cvar_Get( "cl_stereo_separation", "0.4", CVAR_ARCHIVE );
-	cl_stereo_separation->description = "Stereo separation when used with cl_stereo 1.";
+	Cvar_SetDescription("cl_stereo_separation" ,"Stereo separation when used with cl_stereo 1.");
 	cl_stereo = Cvar_Get( "cl_stereo", "0", 0 );
-	cl_stereo->description = "Stereo mode for 3D Glasses.";
+	Cvar_SetDescription("cl_stereo", "Stereo mode for 3D Glasses.");
 
 	cl_add_blend = Cvar_Get ("cl_blend", "1", 0);
 	cl_add_lights = Cvar_Get ("cl_lights", "1", 0);
 	cl_add_particles = Cvar_Get ("cl_particles", "1", 0);
 	cl_add_entities = Cvar_Get ("cl_entities", "1", 0);
 	cl_gun = Cvar_Get ("cl_gun", "1", 0);
-	cl_gun->description = "Set to 0 to disable rendering of the gun model.  Useful for screenshots.";
+	Cvar_SetDescription("cl_gun", "Set to 0 to disable rendering of the gun model.  Useful for screenshots.");
 	cl_footsteps = Cvar_Get ("cl_footsteps", "1", 0);
-	cl_footsteps->description = "Play footstep sounds from player.";
+	Cvar_SetDescription("cl_footsetps", "Play footstep sounds from player.");
 	cl_noskins = Cvar_Get ("cl_noskins", "0", 0);
-	cl_noskins->description = "All player skins are Male/Grunt";
+	Cvar_SetDescription("cl_noskins", "All player skins are Male/Grunt");
 	cl_predict = Cvar_Get ("cl_predict", "1", 0);
-	cl_predict->description = "Client-side movement prediction.  Recommended to leave enabled.";
+	Cvar_SetDescription("cl_predict", "Client-side movement prediction.  Recommended to leave enabled.");
 //	cl_minfps = Cvar_Get ("cl_minfps", "5", 0);
 	cl_maxfps = Cvar_Get ("cl_maxfps", "90", CVAR_ARCHIVE);
-	cl_maxfps->description = "Maximum number of frames to render ahead when cl_async (asynchronous frames) is set to 0.";
+	Cvar_SetDescription("cl_maxfps", "Maximum number of frames to render ahead when cl_async (asynchronous frames) is set to 0.");
 
 #ifdef CLIENT_SPLIT_NETFRAME
 	cl_async = Cvar_Get ("cl_async", "0", CVAR_ARCHIVE);
-	cl_async->description = "Asynchronous Frame rendering.  Network frames and renderer frames are separated.  Uses r_maxfps and net_maxfps cvars.";
+	Cvar_SetDescription("cl_async", "Asynchronous Frame rendering.  Network frames and renderer frames are separated.  Uses r_maxfps and net_maxfps cvars.");
 	net_maxfps = Cvar_Get ("net_maxfps", "60", CVAR_ARCHIVE);
-	net_maxfps->description = "FPS limit for network frames when used with cl_async 1.";
+	Cvar_SetDescription("net_maxfps", "FPS limit for network frames when used with cl_async 1.");
 	r_maxfps = Cvar_Get ("r_maxfps", "125", CVAR_ARCHIVE);
-	r_maxfps->description = "FPS limit for renderer frames when used with cl_async 1.";
+	Cvar_SetDescription("r_maxfps", "FPS limit for renderer frames when used with cl_async 1.");
 #endif
 
 	// Knightmare- whether to try to play OGGs instead of CD tracks
 	cl_ogg_music = Cvar_Get ("cl_ogg_music", "1", CVAR_ARCHIVE);
-	cl_ogg_music->description = "Whether to try to play OGG Vorbis files instead of CD audio tracks.";
+	Cvar_SetDescription("cl_ogg_music", "Whether to try to play OGG Vorbis files instead of CD audio tracks.");
 	cl_rogue_music = Cvar_Get ("cl_rogue_music", "0", CVAR_ARCHIVE);
 	cl_xatrix_music = Cvar_Get ("cl_xatrix_music", "0", CVAR_ARCHIVE);
 
 	cl_wav_music = Cvar_Get ("cl_wav_music", "1", CVAR_ARCHIVE);
-	cl_wav_music->description = "Whether to try to play WAV files instead of CD audio tracks.";
+	Cvar_SetDescription("cl_wav_music", "Whether to try to play WAV files instead of CD audio tracks.");
 
 	cl_3dcam = Cvar_Get ("cl_3dcam", "0", CVAR_ARCHIVE);
-	cl_3dcam->description = "Enables 3rd person camera.  Fine tune with cl_3dcam_angle and cl_3dcam_dist.";
+	Cvar_SetDescription("cl_3dcam", "Enables 3rd person camera.  Fine tune with cl_3dcam_angle and cl_3dcam_dist.");
 	cl_3dcam_angle = Cvar_Get ("cl_3dcam_angle", "30", CVAR_ARCHIVE);
-	cl_3dcam_angle->description = "Angle for the 3rd person camera.";
+	Cvar_SetDescription("cl_3dcam_angle", "Angle for the 3rd person camera.");
 	cl_3dcam_dist = Cvar_Get ("cl_3dcam_dist", "50", CVAR_ARCHIVE);
-	cl_3dcam_dist->description = "Distance for the 3rd person camera.";
+	Cvar_SetDescription("cl_3dcam_dist", "Distance for the 3rd person camera.");
 
 	cl_upspeed = Cvar_Get ("cl_upspeed", "200", 0);
 	cl_forwardspeed = Cvar_Get ("cl_forwardspeed", "200", 0);
@@ -1707,13 +1705,13 @@ void CL_InitLocal (void)
 	cl_anglespeedkey = Cvar_Get ("cl_anglespeedkey", "1.5", 0);
 
 	cl_run = Cvar_Get ("cl_run", "0", CVAR_ARCHIVE);
-	cl_run->description = "Set to 1 for always run movement.";
+	Cvar_SetDescription("cl_run", "Set to 1 for always run movement.");
 	freelook = Cvar_Get( "freelook", "0", CVAR_ARCHIVE );
-	freelook->description = "If enabled mouse will be used for looking around instead of moving.";
+	Cvar_SetDescription("freelook", "If enabled mouse will be used for looking around instead of moving.");
 	lookspring = Cvar_Get ("lookspring", "0", CVAR_ARCHIVE);
 	lookstrafe = Cvar_Get ("lookstrafe", "0", CVAR_ARCHIVE);
 	sensitivity = Cvar_Get ("sensitivity", "3", CVAR_ARCHIVE);
-	sensitivity->description = "Mouse sensitivity.";
+	Cvar_SetDescription("sensitivity", "Mouse sensitivity.");
 
 	m_pitch = Cvar_Get ("m_pitch", "0.022", CVAR_ARCHIVE);
 	m_yaw = Cvar_Get ("m_yaw", "0.022", 0);
@@ -1721,17 +1719,17 @@ void CL_InitLocal (void)
 	m_side = Cvar_Get ("m_side", "1", 0);
 
 	cl_shownet = Cvar_Get ("cl_shownet", "0", 0);
-	cl_shownet->description = "Shows verbose output about server packets.  1 will show current message sizes.  2 will show svc_xxx packets as they are parsed.  3 will show verbose information about delta encoding from packet entities.";
+	Cvar_SetDescription("cl_shownet", "Shows verbose output about server packets.  1 will show current message sizes.  2 will show svc_xxx packets as they are parsed.  3 will show verbose information about delta encoding from packet entities.");
 	cl_showmiss = Cvar_Get ("cl_showmiss", "0", 0);
-	cl_showmiss->description = "Shows misses on movement prediction.";
+	Cvar_SetDescription("cl_showmiss", "Shows misses on movement prediction.");
 	cl_showclamp = Cvar_Get ("showclamp", "0", 0);
-	cl_showclamp->description = "Shows time skews from clients timer versus the servers timer.";
+	Cvar_SetDescription("showclamp", "Shows time skews from clients timer versus the servers timer.");
 	cl_timeout = Cvar_Get ("cl_timeout", "120", 0);
-	cl_timeout->description = "Timeout (in seconds) for connecting to servers.";
+	Cvar_SetDescription("cl_timeout", "Timeout (in seconds) for connecting to servers.");
 	cl_paused = Cvar_Get ("paused", "0", 0);
-	cl_paused->description = "If enabled in Single Player then the game is currently paused.  Only works in multiplayer if cheats are enabled.";
+	Cvar_SetDescription("paused", "If enabled in Single Player then the game is currently paused.  Only works in multiplayer if cheats are enabled.");
 	cl_timedemo = Cvar_Get ("timedemo", "0", 0);
-	cl_timedemo->description = "Set to 1 for timing playback of demos.  Useful for bencmarking.";
+	Cvar_SetDescription("timedemo", "Set to 1 for timing playback of demos.  Useful for bencmarking.");
 
 	rcon_client_password = Cvar_Get ("rcon_password", "", 0);
 	rcon_address = Cvar_Get ("rcon_address", "", 0);
@@ -1750,11 +1748,11 @@ void CL_InitLocal (void)
 	hand = Cvar_Get ("hand", "0", CVAR_USERINFO | CVAR_ARCHIVE);
 	fov = Cvar_Get ("fov", "90", CVAR_USERINFO | CVAR_ARCHIVE);
 	fov_adapt = Cvar_Get ("fov_adapt", "1", CVAR_ARCHIVE);
-	fov_adapt->description = "Hor+ style field of view (FOV) scaling: Useful for widescreen resolutions. If enabled your FOV will be scaled automatically according to the resolution.";
+	Cvar_SetDescription("fov_adapt", "Hor+ style field of view (FOV) scaling: Useful for widescreen resolutions. If enabled your FOV will be scaled automatically according to the resolution.");
 	gender = Cvar_Get ("gender", "male", CVAR_USERINFO | CVAR_ARCHIVE);
-	gender->description = "Player gender.";
+	Cvar_SetDescription("gender", "Player gender.");
 	gender_auto = Cvar_Get ("gender_auto", "1", CVAR_ARCHIVE);
-	gender_auto->description = "Automatically fix the player gender if it is modified or a userinfo variable is changed.";
+	Cvar_SetDescription("gender_auto", "Automatically fix the player gender if it is modified or a userinfo variable is changed.");
 	gender->modified = false; // clear this so we know when user sets it manually
 
 	cl_vwep = Cvar_Get ("cl_vwep", "1", CVAR_ARCHIVE);
@@ -1762,39 +1760,39 @@ void CL_InitLocal (void)
 	/* FS: New stuff */
 	console_old_complete = Cvar_Get("console_old_complete", "0", CVAR_ARCHIVE); /* FS: Old style command completing */
 	cl_autorepeat_allkeys = Cvar_Get("cl_autorepeat_allkeys", "0", CVAR_ARCHIVE); /* FS: Because I want to autorepeat whatever I want, hoss */
-	cl_autorepeat_allkeys->description = "Allow to autorepeat any key, not just Backspace, Pause, PgUp, and PgDn keys.";
+	Cvar_SetDescription("cl_autorepeat_allkeys", "Allow to autorepeat any key, not just Backspace, Pause, PgUp, and PgDn keys.");
 	cl_stufftext_check = Cvar_Get ("cl_stufftext_check", "0", 0);
-	cl_stufftext_check->description = "Check malicious stufftexts from servers and their admins.  Must explicitly be enabled and will not be saved.  Values higher than 1 will ignore connect stufftexts from WallFly, etc.";
+	Cvar_SetDescription("cl_stufftext_check", "Check malicious stufftexts from servers and their admins.  Must explicitly be enabled and will not be saved.  Values higher than 1 will ignore connect stufftexts from WallFly, etc.");
 
 	/* Knightmare: Added */
 	cl_sleep = Cvar_Get("cl_sleep", "0", CVAR_ARCHIVE);
-	cl_sleep->description = "Reduce CPU usage by issuing sleep commands between extra frames.";
+	Cvar_SetDescription("cl_sleep", "Reduce CPU usage by issuing sleep commands between extra frames.");
 
 #ifdef GAMESPY
 	/* FS: For gamespy */
 	cl_master_server_ip = Cvar_Get("cl_master_server_ip", CL_MASTER_ADDR, CVAR_ARCHIVE);
-	cl_master_server_ip->description = "Master server IP to use with the gamespy browser.";
+	Cvar_SetDescription("cl_master_server_ip", "Master server IP to use with the gamespy browser.");
 	cl_master_server_port = Cvar_Get("cl_master_server_port", CL_MASTER_PORT, CVAR_ARCHIVE);
-	cl_master_server_port->description = "Master server port to use with the gamespy browser.";
+	Cvar_SetDescription("cl_master_server_port", "Master server port to use with the gamespy browser.");
 	cl_master_server_queries = Cvar_Get("cl_master_server_queries", "10", CVAR_ARCHIVE);
-	cl_master_server_queries->description = "Maximum number of query (ping) requests to use per loop with the gamespy browser.";
+	Cvar_SetDescription("cl_master_server_queries", "Maximum number of query (ping) requests to use per loop with the gamespy browser.");
 	cl_master_server_timeout = Cvar_Get("cl_master_server_timeout", "3000", CVAR_ARCHIVE);
-	cl_master_server_timeout->description = "Timeout (in milliseconds) to give up on pinging a server.";
+	Cvar_SetDescription("cl_master_server_timeout", "Timeout (in milliseconds) to give up on pinging a server.");
 	cl_master_server_retries = Cvar_Get("cl_master_server_retries", "20", CVAR_ARCHIVE);
-	cl_master_server_retries->description = "Number of retries to attempt for receiving the server list.  Formula is 50ms + 10ms for each retry.";
+	Cvar_SetDescription("cl_master_server_retries", "Number of retries to attempt for receiving the server list.  Formula is 50ms + 10ms for each retry.");
 	cl_master_server_optout = Cvar_Get("cl_master_server_optout", "0", CVAR_ARCHIVE);
-	cl_master_server_optout->description = "Opt-out of sending your Quake 2 Username in GameSpy list requests.";
+	Cvar_SetDescription("cl_master_server_optout", "Opt-out of sending your Quake 2 Username in GameSpy list requests.");
 	s_gamespy_sounds = Cvar_Get("s_gamespysounds", "0", CVAR_ARCHIVE);
-	s_gamespy_sounds->description = "Play the complete.wav and abort.wav from GameSpy3D if it exists in sounds/gamespy.";
+	Cvar_SetDescription("s_gamespysounds", "Play the complete.wav and abort.wav from GameSpy3D if it exists in sounds/gamespy.");
 #endif
 
 #ifdef USE_CURL /* HTTP downloading from R1Q2 */
 	cl_http_proxy = Cvar_Get ("cl_http_proxy", "", 0);
 	cl_http_filelists = Cvar_Get ("cl_http_filelists", "1", 0);
 	cl_http_downloads = Cvar_Get ("cl_http_downloads", "1", CVAR_ARCHIVE);
-	cl_http_downloads->description = "Enable HTTP downloading.";
+	Cvar_SetDescription("cl_http_downloads", "Enable HTTP downloading.");
 	cl_http_max_connections = Cvar_Get ("cl_http_max_connections", "4", 0);
-	cl_http_max_connections->description = "Maximum number of connections to open up during HTTP downloading.  Currently limited to 4.";
+	Cvar_SetDescription("cl_http_max_connections", "Maximum number of connections to open up during HTTP downloading.  Currently limited to 4.");
 #endif
 	//
 	// register our commands
@@ -1890,7 +1888,7 @@ void CL_WriteConfiguration (char *cfgName)
 		return;
 
 	if(!(cfgName) || (cfgName[0] == 0)) /* FS: Sanity check */
-		Com_sprintf (path, sizeof(path),"%s/q2dos.cfg", FS_Gamedir());
+		Com_sprintf (path, sizeof(path),"%s/%s", FS_Gamedir(), CFGFILENAME);
 	else
 		Com_sprintf (path, sizeof(path),"%s/%s.cfg", FS_Gamedir(), cfgName);
 
@@ -1988,9 +1986,9 @@ void CL_FixCvarCheats (void)
 	}
 
 	// make sure they are all set to the proper values
-	for (i=0, var = cheatvars ; i<numcheatvars ; i++, var++)
+	for (i = 0, var = cheatvars; i < numcheatvars; i++, var++)
 	{
-		if ( strcmp (var->var->string, var->value) )
+		if (strcmp (var->var->string, var->value) != 0)
 		{
 			Cvar_Set (var->name, var->value);
 		}
@@ -2113,14 +2111,14 @@ void CL_Frame_Async (int msec)
 		cls.netchan.last_received = Sys_Milliseconds ();
 	}
 
-	if (!cl_timedemo->value)
+	if (!CL_IsDemoWithTimeDemo())
 	{	// Don't flood packets out while connecting
 		if (cls.state == ca_connected && packetDelta < 100)
 		{
 			packetFrame = false;
 		}
 
-		if (packetDelta < 1000.0 / net_maxfps->value)
+		if (packetDelta < 1000.0 / net_maxfps->intValue)
 		{
 			packetFrame = false;
 		}
@@ -2143,9 +2141,9 @@ void CL_Frame_Async (int msec)
 		if (!packetFrame && !renderFrame && !cls.forcePacket && !userinfo_modified)
 		{
 			// Pooy's CPU usage fix
-			if (cl_sleep->value)
+			if (cl_sleep->intValue)
 			{
-				int temptime = min( (1000.0 / net_maxfps->value - packetDelta), (1000.0 / r_maxfps->value - renderDelta) );
+				int temptime = min( (1000.0 / net_maxfps->intValue - packetDelta), (1000.0 / r_maxfps->intValue - renderDelta) );
 				if (temptime > 1)
 				{
 					Sys_Sleep (1);
@@ -2228,14 +2226,14 @@ void CL_Frame_Async (int msec)
 		}
 
 		// update the screen
-		if (host_speeds->value)
+		if (host_speeds->intValue)
 		{
 			time_before_ref = Sys_Milliseconds ();
 		}
 
 		SCR_UpdateScreen ();
 
-		if (host_speeds->value)
+		if (host_speeds->intValue)
 		{
 			time_after_ref = Sys_Milliseconds ();
 		}
@@ -2256,7 +2254,7 @@ void CL_Frame_Async (int msec)
 
 		cls.framecount++;
 
-		if (log_stats->value)
+		if (log_stats->intValue)
 		{
 			if (cls.state == ca_active)
 			{
@@ -2329,7 +2327,7 @@ void CL_Frame (int msec)
 	static int  lasttimecalled;
 	float	fps;
 
-	if (dedicated->value)
+	if (dedicated->intValue)
 	{
 		return;
 	}
@@ -2339,7 +2337,7 @@ void CL_Frame (int msec)
 #endif
 
 #ifdef CLIENT_SPLIT_NETFRAME
-	if (cl_async->value && !cl_timedemo->value)
+	if (cl_async->intValue && !CL_IsDemoWithTimeDemo())
 	{
 		CL_Frame_Async (msec);
 		return;
@@ -2348,16 +2346,16 @@ void CL_Frame (int msec)
 
 	extratime += msec;
 
-	if (cl_maxfps->value)
+	if (cl_maxfps->intValue)
 	{
-		fps = bound(5, cl_maxfps->value, 1000); /* FS: Don't go under 5 */
+		fps = bound(5, cl_maxfps->intValue, 1000); /* FS: Don't go under 5 */
 	}
 	else
 	{
-		fps = bound(5, cl_maxfps->value, 72); /* FS: Default to 72hz if nothing is set */
+		fps = bound(5, cl_maxfps->intValue, 72); /* FS: Default to 72hz if nothing is set */
 	}
 
-	if (!cl_timedemo->value)
+	if (!CL_IsDemoWithTimeDemo())
 	{
 		if (cls.state == ca_connected && extratime < 100)
 		{
@@ -2367,9 +2365,9 @@ void CL_Frame (int msec)
 		if (extratime < 1000.0/fps)
 		{
 			// Knightmare- added Pooy's CPU usage fix
-			if (cl_sleep->value)
+			if (cl_sleep->intValue)
 			{
-				int temptime = 1000 / cl_maxfps->value - extratime;
+				int temptime = 1000 / cl_maxfps->intValue - extratime;
 
 				if (temptime > 1)
 				{
@@ -2438,14 +2436,14 @@ void CL_Frame (int msec)
 	}
 
 	// update the screen
-	if (host_speeds->value)
+	if (host_speeds->intValue)
 	{
 		time_before_ref = Sys_Milliseconds ();
 	}
 
 	SCR_UpdateScreen ();
 
-	if (host_speeds->value)
+	if (host_speeds->intValue)
 	{
 		time_after_ref = Sys_Milliseconds ();
 	}
@@ -2463,7 +2461,7 @@ void CL_Frame (int msec)
 
 	cls.framecount++;
 
-	if ( log_stats->value )
+	if ( log_stats->intValue)
 	{
 		if ( cls.state == ca_active )
 		{
@@ -2501,7 +2499,7 @@ CL_Init
 */
 void CL_Init (void)
 {
-	if (dedicated->value)
+	if (dedicated->intValue)
 	{
 		return;		// nothing running on the client
 	}
@@ -2814,7 +2812,7 @@ void CL_PingNetServers_f (void)
 
 	if ((Cmd_Argc() == 1) || (cls.key_dest == key_menu))
 	{
-		cls.gamespyupdate = SHOW_POPULATED_SERVERS;;
+		cls.gamespyupdate = SHOW_POPULATED_SERVERS;
 		Com_Printf("\x02Grabbing populated server list from GameSpy master. . .\n");
 	}
 	else
@@ -2930,3 +2928,13 @@ void CL_Download_Calculate_KBps (int byteDistance, int totalSize)
 	dlSpeedInfo.prevTime = cls.realtime;
 }
 
+qboolean CL_IsDemoWithTimeDemo (void)
+{
+	/* FS: 4 is ss_demo, see server.h */
+	if (cl_timedemo && cl_timedemo->intValue && (Com_ServerState() == 4)) /* FS: Timedemo and a Demo Playing */
+	{
+		return true;
+	}
+
+	return false;
+}

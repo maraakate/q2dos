@@ -422,7 +422,7 @@ parasite_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage
 
 	self->pain_debounce_time = level.time + 3;
 
-	if (skill->value == 3)
+	if (skill->intValue == 3)
 	{
 		return; /* no pain anims in nightmare */
 	}
@@ -746,7 +746,7 @@ parasite_blocked(edict_t *self, float dist) /* FS: Coop: Rogue specific */
 		return false;
 	}
 
-	if (blocked_checkshot(self, 0.25 + (0.05 * skill->value)))
+	if (blocked_checkshot(self, 0.25 + (0.05 * skill->intValue)))
 	{
 		return true;
 	}
@@ -895,6 +895,7 @@ parasite_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /
 	}
 
 	/* regular death */
+	self->s.skinnum |= 1;	// Knightmare- make sure pain skin is set if we got one-shotted
 	gi.sound(self, CHAN_VOICE, sound_die, 1, ATTN_NORM, 0);
 	self->deadflag = DEAD_DEAD;
 	self->takedamage = DAMAGE_YES;
@@ -912,7 +913,7 @@ SP_monster_parasite(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;
@@ -963,6 +964,8 @@ SP_monster_parasite(edict_t *self)
 		self->monsterinfo.blocked = parasite_blocked;
 		self->monsterinfo.checkattack = parasite_checkattack;
 	}
+
+	self->blood_type = 3;	// Knightmare- use sparks and blood type
 
 	gi.linkentity(self);
 

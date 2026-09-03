@@ -17,8 +17,6 @@
  ** 
  ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
  **
- ** $Header: /cvsroot/glide/glide3x/sst1/glide3/src/Attic/gpci.c,v 1.1.2.4 2005/05/25 08:51:52 jwrdegoede Exp $
- ** $Log: gpci.c,v $
  ** Revision 1.1.2.4  2005/05/25 08:51:52  jwrdegoede
  ** Add #ifdef GL_X86 around x86 specific code
  **
@@ -400,6 +398,7 @@ void
 _GlideInitEnvironment( void )
 {
   int i;
+  const char *envp;
 
   if ( _GlideRoot.initialized ) /* only execute once */
     return;
@@ -431,7 +430,10 @@ _GlideInitEnvironment( void )
 
 #if GL_X86
   _GlideRoot.CPUType = _cpu_detect_asm();
-  if (getenv("FX_CPU")) _GlideRoot.CPUType = atoi(getenv("FX_CPU"));
+  envp = getenv("FX_CPU");
+  if (envp) {
+    _GlideRoot.CPUType = atoi(envp);
+  }
 #endif
 
   _GlideRoot.environment.swapInterval = -1;
@@ -460,14 +462,22 @@ _GlideInitEnvironment( void )
   _GlideRoot.environment.swapPendingCount = 6;
 #endif
 
-  if (getenv("FX_SNAPSHOT"))  _GlideRoot.environment.snapshot = atoi(getenv("FX_SNAPSHOT"));
-  if (getenv("FX_GLIDE_LWM")) _GlideRoot.environment.swFifoLWM = atoi(getenv("FX_GLIDE_LWM"));
-
-  if (getenv("FX_GLIDE_SWAPINTERVAL")) {
-    _GlideRoot.environment.swapInterval = atoi(getenv("FX_GLIDE_SWAPINTERVAL"));
-    if (_GlideRoot.environment.swapInterval < 0) _GlideRoot.environment.swapInterval = 0;
+  envp = getenv("FX_SNAPSHOT");
+  if (envp) {
+    _GlideRoot.environment.snapshot  = atoi(envp);
   }
-  
+  envp = getenv("FX_GLIDE_LWM");
+  if (envp) {
+    _GlideRoot.environment.swFifoLWM = atoi(envp);
+  }
+
+  envp = getenv("FX_GLIDE_SWAPINTERVAL");
+  if (envp) {
+    _GlideRoot.environment.swapInterval = atoi(envp);
+    if (_GlideRoot.environment.swapInterval < 0)
+        _GlideRoot.environment.swapInterval = 0;
+  }
+
   GDBG_INFO((80,"    triBoundsCheck: %d\n",_GlideRoot.environment.triBoundsCheck));
   GDBG_INFO((80,"      swapInterval: %d\n",_GlideRoot.environment.swapInterval));
   GDBG_INFO((80,"          noSplash: %d\n",_GlideRoot.environment.noSplash));
@@ -495,7 +505,7 @@ _GlideInitEnvironment( void )
   if (!_grSstDetectResources()) {
     char s[128];
     sprintf(s,
-            "_GlideInitEnvironment: glide3x.dll expected %s, none detected\n",
+            "_GlideInitEnvironment: expected %s, none detected\n",
             GLIDE_DRIVER_NAME);
     GrErrorCallback(s, FXTRUE);
   }
@@ -515,8 +525,6 @@ _GlideInitEnvironment( void )
 } /* _GlideInitEnvironment */
 
 
-
-
 #if defined(GLIDE_DEBUG) && !(GLIDE_PLATFORM & GLIDE_SST_SIM)
 
 /* GMT: tracing utilities */
@@ -526,7 +534,7 @@ _GlideInitEnvironment( void )
   An array of SST register info
   ----------------------------------------------------------------------*/
 typedef struct {
-  char *name;
+  const char *name;
 } regInfo;
 
 static regInfo regsInfo[] = {
@@ -901,7 +909,7 @@ _GR_SET16(void *addr, unsigned short data)
 
 #if defined( GLIDE_DEBUG ) && ( GLIDE_PLATFORM & GLIDE_HW_SST96 ) 
 
-extern char *regNames[];
+extern const char *regNames[];
 
 static FxU32 thisMask;
 static FxU32 thisWrite;

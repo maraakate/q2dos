@@ -19,14 +19,7 @@
 ** THE UNITED STATES. 
 **
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-** $Revision: 1.4.4.4 $
-** $Date: 2005/05/25 08:56:27 $
 */
-
-#ifndef WINSIM
-#include "gendate.h"
-#endif // WINSIM
 
 #ifdef SST2
 #define MAX_NUM_TMUS 4

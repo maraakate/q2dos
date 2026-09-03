@@ -888,6 +888,10 @@ SOURCE=..\QCOMMON\cmd.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\QCOMMON\cmd_auto.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\QCOMMON\cmodel.c
 # End Source File
 # Begin Source File

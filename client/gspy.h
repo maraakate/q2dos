@@ -78,9 +78,9 @@ typedef struct
  */
 typedef struct
 {
-	void	(*print)(char *str, ...) __fp_attribute__((__format__(__printf__,1,2)));
-	void	(*dprint)(unsigned long developerFlags, char *fmt, ...) __fp_attribute__((__format__(__printf__,2,3)));
-	void	(*error)(char *error, ...) __fp_attribute__((__noreturn__, __format__(__printf__,1,2)));
+	void	(*print)(const char *str, ...) __fp_attribute__((__format__(__printf__,1,2)));
+	void	(*dprint)(unsigned int developerFlags, const char *fmt, ...) __fp_attribute__((__format__(__printf__,2,3)));
+	void	(*error)(const char *error, ...) __fp_attribute__((__noreturn__, __format__(__printf__,1,2)));
 	cvar_t	*(*cvar)(char *name, char *value, int flags);
 	cvar_t	*(*cvar_set)(char *name, char *value);
 	cvar_t	*(*cvar_forceset)(char *name, char *value);
@@ -92,7 +92,6 @@ typedef struct
 
 /* FS: Binary stuff the DLL needs to access */
 extern void S_GamespySound (char *sound);
-extern char *NET_ErrorString(void);
 extern void *Sys_GetGameSpyAPI(void *parms);
 extern void Sys_UnloadGameSpy(void);
 

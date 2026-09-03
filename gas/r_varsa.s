@@ -88,6 +88,9 @@ C(d_pzbuffer):		.long	0
 C(d_zrowbytes):		.long	0
 C(d_zwidth):		.long	0
 
+.globl  C(s_prefetch_address)
+C(s_prefetch_address):	.long	0
+
 
 //-------------------------------------------------------
 // ASM-only variables
@@ -129,6 +132,8 @@ reciprocal_table_16:	.long	0x40000000, 0x2aaaaaaa, 0x20000000
 						.long	0x10000000, 0xe38e38e, 0xccccccc, 0xba2e8ba
 						.long	0xaaaaaaa, 0x9d89d89, 0x9249249, 0x8888888
 
+// old as from Apple cctools does not recognize .extern
+#ifndef __APPLE__
 #ifndef NeXT
 	.extern Entry2_16
 	.extern Entry3_16
@@ -145,6 +150,7 @@ reciprocal_table_16:	.long	0x40000000, 0x2aaaaaaa, 0x20000000
 	.extern Entry14_16
 	.extern Entry15_16
 	.extern Entry16_16
+#endif
 #endif
 
 entryvec_table_16:	.long	0, Entry2_16, Entry3_16, Entry4_16
@@ -204,6 +210,8 @@ entryvec_table:	.long	0, Entry2_8, Entry3_8, Entry4_8
 				.long	Entry5_8, Entry6_8, Entry7_8, Entry8_8
 #endif
 
+// old as from Apple cctools does not recognize .extern
+#ifndef __APPLE__
 #ifndef NeXT
 	.extern Spr8Entry2_8
 	.extern Spr8Entry3_8
@@ -213,11 +221,10 @@ entryvec_table:	.long	0, Entry2_8, Entry3_8, Entry4_8
 	.extern Spr8Entry7_8
 	.extern Spr8Entry8_8
 #endif
+#endif
 	
 .globl spr8entryvec_table
 spr8entryvec_table:	.long	0, Spr8Entry2_8, Spr8Entry3_8, Spr8Entry4_8
 					.long	Spr8Entry5_8, Spr8Entry6_8, Spr8Entry7_8, Spr8Entry8_8
 
 #endif	// id386
-
-

@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{BF38E300-8B6C-4914-85EC-2E3A334FF2BF}</ProjectGuid>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>15.0.28307.799</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>.\coop\Debug\</OutDir>
+    <IntDir>.\coop\Debug\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>.\coop\Release\</OutDir>
+    <IntDir>.\coop\Release\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>.\coop\Debug\</OutDir>
+    <IntDir>.\coop\Debug\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>.\coop\Release\</OutDir>
+    <IntDir>.\coop\Release\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\coop\Debug/coopgamex86.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;id386=1;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <BrowseInformation>true</BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x1009</Culture>
+    </ResourceCompile>
+    <Link>
+      <OutputFile>$(OutDir)gamex86.dll</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ModuleDefinitionFile>..\coop\game.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\coop\Debug/coopgamex86.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\coop\Release/coopgamex86.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <OmitFramePointers>true</OmitFramePointers>
+      <PreprocessorDefinitions>WIN32;id386=1;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x1009</Culture>
+    </ResourceCompile>
+    <Link>
+      <OutputFile>$(OutDir)gamex86.dll</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ModuleDefinitionFile>..\coop\game.def</ModuleDefinitionFile>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\coop\Release/coopgamex86.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>X64</TargetEnvironment>
+      <TypeLibraryName>.\coop\Debug/coopgamex86.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;id386=0;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <BrowseInformation>true</BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x1009</Culture>
+    </ResourceCompile>
+    <Link>
+      <OutputFile>$(OutDir)gamex64.dll</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ModuleDefinitionFile>..\coop\game.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+    <Bscmake>
+      <OutputFile>.\coop\Debug/coopgamex86.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>X64</TargetEnvironment>
+      <TypeLibraryName>.\coop\Release/coopgamex86.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <OmitFramePointers>true</OmitFramePointers>
+      <PreprocessorDefinitions>WIN32;id386=0;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DisableSpecificWarnings>4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x1009</Culture>
+    </ResourceCompile>
+    <Link>
+      <OutputFile>$(OutDir)gamex64.dll</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ModuleDefinitionFile>..\coop\game.def</ModuleDefinitionFile>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+    <Bscmake>
+      <OutputFile>.\coop\Release/coopgamex86.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\coop\b_cam.c" />
+    <ClCompile Include="..\coop\dm_ball.c" />
+    <ClCompile Include="..\coop\dm_tag.c" />
+    <ClCompile Include="..\coop\flashlight.c" />
+    <ClCompile Include="..\coop\g_ai.c" />
+    <ClCompile Include="..\coop\g_chase.c" />
+    <ClCompile Include="..\coop\g_cmds.c" />
+    <ClCompile Include="..\coop\g_combat.c" />
+    <ClCompile Include="..\coop\g_coop.c" />
+    <ClCompile Include="..\coop\g_func.c" />
+    <ClCompile Include="..\coop\g_items.c" />
+    <ClCompile Include="..\coop\g_main.c" />
+    <ClCompile Include="..\coop\g_misc.c" />
+    <ClCompile Include="..\coop\g_monster.c" />
+    <ClCompile Include="..\coop\g_newai.c" />
+    <ClCompile Include="..\coop\g_newdm.c" />
+    <ClCompile Include="..\coop\g_newfnc.c" />
+    <ClCompile Include="..\coop\g_newtarg.c" />
+    <ClCompile Include="..\coop\g_newtrig.c" />
+    <ClCompile Include="..\coop\g_newweap.c" />
+    <ClCompile Include="..\coop\g_phys.c" />
+    <ClCompile Include="..\coop\g_save.c" />
+    <ClCompile Include="..\coop\g_spawn.c" />
+    <ClCompile Include="..\coop\g_sphere.c" />
+    <ClCompile Include="..\coop\g_svcmds.c" />
+    <ClCompile Include="..\coop\g_target.c" />
+    <ClCompile Include="..\coop\g_trigger.c" />
+    <ClCompile Include="..\coop\g_turret.c" />
+    <ClCompile Include="..\coop\g_utils.c" />
+    <ClCompile Include="..\coop\g_vote.c" />
+    <ClCompile Include="..\coop\g_weapon.c" />
+    <ClCompile Include="..\coop\menu.c" />
+    <ClCompile Include="..\coop\m_actor.c" />
+    <ClCompile Include="..\coop\m_berserk.c" />
+    <ClCompile Include="..\coop\m_boss2.c" />
+    <ClCompile Include="..\coop\m_boss3.c" />
+    <ClCompile Include="..\coop\m_boss31.c" />
+    <ClCompile Include="..\coop\m_boss32.c" />
+    <ClCompile Include="..\coop\m_boss5.c" />
+    <ClCompile Include="..\coop\m_brain.c" />
+    <ClCompile Include="..\coop\m_carrier.c" />
+    <ClCompile Include="..\coop\m_chick.c" />
+    <ClCompile Include="..\coop\m_fixbot.c" />
+    <ClCompile Include="..\coop\m_flash.c" />
+    <ClCompile Include="..\coop\m_flipper.c" />
+    <ClCompile Include="..\coop\m_float.c" />
+    <ClCompile Include="..\coop\m_flyer.c" />
+    <ClCompile Include="..\coop\m_gekk.c" />
+    <ClCompile Include="..\coop\m_gladb.c" />
+    <ClCompile Include="..\coop\m_gladiator.c" />
+    <ClCompile Include="..\coop\m_gunner.c" />
+    <ClCompile Include="..\coop\m_hover.c" />
+    <ClCompile Include="..\coop\m_infantry.c" />
+    <ClCompile Include="..\coop\m_insane.c" />
+    <ClCompile Include="..\coop\m_medic.c" />
+    <ClCompile Include="..\coop\m_move.c" />
+    <ClCompile Include="..\coop\m_mutant.c" />
+    <ClCompile Include="..\coop\m_parasite.c" />
+    <ClCompile Include="..\coop\m_soldier.c" />
+    <ClCompile Include="..\coop\m_stalker.c" />
+    <ClCompile Include="..\coop\m_supertank.c" />
+    <ClCompile Include="..\coop\m_tank.c" />
+    <ClCompile Include="..\coop\m_turret.c" />
+    <ClCompile Include="..\coop\m_widow.c" />
+    <ClCompile Include="..\coop\m_widow2.c" />
+    <ClCompile Include="..\coop\p_client.c" />
+    <ClCompile Include="..\coop\p_hook.c" />
+    <ClCompile Include="..\coop\p_hud.c" />
+    <ClCompile Include="..\coop\p_trail.c" />
+    <ClCompile Include="..\coop\p_view.c" />
+    <ClCompile Include="..\coop\p_weapon.c" />
+    <ClCompile Include="..\coop\q_shared.c" />
+    <ClCompile Include="..\coop\z_acannon.c" />
+    <ClCompile Include="..\coop\z_ai.c" />
+    <ClCompile Include="..\coop\z_boss.c" />
+    <ClCompile Include="..\coop\z_camera.c" />
+    <ClCompile Include="..\coop\z_handler.c" />
+    <ClCompile Include="..\coop\z_hound.c" />
+    <ClCompile Include="..\coop\z_item.c" />
+    <ClCompile Include="..\coop\z_sentien.c" />
+    <ClCompile Include="..\coop\z_spawn.c" />
+    <ClCompile Include="..\coop\z_trigger.c" />
+    <ClCompile Include="..\coop\z_weapon.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\coop\game.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\coop\b_cam.h" />
+    <ClInclude Include="..\coop\flashlight.h" />
+    <ClInclude Include="..\coop\game.h" />
+    <ClInclude Include="..\coop\g_local.h" />
+    <ClInclude Include="..\coop\menu.h" />
+    <ClInclude Include="..\coop\m_actor.h" />
+    <ClInclude Include="..\coop\m_berserk.h" />
+    <ClInclude Include="..\coop\m_boss2.h" />
+    <ClInclude Include="..\coop\m_boss31.h" />
+    <ClInclude Include="..\coop\m_boss32.h" />
+    <ClInclude Include="..\coop\m_brain.h" />
+    <ClInclude Include="..\coop\m_carrier.h" />
+    <ClInclude Include="..\coop\m_chick.h" />
+    <ClInclude Include="..\coop\m_fixbot.h" />
+    <ClInclude Include="..\coop\m_flipper.h" />
+    <ClInclude Include="..\coop\m_float.h" />
+    <ClInclude Include="..\coop\m_flyer.h" />
+    <ClInclude Include="..\coop\m_gekk.h" />
+    <ClInclude Include="..\coop\m_gladiator.h" />
+    <ClInclude Include="..\coop\m_gunner.h" />
+    <ClInclude Include="..\coop\m_hover.h" />
+    <ClInclude Include="..\coop\m_infantry.h" />
+    <ClInclude Include="..\coop\m_insane.h" />
+    <ClInclude Include="..\coop\m_medic.h" />
+    <ClInclude Include="..\coop\m_mutant.h" />
+    <ClInclude Include="..\coop\m_parasite.h" />
+    <ClInclude Include="..\coop\m_player.h" />
+    <ClInclude Include="..\coop\m_rider.h" />
+    <ClInclude Include="..\coop\m_soldier.h" />
+    <ClInclude Include="..\coop\m_stalker.h" />
+    <ClInclude Include="..\coop\m_supertank.h" />
+    <ClInclude Include="..\coop\m_tank.h" />
+    <ClInclude Include="..\coop\m_turret.h" />
+    <ClInclude Include="..\coop\m_widow.h" />
+    <ClInclude Include="..\coop\m_widow2.h" />
+    <ClInclude Include="..\coop\p_hook.h" />
+    <ClInclude Include="..\coop\q_shared.h" />
+    <ClInclude Include="..\coop\tables\clientfields.h" />
+    <ClInclude Include="..\coop\tables\fields.h" />
+    <ClInclude Include="..\coop\tables\gamefunc_decs.h" />
+    <ClInclude Include="..\coop\tables\gamefunc_list.h" />
+    <ClInclude Include="..\coop\tables\gamemmove_decs.h" />
+    <ClInclude Include="..\coop\tables\gamemmove_list.h" />
+    <ClInclude Include="..\coop\tables\levelfields.h" />
+    <ClInclude Include="..\coop\z_boss.h" />
+    <ClInclude Include="..\coop\z_handler.h" />
+    <ClInclude Include="..\coop\z_hound.h" />
+    <ClInclude Include="..\coop\z_sentien.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

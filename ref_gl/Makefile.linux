@@ -1,0 +1,102 @@
+CC = gcc
+NASM = nasm
+
+# asm optimizations (shouldn't be needed)
+USE_ASM=0
+# use nasm or gas as assembler:
+USE_NASM=0
+
+# use SDL or GLX implementation:
+USE_SDL=1
+
+CFLAGS = -Wall -O2 -fPIC
+CFLAGS+= -fomit-frame-pointer
+CFLAGS+= -ffast-math
+CPPFLAGS+= -DNDEBUG
+CPPFLAGS+= -I../client -I../qcommon -I../game
+CPPFLAGS+= -I../ref_gl
+LDFLAGS = -shared
+# make sure that this flags is supported..
+LDFLAGS+= -Wl,--no-undefined
+# export only the relevant functions:
+LDFLAGS+= -Wl,--version-script=ref.version
+LDLIBS =
+
+ifeq ($(USE_ASM),1)
+CPPFLAGS+= -Did386=1
+else
+CPPFLAGS+= -Did386=0
+endif
+ifeq ($(USE_NASM),1)
+ASMDIR=../nasm
+else
+ASMDIR=../gas
+endif
+
+ifeq ($(USE_SDL),0)
+# FIXME: glx version not implemented yet
+GLIMP = gl_glx
+CPPFLAGS+= -DGLIMP_GLX
+LDLIBS+= -lX11 -lXext -lXxf86dga -lXxf86vm
+LDLIBS+= -ldl
+else
+GLIMP = gl_sdl
+CPPFLAGS+= -DGLIMP_SDL
+SDL_CONFIG =sdl-config
+SDL_CFLAGS = $(shell $(SDL_CONFIG) --cflags 2> /dev/null)
+SDL_LIBS   = $(shell $(SDL_CONFIG) --libs 2> /dev/null)
+CFLAGS+= $(SDL_CFLAGS)
+LDLIBS+= $(SDL_LIBS)
+endif
+LDLIBS+= -lm
+
+REFSOFT = ../game/q_shared.o \
+	../qcommon/crc.o \
+	../linux/glob.o \
+	../linux/q_shlinux.o \
+	../linux/qgl_linux.o \
+	../linux/$(GLIMP).o \
+	gl_draw.o \
+	gl_image.o \
+	gl_light.o \
+	gl_mesh.o \
+	gl_model.o \
+	gl_rmain.o \
+	gl_rmisc.o \
+	gl_rsurf.o \
+	gl_warp.o
+
+ifeq ($(USE_ASM),1)
+REFASM = $(ASMDIR)/math_ref.o \
+	$(ASMDIR)/math.o \
+	$(ASMDIR)/sys_dosa.o
+endif
+
+.PHONY: all test clean
+#
+
+OBJECTS = $(REFSOFT) $(REFASM)
+
+all: ref_gl.so
+
+ref_gl.so: $(OBJECTS)
+	$(CC) -o ref_gl.so $(LDFLAGS) $(OBJECTS) $(LDLIBS)
+
+clean:
+	rm -f *.o
+	rm -f ../linux/*.o
+	rm -f ../game/*.o
+	rm -f ../qcommon/*.o
+	rm -f ../gas/*.o
+	rm -f ../nasm/*.o
+
+DO_AS=$(CC) -x assembler-with-cpp
+
+%.o: %.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+
+%.o: %.s
+	$(DO_AS) $(CFLAGS) $(CPPFLAGS) -DELF -c $< -o $@
+
+%.o: %.asm
+	$(NASM) -I../nasm/ -d_NO_PREFIX -f elf -o $@ $<

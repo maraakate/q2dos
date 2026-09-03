@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{1BC87A8E-93A6-4183-8E60-B197D2E4E32E}</ProjectGuid>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>15.0.28307.799</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>.\Zaero\Release\</OutDir>
+    <IntDir>.\Zaero\Release\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>.\Zaero\Debug\</OutDir>
+    <IntDir>.\Zaero\Debug\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>.\Zaero\Release\</OutDir>
+    <IntDir>.\Zaero\Release\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>.\Zaero\Debug\</OutDir>
+    <IntDir>.\Zaero\Debug\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\Zaero\Release/zaerogamex86.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <OmitFramePointers>true</OmitFramePointers>
+      <PreprocessorDefinitions>WIN32;id386=1;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x1009</Culture>
+    </ResourceCompile>
+    <Link>
+      <OutputFile>$(OutDir)gamex86.dll</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ModuleDefinitionFile>..\zaero\game.def</ModuleDefinitionFile>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\Zaero\Release/zaerogamex86.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\Zaero\Debug/zaerogamex86.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;id386=1;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <BrowseInformation>true</BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x1009</Culture>
+    </ResourceCompile>
+    <Link>
+      <OutputFile>$(OutDir)gamex86.dll</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ModuleDefinitionFile>..\zaero\game.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\Zaero\Debug/zaerogamex86.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>X64</TargetEnvironment>
+      <TypeLibraryName>.\Zaero\Release/zaerogamex86.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <OmitFramePointers>true</OmitFramePointers>
+      <PreprocessorDefinitions>WIN32;id386=0;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DisableSpecificWarnings>4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x1009</Culture>
+    </ResourceCompile>
+    <Link>
+      <OutputFile>$(OutDir)gamex64.dll</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ModuleDefinitionFile>..\zaero\game.def</ModuleDefinitionFile>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+    <Bscmake>
+      <OutputFile>.\Zaero\Release/zaerogamex86.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>X64</TargetEnvironment>
+      <TypeLibraryName>.\Zaero\Debug/zaerogamex86.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;id386=0;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <BrowseInformation>true</BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x1009</Culture>
+    </ResourceCompile>
+    <Link>
+      <OutputFile>$(OutDir)gamex64.dll</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ModuleDefinitionFile>..\zaero\game.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+    <Bscmake>
+      <OutputFile>.\Zaero\Debug/zaerogamex86.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\zaero\g_ai.c" />
+    <ClCompile Include="..\zaero\g_chase.c" />
+    <ClCompile Include="..\zaero\g_cmds.c" />
+    <ClCompile Include="..\zaero\g_combat.c" />
+    <ClCompile Include="..\zaero\g_func.c" />
+    <ClCompile Include="..\zaero\g_items.c" />
+    <ClCompile Include="..\zaero\g_main.c" />
+    <ClCompile Include="..\zaero\g_misc.c" />
+    <ClCompile Include="..\zaero\g_monster.c" />
+    <ClCompile Include="..\zaero\g_phys.c" />
+    <ClCompile Include="..\zaero\g_save.c" />
+    <ClCompile Include="..\zaero\g_spawn.c" />
+    <ClCompile Include="..\zaero\g_svcmds.c" />
+    <ClCompile Include="..\zaero\g_target.c" />
+    <ClCompile Include="..\zaero\g_trigger.c" />
+    <ClCompile Include="..\zaero\g_turret.c" />
+    <ClCompile Include="..\zaero\g_utils.c" />
+    <ClCompile Include="..\zaero\g_weapon.c" />
+    <ClCompile Include="..\zaero\m_actor.c" />
+    <ClCompile Include="..\zaero\m_berserk.c" />
+    <ClCompile Include="..\zaero\m_boss2.c" />
+    <ClCompile Include="..\zaero\m_boss3.c" />
+    <ClCompile Include="..\zaero\m_boss31.c" />
+    <ClCompile Include="..\zaero\m_boss32.c" />
+    <ClCompile Include="..\zaero\m_brain.c" />
+    <ClCompile Include="..\zaero\m_chick.c" />
+    <ClCompile Include="..\zaero\m_flash.c" />
+    <ClCompile Include="..\zaero\m_flipper.c" />
+    <ClCompile Include="..\zaero\m_float.c" />
+    <ClCompile Include="..\zaero\m_flyer.c" />
+    <ClCompile Include="..\zaero\m_gladiator.c" />
+    <ClCompile Include="..\zaero\m_gunner.c" />
+    <ClCompile Include="..\zaero\m_hover.c" />
+    <ClCompile Include="..\zaero\m_infantry.c" />
+    <ClCompile Include="..\zaero\m_insane.c" />
+    <ClCompile Include="..\zaero\m_medic.c" />
+    <ClCompile Include="..\zaero\m_move.c" />
+    <ClCompile Include="..\zaero\m_mutant.c" />
+    <ClCompile Include="..\zaero\m_parasite.c" />
+    <ClCompile Include="..\zaero\m_soldier.c" />
+    <ClCompile Include="..\zaero\m_supertank.c" />
+    <ClCompile Include="..\zaero\m_tank.c" />
+    <ClCompile Include="..\zaero\p_client.c" />
+    <ClCompile Include="..\zaero\p_hud.c" />
+    <ClCompile Include="..\zaero\p_trail.c" />
+    <ClCompile Include="..\zaero\p_view.c" />
+    <ClCompile Include="..\zaero\p_weapon.c" />
+    <ClCompile Include="..\zaero\q_shared.c" />
+    <ClCompile Include="..\zaero\z_acannon.c" />
+    <ClCompile Include="..\zaero\z_ai.c" />
+    <ClCompile Include="..\zaero\z_anim.c" />
+    <ClCompile Include="..\zaero\z_boss.c" />
+    <ClCompile Include="..\zaero\z_camera.c" />
+    <ClCompile Include="..\zaero\z_debug.c" />
+    <ClCompile Include="..\zaero\z_frames.c" />
+    <ClCompile Include="..\zaero\z_handler.c" />
+    <ClCompile Include="..\zaero\z_hound.c" />
+    <ClCompile Include="..\zaero\z_item.c" />
+    <ClCompile Include="..\zaero\z_list.c" />
+    <ClCompile Include="..\zaero\z_mtest.c" />
+    <ClCompile Include="..\zaero\z_sentien.c" />
+    <ClCompile Include="..\zaero\z_spawn.c" />
+    <ClCompile Include="..\zaero\z_trigger.c" />
+    <ClCompile Include="..\zaero\z_weapon.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\zaero\game.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\zaero\game.h" />
+    <ClInclude Include="..\zaero\g_local.h" />
+    <ClInclude Include="..\zaero\m_actor.h" />
+    <ClInclude Include="..\zaero\m_berserk.h" />
+    <ClInclude Include="..\zaero\m_boss2.h" />
+    <ClInclude Include="..\zaero\m_boss31.h" />
+    <ClInclude Include="..\zaero\m_boss32.h" />
+    <ClInclude Include="..\zaero\m_brain.h" />
+    <ClInclude Include="..\zaero\m_chick.h" />
+    <ClInclude Include="..\zaero\m_flipper.h" />
+    <ClInclude Include="..\zaero\m_float.h" />
+    <ClInclude Include="..\zaero\m_flyer.h" />
+    <ClInclude Include="..\zaero\m_gladiator.h" />
+    <ClInclude Include="..\zaero\m_gunner.h" />
+    <ClInclude Include="..\zaero\m_hover.h" />
+    <ClInclude Include="..\zaero\m_infantry.h" />
+    <ClInclude Include="..\zaero\m_insane.h" />
+    <ClInclude Include="..\zaero\m_medic.h" />
+    <ClInclude Include="..\zaero\m_mutant.h" />
+    <ClInclude Include="..\zaero\m_parasite.h" />
+    <ClInclude Include="..\zaero\m_player.h" />
+    <ClInclude Include="..\zaero\m_rider.h" />
+    <ClInclude Include="..\zaero\m_soldier.h" />
+    <ClInclude Include="..\zaero\m_supertank.h" />
+    <ClInclude Include="..\zaero\m_tank.h" />
+    <ClInclude Include="..\zaero\q_shared.h" />
+    <ClInclude Include="..\zaero\tables\clientfields.h" />
+    <ClInclude Include="..\zaero\tables\fields.h" />
+    <ClInclude Include="..\zaero\tables\gamefunc_decs.h" />
+    <ClInclude Include="..\zaero\tables\gamefunc_list.h" />
+    <ClInclude Include="..\zaero\tables\gamemmove_decs.h" />
+    <ClInclude Include="..\zaero\tables\gamemmove_list.h" />
+    <ClInclude Include="..\zaero\tables\levelfields.h" />
+    <ClInclude Include="..\zaero\z_anim.h" />
+    <ClInclude Include="..\zaero\z_boss.h" />
+    <ClInclude Include="..\zaero\z_debug.h" />
+    <ClInclude Include="..\zaero\z_frames.h" />
+    <ClInclude Include="..\zaero\z_handler.h" />
+    <ClInclude Include="..\zaero\z_hound.h" />
+    <ClInclude Include="..\zaero\z_list.h" />
+    <ClInclude Include="..\zaero\z_sentien.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

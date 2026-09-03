@@ -4,6 +4,13 @@
 
 qboolean Bot_CanReachSpotDirectly(edict_t *ent, vec3_t target);
 
+int path_buffer[100];
+int first_pathnode = 0;
+int numnodes = -1;
+
+nodes_t		nodes[MAX_NODES];
+nodeinfo_t	nodeinfo[MAX_NODES];
+
 /*
 Init the note table system
 */

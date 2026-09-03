@@ -250,14 +250,18 @@ void R_ConcatTransforms (float in1[3][4], float in2[3][4], float out[3][4])
 
 float Q_fabs (float f)
 {
-	int tmp = *(int *) &f;
-	tmp &= 0x7FFFFFFF;
-	return *(float *) &tmp;
+	union {
+	    float f;
+	    int   i;
+	} u;
+	u.f = f;
+	u.i &= 0x7FFFFFFF;
+	return u.f;
 }
 
 #if defined(_MSC_VER) && defined(_M_IX86) && !defined(C_ONLY)
 #pragma warning (disable:4035)
-__declspec( naked ) long Q_ftol( float f )
+__declspec( naked ) int Q_ftol( float f )
 {
 	static int tmp;
 	__asm fld dword ptr [esp+4]
@@ -1018,10 +1022,10 @@ Swap_Init
 */
 void Swap_Init (void)
 {
-	byte	swaptest[2] = {1,0};
+	int	i = 0x12345678;
 
 // set the byte swapping variables in a portable manner	
-	if ( *(short *)swaptest == 1)
+	if ( *(char *)&i == 0x78)	/* LITTLE_ENDIAN */
 	{
 		bigendien = false;
 		_BigShort = ShortSwap;
@@ -1053,7 +1057,7 @@ varargs versions of all text functions.
 FIXME: make this buffer size safe someday
 ============
 */
-char	*va(char *format, ...)
+char	*va(const char *format, ...)
 {
 	va_list		argptr;
 	static char		string[1024];
@@ -1183,7 +1187,7 @@ void Com_PageInMemory (byte *buffer, int size)
 */
 
 // FIXME: replace all Q_stricmp with Q_strcasecmp
-int Q_stricmp (char *s1, char *s2)
+int Q_stricmp (const char *s1, const char *s2)
 {
 #if defined(_WIN32)
 	return _stricmp (s1, s2);
@@ -1194,7 +1198,7 @@ int Q_stricmp (char *s1, char *s2)
 #endif
 }
 
-int Q_strncasecmp (char *s1, char *s2, int n)
+int Q_strncasecmp (const char *s1, const char *s2, int n)
 {
 	int		c1, c2;
 
@@ -1220,13 +1224,13 @@ int Q_strncasecmp (char *s1, char *s2, int n)
 	return 0;		// strings are equal
 }
 
-int Q_strcasecmp (char *s1, char *s2)
+int Q_strcasecmp (const char *s1, const char *s2)
 {
 	return Q_strncasecmp (s1, s2, 99999);
 }
 
 
-void Com_sprintf (char *dest, int size, char *fmt, ...)
+void Com_sprintf (char *dest, int size, const char *fmt, ...)
 {
 	int		len;
 	va_list		argptr;
@@ -1380,7 +1384,12 @@ void Info_RemoveKey (char *s, char *key)
 	char	value[512];
 	char	*o;
 
-	if (strstr (key, "\\"))
+	if (!key)
+	{
+		return;
+	}
+
+	if (strchr(key, '\\'))
 	{
 //		Com_Printf ("Can't use a key with a \\\n");
 		return;
@@ -1432,9 +1441,9 @@ can mess up the server's parsing
 */
 qboolean Info_Validate (char *s)
 {
-	if (strstr (s, "\""))
+	if (strchr(s, '\"'))
 		return false;
-	if (strstr (s, ";"))
+	if (strchr(s, ';'))
 		return false;
 	return true;
 }
@@ -1445,25 +1454,25 @@ void Info_SetValueForKey (char *s, char *key, char *value)
 	int		c;
 	int		maxsize = MAX_INFO_STRING;
 
-	if (strstr (key, "\\") || strstr (value, "\\") )
+	if ((key && strchr(key, '\\')) || (value && strchr(value, '\\')))
 	{
 		Com_Printf ("Can't use keys or values with a \\\n");
 		return;
 	}
 
-	if (strstr (key, ";") )
+	if (key && strchr(key, ';'))
 	{
 		Com_Printf ("Can't use keys or values with a semicolon\n");
 		return;
 	}
 
-	if (strstr (key, "\"") || strstr (value, "\"") )
+	if ((key && strchr(key, '\"')) || (value && strchr(value, '\"')))
 	{
 		Com_Printf ("Can't use keys or values with a \"\n");
 		return;
 	}
 
-	if (strlen(key) > MAX_INFO_KEY-1 || strlen(value) > MAX_INFO_KEY-1)
+	if ((key && (strlen(key) > MAX_INFO_KEY-1)) || (value && (strlen(value) > MAX_INFO_KEY-1)))
 	{
 		Com_Printf ("Keys and values must be < 64 characters.\n");
 		return;
@@ -1474,7 +1483,7 @@ void Info_SetValueForKey (char *s, char *key, char *value)
 
 	Com_sprintf (newi, sizeof(newi), "\\%s\\%s", key, value);
 
-	if (strlen(newi) + strlen(s) > maxsize)
+	if (strlen(newi) + strlen(s) >= maxsize)
 	{
 		Com_Printf ("Info string length exceeded\n");
 		return;

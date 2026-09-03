@@ -134,7 +134,7 @@ Tag_Score(edict_t *attacker, edict_t *victim, int scoreChange)
 qboolean
 Tag_PickupToken(edict_t *ent, edict_t *other)
 {
-	if (gamerules && (gamerules->value != 2))
+	if (gamerules && (gamerules->intValue != 2))
 	{
 		return false;
 	}
@@ -340,13 +340,13 @@ SP_dm_tag_token(edict_t *self)
 		return;
 	}
 
-	if (!(deathmatch->value))
+	if (!(deathmatch->intValue))
 	{
 		G_FreeEdict(self);
 		return;
 	}
 
-	if (gamerules && (gamerules->value != 2))
+	if (gamerules && (gamerules->intValue != 2))
 	{
 		G_FreeEdict(self);
 		return;

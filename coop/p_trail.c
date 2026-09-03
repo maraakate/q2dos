@@ -23,7 +23,7 @@ PlayerTrail_Init(void)
 {
 	int n;
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		return;
 	}

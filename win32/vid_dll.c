@@ -27,13 +27,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "winquake.h"
 //#include "zmouse.h"
 
+#ifndef GetWindowLongPtr
+#define GetWindowLongPtr GetWindowLong
+#endif
+
+#ifndef SetWindowLongPtr
+#define SetWindowLongPtr SetWindowLong
+#endif
+
 // Structure containing functions exported from refresh DLL
 refexport_t	re;
 
 cvar_t *win_noalttab;
 
 #ifndef WM_MOUSEWHEEL
-#define WM_MOUSEWHEEL (WM_MOUSELAST+1)  // message that will be supported by the OS 
+#define WM_MOUSEWHEEL (WM_MOUSELAST+1)  // message that will be supported by the OS
 #endif
 
 static UINT MSH_MOUSEWHEEL;
@@ -53,15 +61,15 @@ viddef_t	viddef;				// global video state; used by other modules
 #ifdef REF_HARD_LINKED
 refexport_t GetRefAPI (refimport_t rimp);
 #else
-HINSTANCE	reflib_library;		// Handle to refresh DLL 
+HINSTANCE	reflib_library;		// Handle to refresh DLL
 #endif
 qboolean	reflib_active = 0;
 
-HWND        cl_hwnd;            // Main window handle for life of program
+HWND		cl_hwnd;		// Main window handle for life of program
 
-#define VID_NUM_MODES ( sizeof( vid_modes ) / sizeof( vid_modes[0] ) )
+#define VID_NUM_MODES (sizeof(vid_modes) / sizeof(vid_modes[0]))
 
-LRESULT WINAPI MainWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
+LRESULT WINAPI MainWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 static qboolean s_alttab_disabled;
 
@@ -89,8 +97,8 @@ static void WIN_DisableAltTab( void )
 	}
 	else
 	{
-		RegisterHotKey( 0, 0, MOD_ALT, VK_TAB );
-		RegisterHotKey( 0, 1, MOD_ALT, VK_RETURN );
+		RegisterHotKey( NULL, 0, MOD_ALT, VK_TAB );
+		RegisterHotKey( NULL, 1, MOD_ALT, VK_RETURN );
 	}
 	s_alttab_disabled = true;
 }
@@ -107,8 +115,8 @@ static void WIN_EnableAltTab( void )
 		}
 		else
 		{
-			UnregisterHotKey( 0, 0 );
-			UnregisterHotKey( 0, 1 );
+			UnregisterHotKey( NULL, 0 );
+			UnregisterHotKey( NULL, 1 );
 		}
 
 		s_alttab_disabled = false;
@@ -124,8 +132,8 @@ DLL GLUE
 */
 
 #define	MAXPRINTMSG	4096
-void __attribute__((__format__(__printf__,2,3)))
-VID_Printf (int print_level, char *fmt, ...)
+static void __attribute__((__format__(__printf__,2,3)))
+VID_Printf (int print_level, const char *fmt, ...)
 {
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
@@ -136,22 +144,18 @@ VID_Printf (int print_level, char *fmt, ...)
 	msg[sizeof(msg)-1] = 0;
 
 	if (print_level == PRINT_ALL)
-	{
 		Com_Printf ("%s", msg);
-	}
 	else if ( print_level == PRINT_DEVELOPER )
-	{
 		Com_DPrintf(DEVELOPER_MSG_GFX, "%s", msg);
-	}
 	else if ( print_level == PRINT_ALERT )
 	{
-		MessageBox( 0, msg, "PRINT_ALERT", MB_ICONWARNING );
-		OutputDebugString( msg );
+		MessageBoxA( NULL, msg, "PRINT_ALERT", MB_ICONWARNING );
+		OutputDebugStringA( msg );
 	}
 }
 
-void __attribute__((__noreturn__, __format__(__printf__,2,3)))
-VID_Error (int err_level, char *fmt, ...)
+static void __attribute__((__noreturn__, __format__(__printf__,2,3)))
+VID_Error (int err_level, const char *fmt, ...)
 {
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
@@ -271,7 +275,7 @@ void AppActivate(BOOL fActive, BOOL minimize)
 		CDAudio_Activate (false);
 		S_Activate (false);
 
-		if ( win_noalttab->value )
+		if ( win_noalttab->intValue )
 		{
 			WIN_EnableAltTab();
 		}
@@ -281,7 +285,7 @@ void AppActivate(BOOL fActive, BOOL minimize)
 		IN_Activate (true);
 		CDAudio_Activate (true);
 		S_Activate (true);
-		if ( win_noalttab->value )
+		if ( win_noalttab->intValue )
 		{
 			WIN_DisableAltTab();
 		}
@@ -303,7 +307,7 @@ LRESULT WINAPI MainWndProc (
 {
 	if ( uMsg == MSH_MOUSEWHEEL )
 	{
-		if ( ( ( int ) wParam ) > 0 )
+		if (((int) wParam) > 0)
 		{
 			Key_Event( K_MWHEELUP, true, sys_msg_time );
 			Key_Event( K_MWHEELUP, false, sys_msg_time );
@@ -313,7 +317,7 @@ LRESULT WINAPI MainWndProc (
 			Key_Event( K_MWHEELDOWN, true, sys_msg_time );
 			Key_Event( K_MWHEELDOWN, false, sys_msg_time );
 		}
-        return DefWindowProc (hWnd, uMsg, wParam, lParam);
+		return DefWindowProc (hWnd, uMsg, wParam, lParam);
 	}
 
 	switch (uMsg)
@@ -340,18 +344,17 @@ LRESULT WINAPI MainWndProc (
 
 	case WM_CREATE:
 		cl_hwnd = hWnd;
-
 		MSH_MOUSEWHEEL = RegisterWindowMessage("MSWHEEL_ROLLMSG"); 
-        return DefWindowProc (hWnd, uMsg, wParam, lParam);
+		return DefWindowProc (hWnd, uMsg, wParam, lParam);
 
 	case WM_PAINT:
 		SCR_DirtyScreen ();	// force entire screen to update next frame
-        return DefWindowProc (hWnd, uMsg, wParam, lParam);
+		return DefWindowProc (hWnd, uMsg, wParam, lParam);
 
 	case WM_DESTROY:
 		// let sound and input know about this?
 		cl_hwnd = NULL;
-        return DefWindowProc (hWnd, uMsg, wParam, lParam);
+		return DefWindowProc (hWnd, uMsg, wParam, lParam);
 
 	case WM_ACTIVATE:
 		{
@@ -366,7 +369,7 @@ LRESULT WINAPI MainWndProc (
 			if ( reflib_active )
 				re.AppActivate( !( fActive == WA_INACTIVE ) );
 		}
-        return DefWindowProc (hWnd, uMsg, wParam, lParam);
+		return DefWindowProc (hWnd, uMsg, wParam, lParam);
 
 	case WM_MOVE:
 		{
@@ -374,7 +377,7 @@ LRESULT WINAPI MainWndProc (
 			RECT r;
 			int		style;
 
-			if (!vid_fullscreen->value)
+			if (!vid_fullscreen->intValue)
 			{
 				xPos = (short) LOWORD(lParam);    // horizontal position 
 				yPos = (short) HIWORD(lParam);    // vertical position 
@@ -384,7 +387,7 @@ LRESULT WINAPI MainWndProc (
 				r.right  = 1;
 				r.bottom = 1;
 
-				style = GetWindowLong( hWnd, GWL_STYLE );
+				style = GetWindowLongPtr(hWnd, GWL_STYLE);
 				AdjustWindowRect( &r, style, FALSE );
 
 				Cvar_SetValue( "vid_xpos", xPos + r.left);
@@ -395,7 +398,7 @@ LRESULT WINAPI MainWndProc (
 					IN_Activate (true);
 			}
 		}
-        return DefWindowProc (hWnd, uMsg, wParam, lParam);
+		return DefWindowProc (hWnd, uMsg, wParam, lParam);
 
 // this is complicated because Win32 seems to pack multiple mouse events into
 // one update sometimes, so we always check all states and look for events
@@ -407,19 +410,14 @@ LRESULT WINAPI MainWndProc (
 	case WM_MBUTTONUP:
 	case WM_MOUSEMOVE:
 		{
-			int	temp;
-
-			temp = 0;
+			int	temp = 0;
 
 			if (wParam & MK_LBUTTON)
 				temp |= 1;
-
 			if (wParam & MK_RBUTTON)
 				temp |= 2;
-
 			if (wParam & MK_MBUTTON)
 				temp |= 4;
-
 			IN_MouseEvent (temp);
 		}
 		break;
@@ -427,7 +425,7 @@ LRESULT WINAPI MainWndProc (
 	case WM_SYSCOMMAND:
 		if ( wParam == SC_SCREENSAVE )
 			return 0;
-        return DefWindowProc (hWnd, uMsg, wParam, lParam);
+		return DefWindowProc (hWnd, uMsg, wParam, lParam);
 	case WM_SYSKEYDOWN:
 		if ( wParam == 13 )
 		{
@@ -457,11 +455,18 @@ LRESULT WINAPI MainWndProc (
 		break;
 
 	default:	// pass all unhandled messages to DefWindowProc
-        return DefWindowProc (hWnd, uMsg, wParam, lParam);
-    }
+		return DefWindowProc (hWnd, uMsg, wParam, lParam);
+	}
 
-    /* return 0 if handled message, 1 if not */
-    return DefWindowProc( hWnd, uMsg, wParam, lParam );
+	/* return 0 if handled message, 1 if not */
+	return DefWindowProc( hWnd, uMsg, wParam, lParam );
+}
+
+void VID_Minimize_f (void) /* FS: By request. */
+{
+#ifndef DEDICATED_ONLY
+	ShowWindow(cl_hwnd, SW_MINIMIZE);
+#endif
 }
 
 /*
@@ -480,7 +485,7 @@ void VID_Restart_f (void)
 
 void VID_Front_f( void )
 {
-	SetWindowLong( cl_hwnd, GWL_EXSTYLE, WS_EX_TOPMOST );
+	SetWindowLongPtr( cl_hwnd, GWL_EXSTYLE, WS_EX_TOPMOST );
 	SetForegroundWindow( cl_hwnd );
 }
 
@@ -541,7 +546,7 @@ void VID_UpdateWindowPosAndSize( int x, int y )
 	r.right  = viddef.width;
 	r.bottom = viddef.height;
 
-	style = GetWindowLong( cl_hwnd, GWL_STYLE );
+	style = GetWindowLongPtr( cl_hwnd, GWL_STYLE );
 	AdjustWindowRect( &r, style, FALSE );
 
 	w = r.right - r.left;
@@ -583,7 +588,7 @@ qboolean VID_LoadRefresh( char *name )
 #ifndef REF_HARD_LINKED
 	GetRefAPI_t	GetRefAPI;
 #endif
-	
+
 	if ( reflib_active )
 	{
 		re.Shutdown();
@@ -593,7 +598,7 @@ qboolean VID_LoadRefresh( char *name )
 	Com_Printf( "------- Loading %s -------\n", name );
 
 #ifndef REF_HARD_LINKED
-	if ( ( reflib_library = LoadLibrary( name ) ) == NULL )
+	if ((reflib_library = LoadLibraryA(name)) == NULL)
 	{
 		Com_Printf( "LoadLibrary(\"%s\") failed\n", name );
 		return false;
@@ -613,12 +618,14 @@ qboolean VID_LoadRefresh( char *name )
 	ri.Cvar_Get = Cvar_Get;
 	ri.Cvar_Set = Cvar_Set;
 	ri.Cvar_SetValue = Cvar_SetValue;
+	ri.Cvar_SetDescription = Cvar_SetDescription; /* FS */
+	ri.Cvar_ForceSet = Cvar_ForceSet; /* FS */
 	ri.Vid_GetModeInfo = VID_GetModeInfo;
 	ri.Vid_MenuInit = VID_MenuInit;
 	ri.Vid_NewWindow = VID_NewWindow;
 
 #ifndef REF_HARD_LINKED
-	if ( ( GetRefAPI = (void *) GetProcAddress( reflib_library, "GetRefAPI" ) ) == NULL )
+	if ((GetRefAPI = (GetRefAPI_t) GetProcAddress(reflib_library, "GetRefAPI")) == NULL)
 		Com_Error( ERR_FATAL, "GetProcAddress failed on %s", name );
 #endif
 
@@ -630,7 +637,7 @@ qboolean VID_LoadRefresh( char *name )
 		Com_Error (ERR_FATAL, "%s has incompatible api_version", name);
 	}
 
-	if ( re.Init( global_hInstance, MainWndProc ) == -1 )
+	if (re.Init((void *) global_hInstance, (void *) MainWndProc) == -1)
 	{
 		re.Shutdown();
 		VID_FreeReflib ();
@@ -661,7 +668,7 @@ qboolean VID_LoadRefresh( char *name )
 VID_CheckChanges
 
 This function gets called once just before drawing each frame, and it's sole purpose in life
-is to check to see if any of the video mode parameters have changed, and if they have to 
+is to check to see if any of the video mode parameters have changed, and if they have to
 update the rendering DLL and/or video mode to match.
 ============
 */
@@ -671,7 +678,7 @@ void VID_CheckChanges (void)
 
 	if ( win_noalttab->modified )
 	{
-		if ( win_noalttab->value )
+		if ( win_noalttab->intValue )
 		{
 			WIN_DisableAltTab();
 		}
@@ -720,8 +727,8 @@ void VID_CheckChanges (void)
 	*/
 	if ( vid_xpos->modified || vid_ypos->modified )
 	{
-		if (!vid_fullscreen->value)
-			VID_UpdateWindowPosAndSize( vid_xpos->value, vid_ypos->value );
+		if (!vid_fullscreen->intValue)
+			VID_UpdateWindowPosAndSize( vid_xpos->intValue, vid_ypos->intValue );
 
 		vid_xpos->modified = false;
 		vid_ypos->modified = false;
@@ -749,6 +756,8 @@ void VID_Init (void)
 	Cmd_AddCommand ("vid_restart", VID_Restart_f);
 	Cmd_AddCommand ("vid_front", VID_Front_f);
 
+	Cmd_AddCommand ("minimize", VID_Minimize_f); /* FS: By request. */
+
 	/*
 	** this is a gross hack but necessary to clamp the mode for 3Dfx
 	*/
@@ -757,7 +766,7 @@ void VID_Init (void)
 		cvar_t *gl_driver = Cvar_Get( "gl_driver", "opengl32", 0 );
 		cvar_t *gl_mode = Cvar_Get( "gl_mode", "3", 0 );
 
-		if ( stricmp( gl_driver->string, "3dfxgl" ) == 0 )
+		if ( Q_stricmp( gl_driver->string, "3dfxgl" ) == 0 )
 		{
 			Cvar_SetValue( "gl_mode", 3 );
 			viddef.width  = 640;
@@ -767,9 +776,9 @@ void VID_Init (void)
 #endif
 
 	/* Disable the 3Dfx splash screen */
-	putenv("FX_GLIDE_NO_SPLASH=1");
+	_putenv("FX_GLIDE_NO_SPLASH=1");
 	/* don't let fxMesa cheat multitexturing */
-	putenv("FX_DONT_FAKE_MULTITEX=1");
+	_putenv("FX_DONT_FAKE_MULTITEX=1");
 
 	/* Start the graphics mode and load refresh DLL */
 	VID_CheckChanges();
@@ -788,5 +797,3 @@ void VID_Shutdown (void)
 		VID_FreeReflib ();
 	}
 }
-
-

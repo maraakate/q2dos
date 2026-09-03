@@ -21,11 +21,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#ifndef __linux__
-#include <conio.h>
-#else
-#include <linutil.h>
-#endif
 #include <assert.h>
 #include <string.h>
 
@@ -58,7 +53,6 @@ main(int argc, char **argv)
   FxU32                wrange[2];
 
   FxU32
-    multiBaseMode = 0, 
     minTexSize = 1,
     maxTexSize = 256;
 
@@ -78,7 +72,7 @@ main(int argc, char **argv)
     exit(-1);
   }
   /* Process Command Line Arguments */
-  while(rv = tlGetOpt(argc, argv, "dmnrx", &match, &remArgs)) {
+  while((rv = tlGetOpt(argc, argv, "dmnrx", &match, &remArgs)) != 0) {
     if (rv == -1) {
       printf("Unrecognized command line argument\n");
       printf("%s %s\n", name, usage);
@@ -369,9 +363,6 @@ main(int argc, char **argv)
 
   tlConOutput("Press a key to quit\n");
   while(frames-- && tlOkToRender()) {
-    static float 
-      curOOW = 1.0f;
-
     if (hwconfig == TL_VOODOORUSH) {
       tlGetDimsByConst(resolution,
                        &scrWidth, 

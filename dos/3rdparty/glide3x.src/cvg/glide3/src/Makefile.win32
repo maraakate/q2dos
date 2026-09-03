@@ -1,20 +1,15 @@
-# Win32 makefile for Glide3/CVG and Texus2
+# Win32 makefile for Glide3/CVG and Texus2, using Visual Studio (cl.exe)
 # This makefile MUST be processed by GNU make!!!
 #
 #  Copyright (c) 2004 - Daniel Borca
 #  Email : dborca@users.sourceforge.net
 #  Web   : http://www.geocities.com/dborca
 #
-# $Header: /cvsroot/glide/glide3x/cvg/glide3/src/Attic/Makefile.win32,v 1.1.2.7 2005/05/25 08:49:24 jwrdegoede Exp $
-#
-
 
 #
 #  Available options:
 #
 #    Environment variables:
-#	FX_GLIDE_HW	build for the given ASIC (cvg).
-#			default = cvg
 #	OPTFLAGS	pass given optimization flags to compiler
 #			default = -G6 -O2 (or -Od if DEBUG=1)
 #	DEBUG=1		enable debugging checks and messages
@@ -39,8 +34,6 @@
 #	realclean:	remove all generated files
 #
 
-
-
 .PHONY: all glide3x clean realclean
 .INTERMEDIATE: fxgasm.exe
 .SUFFIXES: .c .obj .rc .res
@@ -54,7 +47,6 @@ GLIDE_DLL = glide3x.dll
 GLIDE_IMP = glide3x.lib
 TEXUS_EXE = texus2.exe
 
-FX_GLIDE_HW ?= cvg
 FX_GLIDE_SW = ../../../swlibs
 GLIDE_LIBDIR = ../../lib
 TEXUS_EXEDIR = $(FX_GLIDE_SW)/bin
@@ -302,10 +294,10 @@ xtexdl_3dnow.obj: xtexdl.asm
 $(GLIDE_OBJECTS): fxinline.h fxgasm.h
 
 fxinline.h: fxgasm.exe
-	./$< -inline > $@
+	.\$< -inline > $@
 
 fxgasm.h: fxgasm.exe
-	./$< -hex > $@
+	.\$< -hex > $@
 
 fxgasm.exe: fxgasm.c
 	$(CC) -o $@ $(CFLAGS) $<

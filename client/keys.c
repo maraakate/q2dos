@@ -42,7 +42,10 @@ qboolean	menubound[256];	// if true, can't be rebound while in menu
 int		keyshift[256];		// key to map to if shift held down in console
 int		key_repeats[256];	// if > 1, it is autorepeating
 qboolean	keydown[256];
-extern char *Sort_Possible_Cmds (char *partial); /* FS: Added */
+
+/* FS: New autocomplete. */
+extern	cvar_t	*console_old_complete;
+extern char *Sort_Possible_Cmds (char *partial, qboolean backwards);
 
 typedef struct
 {
@@ -146,6 +149,8 @@ keyname_t keynames[] =
 
 	{"MWHEELUP", K_MWHEELUP },
 	{"MWHEELDOWN", K_MWHEELDOWN },
+	{"MOUSE4", K_MOUSE4},
+	{"MOUSE5", K_MOUSE5},
 
 	{"PAUSE", K_PAUSE},
 
@@ -165,7 +170,6 @@ keyname_t keynames[] =
 void CompleteCommand (void)
 {
 	char	*cmd, *s;
-	extern	cvar_t	*console_old_complete; /* FS */
 
 	s = key_lines[edit_line]+1;
 	if (*s == '\\' || *s == '/')
@@ -178,7 +182,7 @@ void CompleteCommand (void)
 	}
 	else
 	{
-		cmd = Sort_Possible_Cmds(s); /* FS: Show us all possible commands if it's a partial */
+		cmd = Sort_Possible_Cmds(s, keydown[K_SHIFT]); /* FS: Show us all possible commands if it's a partial */
 	}
 
 	if (cmd)
@@ -202,6 +206,7 @@ Interactive line editing and console scrollback
 */
 void Key_Console (int key)
 {
+	size_t len;
 
 	switch ( key )
 	{
@@ -328,6 +333,8 @@ void Key_Console (int key)
 			SCR_UpdateScreen ();	// force an update, because the command
 		}							// may take some time
 
+		Cmd_RemoveAutoComplete(); /* FS: Free tab auto-complete */
+
 		return;
 	}
 
@@ -354,8 +361,9 @@ void Key_Console (int key)
 				&& !key_lines[history_line][1]);
 		if (history_line == edit_line)
 			history_line = (edit_line+1)&31;
-		strcpy(key_lines[edit_line], key_lines[history_line]);
-		key_linepos = strlen(key_lines[edit_line]);
+		len = strlen(key_lines[history_line]);
+		memmove(key_lines[edit_line], key_lines[history_line], len+1);
+		key_linepos = (int)len;
 		return;
 	}
 
@@ -376,8 +384,9 @@ void Key_Console (int key)
 		}
 		else
 		{
-			strcpy(key_lines[edit_line], key_lines[history_line]);
-			key_linepos = strlen(key_lines[edit_line]);
+			len = strlen(key_lines[history_line]);
+			memmove(key_lines[edit_line], key_lines[history_line], len+1);
+			key_linepos = (int)len;
 		}
 		return;
 	}
@@ -986,9 +995,6 @@ void Key_Event (int key, qboolean down, unsigned time)
 		}
 		return;
 	}
-
-	if (!down)
-		return;		// other systems only care about key down events
 
 	if (shift_down)
 		key = keyshift[key];

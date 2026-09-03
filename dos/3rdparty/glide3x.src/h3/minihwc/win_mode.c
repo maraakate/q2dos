@@ -18,58 +18,92 @@
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 */
 
-#if !defined(GDBG_INFO_ON) || (GDBG_INFO_ON == 0)
-#if defined(GDBG_INFO_ON)
-#undef GDBG_INFO_ON
-#endif /* defined(GDBG_INFO_ON) */
-#define GDBG_INFO_ON
-#endif /* !defined(GDBG_INFO_ON) || (GDBG_INFO_ON == 0) */
-
 #include <stdio.h>
 #include <3dfx.h>
 #include <gdebug.h>
-#define WIN32_LEAN_AND_MEAN 
-#include <windows.h> 
-#include <ddraw.h> 
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#if (WINVER < 0x0500) && !defined(HMONITOR_DECLARED) /* <--- HACK */
+DECLARE_HANDLE(HMONITOR);
+#define HMONITOR_DECLARED
+#endif
+#include <ddraw.h>
 #include <sst1vid.h>
 #include "qmodes.h"
+#ifdef HAVE_WIN9X_DDK
 #define IS_32
 #define Not_VxD
 #include <minivdd.h>
 #include <vmm.h>
 #include <configmg.h>
+#else
+#define CM_REGISTRY_HARDWARE 0
+#define CM_REGISTRY_SOFTWARE 1
+#define CR_FAILURE 0x00000013
+#define ___CONFIGMG_Get_DevNode_Key 0x0033003d
+struct _CMIOCTLPACKET {
+ DWORD dwStack;
+ DWORD dwServiceNumber;
+};
+static DWORD WINAPI CMIOCTLHandler(struct _CMIOCTLPACKET *pkt)
+{
+  HANDLE hCONFIGMG;
+  DWORD crReturnValue = CR_FAILURE;
+  DWORD dwReturnSize = 0;
 
-/* Windows */
-#define SEPARATOR '\\'
-/* UNIX */
-#define SEPARATOR2 '/'
+  hCONFIGMG = CreateFileA(
+    "\\\\.\\CONFIGMG",
+    GENERIC_READ|GENERIC_WRITE,
+    FILE_SHARE_READ|FILE_SHARE_WRITE,
+    NULL, OPEN_EXISTING, 0, NULL);
+
+  if (hCONFIGMG == INVALID_HANDLE_VALUE) {
+      return CR_FAILURE;
+  }
+  if (!DeviceIoControl(
+        hCONFIGMG, pkt->dwServiceNumber,
+        &(pkt->dwStack), sizeof(pkt->dwStack),
+        &crReturnValue, sizeof(crReturnValue),
+        &dwReturnSize, NULL)) {
+    crReturnValue = CR_FAILURE;
+  }
+  CloseHandle(hCONFIGMG);
+  if (dwReturnSize != sizeof(crReturnValue)) {
+      crReturnValue = CR_FAILURE;
+  }
+  return crReturnValue;
+}
+static DWORD __cdecl CM_Get_DevNode_Key (DWORD devnode, char *subkey, void *buffer, ULONG bufferlen, ULONG flags)
+{
+    struct _CMIOCTLPACKET packet;
+    DWORD dwStack;
+    #if defined(_MSC_VER)
+    _asm {mov dwStack, ebp};
+    #elif defined(__GNUC__)
+    dwStack = (DWORD) __builtin_frame_address(0);
+    #else
+    #error Add support for your compiler here.
+    #endif
+    dwStack += 8;
+    packet.dwStack = dwStack;
+    packet.dwServiceNumber = 0x80000000 + (___CONFIGMG_Get_DevNode_Key & 0xFFFF);
+    return CMIOCTLHandler(&packet);
+}
+#endif
+
+#ifndef IDirectDraw7_CreateSurface /* ddraw.h not from dx7 sdk */
+typedef BOOL (FAR PASCAL * LPDDENUMCALLBACKEXA)(GUID FAR *, LPSTR, LPSTR, LPVOID, HMONITOR);
+typedef HRESULT (WINAPI * LPDIRECTDRAWENUMERATEEXA)(LPDDENUMCALLBACKEXA, LPVOID, DWORD);
+#ifndef DDENUM_ATTACHEDSECONDARYDEVICES
+#define DDENUM_ATTACHEDSECONDARYDEVICES 0x00000001L
+#endif
+#endif
 
 static HWND	hwndApp = 0;
 
 /* Direct Draw stuff */
 LPDIRECTDRAW            lpDD1 = NULL;
 LPDIRECTDRAW2           lpDD  = NULL;
-
-/*
- * parseFilename
- *
- *      Return the file name portion of a filename/path.
- */
-
-static char *
-_parseFilename(char *name)
-{
-    int i;
-
-    if (name == NULL) 
-      return NULL;
-    for(i = strlen(name); i >= 0; i--)
-        if ((name[i] == SEPARATOR) ||
-            (name[i] == SEPARATOR2))
-            return (name + i + 1);
-    return name;
-}  /* End of parseFilename*/
-
 
 static int _set_exclusive_relaxed;
 static int _set_vidmode_relaxed;
@@ -219,13 +253,13 @@ getModesRegPath()
 FxBool 
 setVideoMode( HWND hwnd, int xRes, int yRes, int refresh, void *hmon ) 
 {
-  LPGUID          ddGuid = NULL;
-  HMODULE         ddraw = NULL; 
+  LPGUID ddGuid = NULL;
+  HMODULE ddraw = NULL;
   DDSURFACEDESC   ddsd;
   HRESULT hResult;
   DEVMODE devMode;
   FxU32 bpp = 16;
-  EMCData emcData;               /* Enum Modes Callbac Data */
+  EMCData emcData; /* Enum Modes Callbac Data */
   
   GDBG_INFO( 80, "setVideoMode sees hwnd %x\n", hwnd);
   hwndApp = ( hwnd == NULL ) ? GetActiveWindow() : hwnd;
@@ -235,7 +269,7 @@ setVideoMode( HWND hwnd, int xRes, int yRes, int refresh, void *hmon )
   }
   
   ddGuid = NULL;
-  ddraw = GetModuleHandle( "ddraw.dll" );      
+  ddraw = GetModuleHandle( "ddraw.dll" );
   if ( ddraw ) {
     LPDIRECTDRAWENUMERATEEXA ddEnumEx;
     ddEnumEx = (void*)GetProcAddress( ddraw, "DirectDrawEnumerateExA" );
@@ -250,7 +284,6 @@ setVideoMode( HWND hwnd, int xRes, int yRes, int refresh, void *hmon )
 	  GDBG_INFO(80, "GUID %d\n", ddGuid);
     }
   }
-  
 
   EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &devMode);
 
@@ -282,8 +315,8 @@ setVideoMode( HWND hwnd, int xRes, int yRes, int refresh, void *hmon )
       lpDD1 = NULL;
       lpDD  = NULL;
       GDBG_INFO(80, "DDraw Obj Create Failed!\n");
-      return FXFALSE;            
-    } 
+      return FXFALSE;
+    }
     else GDBG_INFO(80, "DDraw2 Obj created!\n");
   }
   
@@ -299,7 +332,7 @@ setVideoMode( HWND hwnd, int xRes, int yRes, int refresh, void *hmon )
       != DD_OK) {
     GDBG_INFO(80, "Couldn't set cooperative level:  " );
     if (hResult & DDERR_EXCLUSIVEMODEALREADYSET)
-      GDBG_INFO_MORE(80, "DDERR_EXCLUSIVEMODEALREADYSET\n" ); 
+      GDBG_INFO_MORE(80, "DDERR_EXCLUSIVEMODEALREADYSET\n" );
     
     if (hResult & DDERR_HWNDALREADYSET) {
       GDBG_INFO_MORE(80, "DDERR_HWNDALREADYSET\n" );
@@ -328,7 +361,6 @@ setVideoMode( HWND hwnd, int xRes, int yRes, int refresh, void *hmon )
   /* Figure out if we can support the requested display mode.  If not,
      try to use the same x & y res, but the default refresh rate.*/
   
-  
   ddsd.dwSize = sizeof(ddsd);
   ddsd.dwFlags = DDSD_WIDTH | DDSD_HEIGHT;
   ddsd.dwWidth = xRes;
@@ -347,8 +379,8 @@ setVideoMode( HWND hwnd, int xRes, int yRes, int refresh, void *hmon )
   if (hResult != DD_OK) {
     GDBG_INFO(80, "Warning:  EnumDisplayModes failed due to: \n");
     msgEnumDisplayModes(hResult);
-  }      
-              
+  }
+
   GDBG_INFO(80, "Setting Display Mode!\n");
   
   if (emcData.modeOK) {
@@ -364,7 +396,7 @@ setVideoMode( HWND hwnd, int xRes, int yRes, int refresh, void *hmon )
       if (hResult != DD_OK) {
         GDBG_INFO(80, "Setting video mode %dx%d@default refresh failed!\n",
                   xRes, yRes);
-        msgModeSetFailure(hResult);        
+        msgModeSetFailure(hResult);
 
         if (!_set_vidmode_relaxed) {
           GDBG_INFO(80, "Returning FXFALSE\n");
@@ -520,7 +552,7 @@ resetVideo( void )
     IDirectDraw2_SetCooperativeLevel( lpDD, hwndApp, DDSCL_NORMAL );
     GDBG_INFO(80, "%s:  Set cooperative level!\n", FN_NAME);
     IDirectDraw2_Release( lpDD );
-    GDBG_INFO(80, "%s:  Released lpDD!\n", FN_NAME);    
+    GDBG_INFO(80, "%s:  Released lpDD!\n", FN_NAME);
 
     if ( lpDD1 ) {
       IDirectDraw_Release( lpDD1 );
@@ -535,7 +567,7 @@ resetVideo( void )
 } /* resetVideo */
 
 typedef struct WidthHeight_s {
-  FxU32 width; 
+  FxU32 width;
   FxU32 height;
 } WidthHeight_t;
 
@@ -564,33 +596,6 @@ static  WidthHeight_t widthHeightByResolution[] = {
   {1920, 1440},               /* GR_RESOLUTION_1920x1440 */
   {2048, 1536},               /* GR_RESOLUTION_2048x1536 */
   {2048, 2048}                /* GR_RESOLUTION_2048x2048 */
-};
-
-static char *resNames[] = {
-  "GR_RESOLUTION_320x200",
-  "GR_RESOLUTION_320x240",
-  "GR_RESOLUTION_400x256",
-  "GR_RESOLUTION_512x384",
-  "GR_RESOLUTION_640x200",
-  "GR_RESOLUTION_640x350",
-  "GR_RESOLUTION_640x400",
-  "GR_RESOLUTION_640x480",
-  "GR_RESOLUTION_800x600",
-  "GR_RESOLUTION_960x720",
-  "GR_RESOLUTION_856x480",
-  "GR_RESOLUTION_512x256",
-  "GR_RESOLUTION_1024x768",
-  "GR_RESOLUTION_1280x1024",
-  "GR_RESOLUTION_1600x1200",
-  "GR_RESOLUTION_400x300",
-  "GR_RESOLUTION_1152x864",
-  "GR_RESOLUTION_1280x960",
-  "GR_RESOLUTION_1600x1024",
-  "GR_RESOLUTION_1792x1344",
-  "GR_RESOLUTION_1856x1392",
-  "GR_RESOLUTION_1920x1440",
-  "GR_RESOLUTION_2048x1536",
-  "GR_RESOLUTION_2048x2048"
 };
 
 
@@ -640,9 +645,9 @@ checkResEMCallback(LPDDSURFACEDESC surfaceDesc, LPVOID lpContext)
 FxBool
 checkResolutions(FxBool *supportedByResolution, void *hmon) 
 {
-#define FN_NAME "checkResolution"  
+#define FN_NAME "checkResolution"
   LPGUID          ddGuid = NULL;
-  HMODULE         ddraw = NULL; 
+  HMODULE         ddraw = NULL;
   HRESULT hResult;
   
   hwndApp = GetActiveWindow();
@@ -652,7 +657,7 @@ checkResolutions(FxBool *supportedByResolution, void *hmon)
   }
   
   ddGuid = NULL;
-  ddraw = GetModuleHandle( "ddraw.dll" );      
+  ddraw = GetModuleHandle( "ddraw.dll" );
   if ( ddraw ) {
     LPDIRECTDRAWENUMERATEEXA ddEnumEx;
     ddEnumEx = (void*)GetProcAddress( ddraw, "DirectDrawEnumerateExA" );
@@ -681,8 +686,8 @@ checkResolutions(FxBool *supportedByResolution, void *hmon)
       lpDD1 = NULL;
       lpDD  = NULL;
       GDBG_INFO(80, "DDraw Obj Create Failed!\n");
-      return FXFALSE;            
-    } 
+      return FXFALSE;
+    }
     else GDBG_INFO(80, "DDraw2 Obj created!\n");
   }
   

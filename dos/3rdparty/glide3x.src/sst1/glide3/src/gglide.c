@@ -17,8 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/sst1/glide3/src/Attic/gglide.c,v 1.1.2.6 2006/01/16 21:22:45 jwrdegoede Exp $
-** $Log: gglide.c,v $
 ** Revision 1.1.2.6  2006/01/16 21:22:45  jwrdegoede
 ** Fix gcc 4.1 new type-punned ptr breaks antialias. warnings
 **
@@ -212,9 +210,6 @@
 #include <init.h>
 #endif
 
-#include "rcver.h"
-static char glideIdent[] = "@#%" VERSIONSTR ;
-
 /*---------------------------------------------------------------------------
 ** grAlphaBlendFunction
 **
@@ -228,9 +223,6 @@ GR_STATE_ENTRY(grAlphaBlendFunction, void, ( GrAlphaBlendFnc_t rgb_sf,   GrAlpha
 
   GR_BEGIN_NOFIFOCHECK("grAlphaBlendFunction",85);
   GDBG_INFO_MORE((gc->myLevel,"(%d,%d,%d,%d)\n",rgb_sf,rgb_df,alpha_sf,alpha_df));
-
-  /* Watcom warning suppressor */
-  glideIdent[0] = glideIdent[0];
 
   alphamode = gc->state.fbi_config.alphaMode;
   if (alpha_sf != GR_BLEND_ONE && alpha_sf != GR_BLEND_ZERO) {
@@ -625,7 +617,8 @@ GR_ENTRY(grBufferSwap, void, ( FxU32 swapInterval ))
   /* wait until there's 6 or fewer buffer swaps pending */
   /* the hardware counter is only 3 bits so we don't want it to overflow */
   /* also the latency gets too long */
-  while (_grBufferNumPending() > _GlideRoot.environment.swapPendingCount);
+  while (_grBufferNumPending() > _GlideRoot.environment.swapPendingCount)
+   ;
 
   /* if the interval is non-zero turn on VSYNC waiting */
   vSync = swapInterval > 0 ? 1 : 0;

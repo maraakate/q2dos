@@ -10,6 +10,9 @@
 		<Platform
 			Name="Win32"
 		/>
+		<Platform
+			Name="x64"
+		/>
 	</Platforms>
 	<ToolFiles>
 	</ToolFiles>
@@ -19,7 +22,6 @@
 			OutputDirectory=".\tsmod\Release"
 			IntermediateDirectory=".\tsmod\Release"
 			ConfigurationType="2"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			>
@@ -49,14 +51,11 @@
 				AdditionalOptions="/MP"
 				Optimization="2"
 				InlineFunctionExpansion="1"
+				OmitFramePointers="true"
 				PreprocessorDefinitions="WIN32;id386=1;NDEBUG;_WINDOWS"
 				StringPooling="true"
 				RuntimeLibrary="0"
-				EnableFunctionLevelLinking="true"
-				PrecompiledHeaderFile=".\tsmod\Release/tsmod.pch"
-				AssemblerListingLocation=".\tsmod\Release/"
-				ObjectFile=".\tsmod\Release/"
-				ProgramDataBaseFileName=".\tsmod\Release/"
+				FloatingPointModel="2"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 			/>
@@ -73,13 +72,14 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile=".\tsmod\Release/gamex86.dll"
+				OutputFile="$(OutDir)\gamex86.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile="..\coop\tsmod\game.def"
-				ProgramDatabaseFile=".\tsmod\Release/gamex86.pdb"
 				SubSystem="2"
-				ImportLibrary=".\tsmod\Release/gamex86.lib"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				OptimizeForWindows98="2"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -114,7 +114,6 @@
 			OutputDirectory=".\tsmod\Debug"
 			IntermediateDirectory=".\tsmod\Debug"
 			ConfigurationType="2"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			>
@@ -146,10 +145,8 @@
 				PreprocessorDefinitions="WIN32;id386=1;_DEBUG;_WINDOWS"
 				MinimalRebuild="true"
 				RuntimeLibrary="1"
-				PrecompiledHeaderFile=".\tsmod\Debug/tsmod.pch"
-				AssemblerListingLocation=".\tsmod\Debug/"
-				ObjectFile=".\tsmod\Debug/"
-				ProgramDataBaseFileName=".\tsmod\Debug/"
+				FloatingPointModel="2"
+				BrowseInformation="1"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
@@ -167,14 +164,13 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile=".\tsmod\Debug/gamex86.dll"
+				OutputFile="$(OutDir)\gamex86.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile="..\coop\tsmod\game.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\tsmod\Debug/gamex86.pdb"
 				SubSystem="2"
-				ImportLibrary=".\tsmod\Debug/gamex86.lib"
+				OptimizeForWindows98="2"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -189,6 +185,190 @@
 			<Tool
 				Name="VCBscMakeTool"
 				SuppressStartupBanner="true"
+				OutputFile=".\tsmod\Debug/tsmod.bsc"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|x64"
+			OutputDirectory=".\tsmod\Release"
+			IntermediateDirectory=".\tsmod\Release"
+			ConfigurationType="2"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="NDEBUG"
+				MkTypLibCompatible="true"
+				SuppressStartupBanner="true"
+				TargetEnvironment="3"
+				TypeLibraryName=".\tsmod\Release/tsmod.tlb"
+				HeaderFileName=""
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP"
+				Optimization="2"
+				InlineFunctionExpansion="1"
+				OmitFramePointers="true"
+				PreprocessorDefinitions="WIN32;id386=0;NDEBUG;_WINDOWS"
+				StringPooling="true"
+				RuntimeLibrary="0"
+				FloatingPointModel="2"
+				WarningLevel="3"
+				SuppressStartupBanner="true"
+				DisableSpecificWarnings="4267"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
+				Culture="4105"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				OutputFile="$(OutDir)\gamex64.dll"
+				LinkIncremental="1"
+				SuppressStartupBanner="true"
+				ModuleDefinitionFile="..\coop\tsmod\game.def"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				OptimizeForWindows98="1"
+				TargetMachine="17"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+				OutputFile=".\tsmod\Release/tsmod.bsc"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Debug|x64"
+			OutputDirectory=".\tsmod\Debug"
+			IntermediateDirectory=".\tsmod\Debug"
+			ConfigurationType="2"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="_DEBUG"
+				MkTypLibCompatible="true"
+				SuppressStartupBanner="true"
+				TargetEnvironment="3"
+				TypeLibraryName=".\tsmod\Debug/tsmod.tlb"
+				HeaderFileName=""
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP"
+				Optimization="0"
+				PreprocessorDefinitions="WIN32;id386=0;_DEBUG;_WINDOWS"
+				MinimalRebuild="true"
+				RuntimeLibrary="1"
+				FloatingPointModel="2"
+				BrowseInformation="1"
+				WarningLevel="3"
+				SuppressStartupBanner="true"
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="3"
+				DisableSpecificWarnings="4267"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
+				Culture="4105"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				OutputFile="$(OutDir)\gamex64.dll"
+				LinkIncremental="2"
+				SuppressStartupBanner="true"
+				ModuleDefinitionFile="..\coop\tsmod\game.def"
+				GenerateDebugInformation="true"
+				SubSystem="2"
+				OptimizeForWindows98="1"
+				TargetMachine="17"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
 				OutputFile=".\tsmod\Debug/tsmod.bsc"
 			/>
 			<Tool
@@ -231,6 +411,22 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\coop\tsmod\game.def"
@@ -249,6 +445,22 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -275,6 +487,22 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\coop\tsmod\regex.c"
@@ -289,6 +517,22 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -315,6 +559,22 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\coop\tsmod\zb_checkvar.c"
@@ -329,6 +589,22 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -355,6 +631,22 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\coop\tsmod\zb_cmd.c"
@@ -369,6 +661,22 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -395,6 +703,22 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\coop\tsmod\zb_flood.c"
@@ -409,6 +733,22 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -435,6 +775,22 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\coop\tsmod\zb_log.c"
@@ -449,6 +805,22 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -475,6 +847,22 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\coop\tsmod\zb_msgqueue.c"
@@ -489,6 +877,22 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -515,6 +919,22 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\coop\tsmod\zb_util.c"
@@ -529,6 +949,22 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -555,6 +991,22 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\coop\tsmod\zb_zbot.c"
@@ -575,6 +1027,22 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\coop\tsmod\zb_zbotcheck.c"
@@ -589,6 +1057,22 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"

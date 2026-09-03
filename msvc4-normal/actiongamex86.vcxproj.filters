@@ -1,0 +1,218 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{db74bf72-6738-4d8f-a5fe-43c4d5618342}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;for;f90</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{ecfdbc26-54f0-48ca-b715-196610b900b7}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;fi;fd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{432abdbc-50b7-4258-a2b8-36144aaa927e}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\action\a_cmds.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\a_doorkick.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\a_game.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\a_items.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\a_menu.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\a_radio.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\a_team.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\acesrc\acebot_ai.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\acesrc\acebot_cmds.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\acesrc\acebot_compress.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\acesrc\acebot_items.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\acesrc\acebot_movement.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\acesrc\acebot_nodes.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\acesrc\acebot_spawn.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\acesrc\botchat.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\acesrc\botnav.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\acesrc\botscan.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\acesrc\cgf_sfx_fog.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\cgf_sfx_glass.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\acesrc\fogstub.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\g_ai.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\g_chase.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\g_cmds.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\g_combat.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\g_func.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\g_items.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\g_main.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\g_misc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\g_monster.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\g_phys.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\g_save.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\g_spawn.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\g_svcmds.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\g_target.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\g_trigger.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\g_turret.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\g_utils.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\g_weapon.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\m_flash.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\m_move.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\m_tank.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\p_client.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\p_hud.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\p_trail.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\p_view.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\p_weapon.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\action\q_shared.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\action\game.def">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\action\a_game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\action\a_menu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\action\a_radio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\action\a_team.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\action\acebot.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\action\acesrc\acebot.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\action\acesrc\botchat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\action\acesrc\botnav.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\action\botnav.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\action\acesrc\botscan.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\action\acesrc\cgf_sfx_fog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\action\cgf_sfx_glass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\action\g_local.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\action\game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\action\m_player.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\action\m_tank.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\action\q_shared.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

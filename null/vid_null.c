@@ -38,7 +38,7 @@ DIRECT LINK GLUE
 
 #define	MAXPRINTMSG	4096
 void __attribute__((__format__(__printf__,2,3)))
-VID_Printf (int print_level, char *fmt, ...)
+VID_Printf (int print_level, const char *fmt, ...)
 {
         va_list		argptr;
         char		msg[MAXPRINTMSG];
@@ -55,7 +55,7 @@ VID_Printf (int print_level, char *fmt, ...)
 }
 
 void __attribute__((__noreturn__, __format__(__printf__,2,3)))
-VID_Error (int err_level, char *fmt, ...)
+VID_Error (int err_level, const char *fmt, ...)
 {
         va_list		argptr;
         char		msg[MAXPRINTMSG];
@@ -133,6 +133,7 @@ void	VID_Init (void)
     ri.Cvar_Get = Cvar_Get;
     ri.Cvar_Set = Cvar_Set;
     ri.Cvar_SetValue = Cvar_SetValue;
+	ri.Cvar_SetDescription = Cvar_SetDescription; /* FS */
     ri.Vid_GetModeInfo = VID_GetModeInfo;
 
 #ifndef DEDICATED_ONLY

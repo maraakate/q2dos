@@ -1,19 +1,16 @@
-# Win32 makefile for Glide3/SST1 and Texus2
+# Win32 makefile for Glide3/SST1 and Texus2, using Visual Studio (cl.exe)
 # This makefile MUST be processed by GNU make!!!
 #
 #  Copyright (c) 2004 - Daniel Borca
 #  Email : dborca@users.sourceforge.net
 #  Web   : http://www.geocities.com/dborca
 #
-# $Header: /cvsroot/glide/glide3x/sst1/glide3/src/Attic/Makefile.win32,v 1.1.2.4 2005/05/25 08:49:29 jwrdegoede Exp $
-#
-
 
 #
 #  Available options:
 #
 #    Environment variables:
-#	FX_GLIDE_HW	build for the given ASIC (sst1, sst96).
+#	FX_GLIDE_HW	build for the given ASIC (either sst1, or sst96).
 #			default = sst1
 #	OPTFLAGS	pass given optimization flags to compiler
 #			default = -G6 -O2 (or -Od if DEBUG=1)
@@ -31,8 +28,6 @@
 #	realclean:	remove all generated files
 #
 
-
-
 .PHONY: all glide3x clean realclean
 .INTERMEDIATE: fxgasm.exe
 .SUFFIXES: .c .obj .rc .res
@@ -48,7 +43,7 @@ TEXUS_EXE = texus2.exe
 
 FX_GLIDE_HW ?= sst1
 FX_GLIDE_SW = ../../../swlibs
-GLIDE_LIBDIR = ../../lib
+GLIDE_LIBDIR = ../../lib/$(FX_GLIDE_HW)
 TEXUS_EXEDIR = $(FX_GLIDE_SW)/bin
 
 ###############################################################################
@@ -84,8 +79,11 @@ ifeq ($(FX_GLIDE_HW),sst96)
 CDEFS += -DSST96
 CDEFS += -DSST96_FIFO
 #CDEFS += -DSST96_ALT_FIFO_WRAP
-#CDEFS += -DINIT96VGASWAP -DINIT_ACCESS_DIRECT
+#CDEFS += -DINIT96VGASWAP
+#CDEFS += -DINIT_ACCESS_DIRECT
 CDEFS += -DGLIDE_USE_ALT_REGMAP
+else
+$(error Invalid FX_GLIDE_HW setting)
 endif
 endif
 
@@ -116,6 +114,9 @@ ASFLAGS += $(CDEFS)
 CFLAGS  = -nologo -W3 -WX -D__MSC__=1
 
 LDLIBS = user32.lib kernel32.lib
+ifeq ($(FX_GLIDE_HW),sst96)
+LDLIBS += gdi32.lib ddraw.lib dxguid.lib oldnames.lib
+endif
 ifdef DEBUG
 CFLAGS += -MTd -Zi
 LDFLAGS += -debugtype:both -debug
@@ -126,11 +127,13 @@ CFLAGS += -DNDEBUG -MT
 LDLIBS += LIBCMT.lib
 OPTFLAGS ?= -G6 -O2
 endif
-ifeq ($(FX_GLIDE_HW),sst96)
-LDLIBS += gdi32.lib ddraw.lib dxguid.lib oldnames.lib
-endif
 
-CFLAGS += -I. -I../../incsrc -I../../init -I../../init/initvg -I../../init/init96
+CFLAGS += -I. -I../../incsrc -I../../init
+ifeq ($(FX_GLIDE_HW),sst1)
+CFLAGS += -I../../init/initvg
+else
+CFLAGS += -I../../init/init96
+endif
 CFLAGS += -I$(FX_GLIDE_SW)/fxmisc -I$(FX_GLIDE_SW)/newpci/pcilib -I$(FX_GLIDE_SW)/fxmemmap
 CFLAGS += -I$(FX_GLIDE_SW)/texus2/lib
 CFLAGS += $(CDEFS) $(OPTFLAGS)
@@ -170,7 +173,7 @@ GLIDE_OBJECTS = \
 
 ifeq ($(USE_X86),1)
 GLIDE_OBJECTS += \
-	cpuid.o
+	cpuid.obj
 ifeq ($(FX_GLIDE_HW),sst1)
 GLIDE_OBJECTS += \
 	xdraw.obj
@@ -178,24 +181,24 @@ else
 GLIDE_OBJECTS += \
 	xdraw96.obj
 endif
-else
-GLIDE_OBJECTS += \
-	gxdraw.obj
 endif
+
+INIT_OBJECTS = \
+	../../init/init.obj \
+	../../init/gdebug.obj
 
 ifeq ($(FX_GLIDE_HW),sst96)
 GLIDE_OBJECTS += \
-	sst96.obj \
+	sst96.obj
+INIT_OBJECTS += \
+	../../init/vg96drvr.obj \
 	../../init/init96/init96.obj \
 	../../init/init96/dxdrvr.obj \
 	../../init/init96/initat3d.obj \
 	../../init/init96/initmcrx.obj
-endif
-
-GLIDE_OBJECTS += \
-	../../init/init.obj \
+else
+INIT_OBJECTS += \
 	../../init/vgdrvr.obj \
-	../../init/vg96drvr.obj \
 	../../init/initvg/gamma.obj \
 	../../init/initvg/dac.obj \
 	../../init/initvg/video.obj \
@@ -204,14 +207,17 @@ GLIDE_OBJECTS += \
 	../../init/initvg/util.obj \
 	../../init/initvg/info.obj \
 	../../init/initvg/print.obj \
-	../../init/initvg/gdebug.obj \
-	../../init/initvg/sst1init.obj \
+	../../init/initvg/sst1init.obj
+endif
+
+GLIDE_OBJECTS += \
+	$(INIT_OBJECTS) \
 	$(FX_GLIDE_SW)/newpci/pcilib/sst1_pci.obj \
 	$(FX_GLIDE_SW)/newpci/pcilib/fxmsr.obj \
 	$(FX_GLIDE_SW)/newpci/pcilib/fxpci.obj \
 	$(FX_GLIDE_SW)/newpci/pcilib/fxw32.obj \
 	$(FX_GLIDE_SW)/newpci/pcilib/fxvxd.obj \
-	$(FX_GLIDE_SW)/newpci/pcilib/fxnt.obj \
+	$(FX_GLIDE_SW)/newpci/pcilib/fxnt.obj
 
 TEXUS_SOURCES = \
 	$(FX_GLIDE_SW)/texus2/lib/texuslib.c \
@@ -279,36 +285,13 @@ xdraw.obj: xdraw.asm
 xdraw96.obj: xdraw96.asm
 	$(AS) -o $@ $(ASFLAGS) $<
 
-ifeq ($(FX_GLIDE_HW),sst96)
-../../init/initvg/gamma.obj: ../../init/initvg/gamma.c
-	$(CC) -Fo$@ $(CFLAGS) -USST96 -c $<
-../../init/initvg/dac.obj: ../../init/initvg/dac.c
-	$(CC) -Fo$@ $(CFLAGS) -USST96 -c $<
-../../init/initvg/video.obj: ../../init/initvg/video.c
-	$(CC) -Fo$@ $(CFLAGS) -USST96 -c $<
-../../init/initvg/parse.obj: ../../init/initvg/parse.c
-	$(CC) -Fo$@ $(CFLAGS) -USST96 -c $<
-../../init/initvg/sli.obj: ../../init/initvg/sli.c
-	$(CC) -Fo$@ $(CFLAGS) -USST96 -c $<
-../../init/initvg/util.obj: ../../init/initvg/util.c
-	$(CC) -Fo$@ $(CFLAGS) -USST96 -c $<
-../../init/initvg/info.obj: ../../init/initvg/info.c
-	$(CC) -Fo$@ $(CFLAGS) -USST96 -c $<
-../../init/initvg/print.obj: ../../init/initvg/print.c
-	$(CC) -Fo$@ $(CFLAGS) -USST96 -c $<
-../../init/initvg/gdebug.obj: ../../init/initvg/gdebug.c
-	$(CC) -Fo$@ $(CFLAGS) -USST96 -c $<
-../../init/initvg/sst1init.obj: ../../init/initvg/sst1init.c
-	$(CC) -Fo$@ $(CFLAGS) -USST96 -c $<
-endif
-
 $(GLIDE_OBJECTS): fxinline.h fxgasm.h
 
 fxinline.h: fxgasm.exe
-	./$< -inline > $@
+	.\$< -inline > $@
 
 fxgasm.h: fxgasm.exe
-	./$< -hex > $@
+	.\$< -hex > $@
 
 fxgasm.exe: fxgasm.c
 	$(CC) -o $@ $(CFLAGS) $<

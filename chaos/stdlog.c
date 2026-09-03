@@ -46,7 +46,7 @@ static void _sl_LogVers( void );
 static void _sl_LogPatch( char *pPatchName );
 static void _sl_LogDate( void );
 static void _sl_LogTime( void );
-static void _sl_LogDeathFlags( unsigned long dmFlags );
+static void _sl_LogDeathFlags( unsigned int dmFlags );
 static void _sl_LogMapName( char *pMapName );
 
 static void _sl_LogPlayerName( char *pPlayerName,
@@ -93,7 +93,7 @@ typedef struct
     void (*pLogPatch)( char *pPatchName );
     void (*pLogDate)( void );
     void (*pLogTime)( void );
-    void (*pLogDeathFlags)( unsigned long dmFlags );
+    void (*pLogDeathFlags)( unsigned int dmFlags );
     void (*pLogMapName)( char *pMapName );
     void (*pLogPlayerName)( char *pPlayerName, char *pTeamName, float timeInSeconds );
     void (*pLogScore)( char *pKillerName, char *pTargetName, char *pScoreType, char *pWeaponName, int   iScore, float timeInSeconds );
@@ -202,9 +202,9 @@ static void _sl_LogTime( void )
 }
 
 
-static void _sl_LogDeathFlags( unsigned long dmFlags )
+static void _sl_LogDeathFlags( unsigned int dmFlags )
 {
-    fprintf( StdLogFile, "\t\tLogDeathFlags\t%lu\n", dmFlags );
+    fprintf( StdLogFile, "\t\tLogDeathFlags\t%u\n", dmFlags );
 }
 
 static void _sl_LogMapName( char *pMapName )
@@ -407,7 +407,7 @@ void sl_LogTime( game_import_t  *gi )
 }
 
 void sl_LogDeathFlags( game_import_t  *gi,
-                       unsigned long   dmFlags)
+                       unsigned int   dmFlags)
 {
     if( _sl_MaybeOpenFile( gi ) )
     {

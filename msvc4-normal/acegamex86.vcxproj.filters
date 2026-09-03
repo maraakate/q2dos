@@ -1,0 +1,284 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{d06827ef-8efe-451c-9657-2c4930821ec0}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;for;f90</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{42e0ebba-0030-48cc-9207-d560fd632a48}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;fi;fd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{658e33f2-b74d-4d13-82a7-53ed0b43ff08}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\acebot\acebot_ai.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\acebot_cmds.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\acebot_compress.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\acebot_items.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\acebot_movement.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\acebot_nodes.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\acebot_spawn.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\g_ai.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\g_chase.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\g_cmds.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\g_combat.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\g_ctf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\g_func.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\g_items.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\g_main.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\g_misc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\g_monster.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\g_phys.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\g_save.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\g_spawn.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\g_svcmds.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\g_target.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\g_trigger.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\g_turret.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\g_utils.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\g_weapon.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\m_actor.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\m_berserk.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\m_boss2.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\m_boss3.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\m_boss31.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\m_boss32.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\m_brain.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\m_chick.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\m_flash.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\m_flipper.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\m_float.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\m_flyer.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\m_gladiator.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\m_gunner.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\m_hover.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\m_infantry.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\m_insane.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\m_medic.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\m_move.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\m_mutant.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\m_parasite.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\m_soldier.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\m_supertank.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\m_tank.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\p_client.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\p_hud.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\p_menu.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\p_trail.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\p_view.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\p_weapon.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\acebot\q_shared.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\acebot\game.def">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\acebot\acebot.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\acebot\g_ctf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\acebot\g_local.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\acebot\game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\acebot\m_actor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\acebot\m_berserk.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\acebot\m_boss2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\acebot\m_boss31.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\acebot\m_boss32.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\acebot\m_brain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\acebot\m_chick.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\acebot\m_flipper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\acebot\m_float.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\acebot\m_flyer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\acebot\m_gladiator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\acebot\m_gunner.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\acebot\m_hover.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\acebot\m_infantry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\acebot\m_insane.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\acebot\m_medic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\acebot\m_mutant.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\acebot\m_parasite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\acebot\m_player.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\acebot\m_rider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\acebot\m_soldier.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\acebot\m_supertank.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\acebot\m_tank.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\acebot\p_menu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\acebot\q_shared.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

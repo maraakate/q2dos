@@ -21,11 +21,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#ifndef __linux__
-#include <conio.h>
-#else
-#include <linutil.h>
-#endif
 #include <assert.h>
 #include <string.h>
 
@@ -76,7 +71,7 @@ main(int argc, char **argv)
   assert(hwconfig = tlVoodooType());
 
   /* Process Command Line Arguments */
-  while(rv = tlGetOpt(argc, argv, "dlmnprs", &match, &remArgs)) {
+  while ((rv = tlGetOpt(argc, argv, "dlmnprs", &match, &remArgs)) != 0) {
     if (rv == -1) {
       printf("Unrecognized command line argument\n");
       printf("%s %s\n", name, usage);

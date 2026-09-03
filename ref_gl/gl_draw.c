@@ -331,9 +331,7 @@ void Draw_StretchRaw (int x, int y, int w, int h, int cols, int rows, byte *data
 	byte		*source;
 	int			frac, fracstep, ministep, row, width = 1, height = 1;
 	float		vscale, t;
-	qboolean	noresize = gl_config.arbTextureNonPowerOfTwo
-							&& (width < gl_config.max_texsize)
-							&& (height < gl_config.max_texsize);
+	qboolean	noresize = gl_config.arbTextureNonPowerOfTwo;
 
 	GL_Bind (0);
 

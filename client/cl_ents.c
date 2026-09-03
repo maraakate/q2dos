@@ -442,7 +442,7 @@ void CL_ParsePacketEntities (frame_t *oldframe, frame_t *newframe)
 
 		while (oldnum < newnum)
 		{	// one or more entities from the old packet are unchanged
-			if (cl_shownet->value == 3)
+			if (cl_shownet->intValue == 3)
 				Com_Printf ("   unchanged: %i\n", oldnum);
 			CL_DeltaEntity (newframe, oldnum, oldstate, 0);
 			
@@ -459,7 +459,7 @@ void CL_ParsePacketEntities (frame_t *oldframe, frame_t *newframe)
 
 		if (bits & U_REMOVE)
 		{	// the entity present in oldframe is not in the current frame
-			if (cl_shownet->value == 3)
+			if (cl_shownet->intValue == 3)
 				Com_Printf ("   remove: %i\n", newnum);
 			if (oldnum != newnum)
 				Com_DPrintf (DEVELOPER_MSG_NET, "U_REMOVE: oldnum != newnum\n"); /* FS: Mods like Whale's WOD make this one happen fairly often */
@@ -478,7 +478,7 @@ void CL_ParsePacketEntities (frame_t *oldframe, frame_t *newframe)
 
 		if (oldnum == newnum)
 		{	// delta from previous state
-			if (cl_shownet->value == 3)
+			if (cl_shownet->intValue == 3)
 				Com_Printf ("   delta: %i\n", newnum);
 			CL_DeltaEntity (newframe, newnum, oldstate, bits);
 
@@ -496,7 +496,7 @@ void CL_ParsePacketEntities (frame_t *oldframe, frame_t *newframe)
 
 		if (oldnum > newnum)
 		{	// delta from baseline
-			if (cl_shownet->value == 3)
+			if (cl_shownet->intValue == 3)
 				Com_Printf ("   baseline: %i\n", newnum);
 			CL_DeltaEntity (newframe, newnum, &cl_entities[newnum].baseline, bits);
 			continue;
@@ -507,7 +507,7 @@ void CL_ParsePacketEntities (frame_t *oldframe, frame_t *newframe)
 	// any remaining entities in the old frame are copied over
 	while (oldnum != 99999)
 	{	// one or more entities from the old packet are unchanged
-		if (cl_shownet->value == 3)
+		if (cl_shownet->intValue == 3)
 			Com_Printf ("   unchanged: %i\n", oldnum);
 		CL_DeltaEntity (newframe, oldnum, oldstate, 0);
 		
@@ -705,7 +705,7 @@ void CL_ParseFrame (void)
 	if (cls.serverProtocol != 26)
 		cl.surpressCount = MSG_ReadByte (&net_message);
 
-	if (cl_shownet->value == 3)
+	if (cl_shownet->intValue == 3)
 		Com_Printf ("   frame:%i  delta:%i\n", cl.frame.serverframe,
 		cl.frame.deltaframe);
 
@@ -1040,7 +1040,7 @@ void CL_AddPacketEntities (frame_t *frame)
 		else if (effects & EF_TRACKERTRAIL)					//PGM
 			V_AddLight (ent.origin, 225, -1.0, -1.0, -1.0);	//PGM
 
-		if (!cl_3dcam->value)
+		if (!cl_3dcam->intValue)
 			continue;
 	}
 
@@ -1383,11 +1383,11 @@ void CL_AddViewWeapon (player_state_t *ps, player_state_t *ops)
 	int			i;
 
 	//dont draw if outside body - credit to quakewiki tutorial 41
-	if (cl_3dcam->value)
+	if (cl_3dcam->intValue)
 		return;
 
 	// allow the gun to be completely removed
-	if (!cl_gun->value)
+	if (!cl_gun->intValue)
 		return;
 
 	memset (&gun, 0, sizeof(gun));
@@ -1447,7 +1447,7 @@ static float AdaptFovx (float fov_x, float width, float height)
 	if ((height / width) * (320.0f / 240.0f) > 1.10f)
 		return fov_x;		/* no fov_adapt for weird VGA modes */
 #endif
-	if (!fov_adapt->value)
+	if (!fov_adapt->intValue)
 		return fov_x;
 	if ((x = height / width) == 0.75)
 		return fov_x;
@@ -1544,7 +1544,7 @@ void CL_CalcViewValues (void)
 	// add the weapon
 	CL_AddViewWeapon (ps, ops);
 
-	if (cl_3dcam->value)
+	if (cl_3dcam->intValue)
 	{
 		vec3_t end, camPos;
 		float dist_up, dist_back, angle;
@@ -1602,14 +1602,14 @@ void CL_AddEntities (void)
 
 	if (cl.time > cl.frame.servertime)
 	{
-		if (cl_showclamp->value)
+		if (cl_showclamp->intValue)
 			Com_Printf ("high clamp %i\n", cl.time - cl.frame.servertime);
 		cl.time = cl.frame.servertime;
 		cl.lerpfrac = 1.0;
 	}
 	else if (cl.time < cl.frame.servertime - 100)
 	{
-		if (cl_showclamp->value)
+		if (cl_showclamp->intValue)
 			Com_Printf ("low clamp %i\n", cl.frame.servertime-100 - cl.time);
 		cl.time = cl.frame.servertime - 100;
 		cl.lerpfrac = 0;
@@ -1617,7 +1617,7 @@ void CL_AddEntities (void)
 	else
 		cl.lerpfrac = 1.0 - (cl.frame.servertime - cl.time) * 0.01;
 
-	if (cl_timedemo->value)
+	if (CL_IsDemoWithTimeDemo())
 		cl.lerpfrac = 1.0;
 
 //	CL_AddPacketEntities (&cl.frame);

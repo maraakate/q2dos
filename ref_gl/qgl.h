@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -28,11 +28,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #  include <windows.h>
 #endif
 
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#else
 #include <GL/gl.h>
-
-#ifdef __linux__
-//#include <GL/fxmesa.h>
-#include <GL/glx.h>
 #endif
 
 qboolean QGL_Init( const char *dllname );
@@ -380,26 +379,23 @@ extern  void ( APIENTRY * qglVertexPointer )(GLint size, GLenum type, GLsizei st
 extern  void ( APIENTRY * qglViewport )(GLint x, GLint y, GLsizei width, GLsizei height);
 
 extern	void ( APIENTRY * qglPointParameterfEXT)( GLenum param, GLfloat value );
-extern	void ( APIENTRY * qglPointParameterfvEXT)( GLenum param, const GLfloat *value );
-extern	void ( APIENTRY * qglColorTableEXT)( GLenum, GLenum, GLsizei, GLenum, GLenum, const GLvoid * );
+extern  void ( APIENTRY * qglPointParameterfvEXT)( GLenum param, const GLfloat *value );
 
-extern	void ( APIENTRY * qglLockArraysEXT) (GLint,GLsizei);
-extern	void ( APIENTRY * qglUnlockArraysEXT) (void);
+extern  void ( APIENTRY * qglColorTableEXT)( GLenum, GLenum, GLsizei, GLenum, GLenum, const GLvoid * );
 
-//extern	void ( APIENTRY * qglMTexCoord2fSGIS)( GLenum, GLfloat, GLfloat );
-extern	void ( APIENTRY * qglSelectTextureSGIS)( GLenum );
+extern  void ( APIENTRY * qglLockArraysEXT) (GLint,GLsizei);
+extern  void ( APIENTRY * qglUnlockArraysEXT) (void);
 
-extern	void ( APIENTRY * qglActiveTextureARB)( GLenum );
-extern	void ( APIENTRY * qglClientActiveTextureARB)( GLenum );
-extern	void ( APIENTRY * qglMultiTexCoord2f)( GLenum, GLfloat, GLfloat );
+extern  void ( APIENTRY * qglMultiTexCoord2fARB)( GLenum, GLfloat, GLfloat );
+extern  void ( APIENTRY * qglActiveTextureARB)( GLenum );
+extern  void ( APIENTRY * qglClientActiveTextureARB)( GLenum );
 
 #ifdef _WIN32
-
-extern  int   ( WINAPI * qwglChoosePixelFormat )(HDC, CONST PIXELFORMATDESCRIPTOR *);
-extern  int   ( WINAPI * qwglDescribePixelFormat) (HDC, int, UINT, LPPIXELFORMATDESCRIPTOR);
-extern  int   ( WINAPI * qwglGetPixelFormat)(HDC);
-extern  BOOL  ( WINAPI * qwglSetPixelFormat)(HDC, int, CONST PIXELFORMATDESCRIPTOR *);
-extern  BOOL  ( WINAPI * qwglSwapBuffers)(HDC);
+extern  int  ( WINAPI * qwglChoosePixelFormat )(HDC, CONST PIXELFORMATDESCRIPTOR *);
+extern  int  ( WINAPI * qwglDescribePixelFormat) (HDC, int, UINT, LPPIXELFORMATDESCRIPTOR);
+extern  int  ( WINAPI * qwglGetPixelFormat)(HDC);
+extern  BOOL ( WINAPI * qwglSetPixelFormat)(HDC, int, CONST PIXELFORMATDESCRIPTOR *);
+extern  BOOL ( WINAPI * qwglSwapBuffers)(HDC);
 
 extern BOOL  ( WINAPI * qwglCopyContext)(HGLRC, HGLRC, UINT);
 extern HGLRC ( WINAPI * qwglCreateContext)(HDC);
@@ -410,62 +406,29 @@ extern HDC   ( WINAPI * qwglGetCurrentDC)(VOID);
 extern PROC  ( WINAPI * qwglGetProcAddress)(LPCSTR);
 extern BOOL  ( WINAPI * qwglMakeCurrent)(HDC, HGLRC);
 extern BOOL  ( WINAPI * qwglShareLists)(HGLRC, HGLRC);
+
 extern BOOL  ( WINAPI * qwglUseFontBitmaps)(HDC, DWORD, DWORD, DWORD);
+extern BOOL  ( WINAPI * qwglUseFontOutlines)(HDC, DWORD, DWORD, DWORD, FLOAT, FLOAT, int, LPGLYPHMETRICSFLOAT);
+extern BOOL  ( WINAPI * qwglDescribeLayerPlane)(HDC, int, int, UINT, LPLAYERPLANEDESCRIPTOR);
+extern int   ( WINAPI * qwglSetLayerPaletteEntries)(HDC, int, int, int, CONST COLORREF *);
+extern int   ( WINAPI * qwglGetLayerPaletteEntries)(HDC, int, int, int, COLORREF *);
+extern BOOL  ( WINAPI * qwglRealizeLayerPalette)(HDC, int, BOOL);
+extern BOOL  ( WINAPI * qwglSwapLayerBuffers)(HDC, UINT);
 
-extern BOOL  ( WINAPI * qwglUseFontOutlines)(HDC, DWORD, DWORD, DWORD, FLOAT,
-                                           FLOAT, int, LPGLYPHMETRICSFLOAT);
+extern BOOL  ( WINAPI * qwglSwapIntervalEXT)( int interval );
 
-extern BOOL ( WINAPI * qwglDescribeLayerPlane)(HDC, int, int, UINT,
-                                            LPLAYERPLANEDESCRIPTOR);
-extern int  ( WINAPI * qwglSetLayerPaletteEntries)(HDC, int, int, int,
-                                                CONST COLORREF *);
-extern int  ( WINAPI * qwglGetLayerPaletteEntries)(HDC, int, int, int,
-                                                COLORREF *);
-extern BOOL ( WINAPI * qwglRealizeLayerPalette)(HDC, int, BOOL);
-extern BOOL ( WINAPI * qwglSwapLayerBuffers)(HDC, UINT);
+extern BOOL  ( WINAPI * qwglGetDeviceGammaRampEXT ) ( unsigned char *pRed, unsigned char *pGreen, unsigned char *pBlue );
+extern BOOL  ( WINAPI * qwglSetDeviceGammaRampEXT ) ( const unsigned char *pRed, const unsigned char *pGreen, const unsigned char *pBlue );
 
-extern BOOL ( WINAPI * qwglSwapIntervalEXT)( int interval );
-
-extern BOOL ( WINAPI * qwglGetDeviceGammaRampEXT ) ( unsigned char *pRed, unsigned char *pGreen, unsigned char *pBlue );
-extern BOOL ( WINAPI * qwglSetDeviceGammaRampEXT ) ( const unsigned char *pRed, const unsigned char *pGreen, const unsigned char *pBlue );
-
-extern BOOL ( WINAPI * qwglGetDeviceGammaRamp3DFX ) ( HDC, LPVOID );
-extern BOOL ( WINAPI * qwglSetDeviceGammaRamp3DFX ) ( HDC, LPVOID );
+extern BOOL  ( WINAPI * qwglGetDeviceGammaRamp3DFX ) ( HDC, LPVOID );
+extern BOOL  ( WINAPI * qwglSetDeviceGammaRamp3DFX ) ( HDC, LPVOID );
+extern BOOL  ( WINAPI * qwglChoosePixelFormatARB ) (HDC, CONST int*, CONST FLOAT*, UINT, int*, UINT*);
 #endif
 
 #ifndef _WIN32
 /* local function in dll */
 extern void *qwglGetProcAddress(const char *sym);
 #endif
-
-#ifdef __linux__
-
-extern void (*qgl3DfxSetPaletteEXT)(GLuint *);
-
-/*
-//FX Mesa Functions
-extern fxMesaContext (*qfxMesaCreateContext)(GLuint win, GrScreenResolution_t, GrScreenRefresh_t, const GLint attribList[]);
-extern fxMesaContext (*qfxMesaCreateBestContext)(GLuint win, GLint width, GLint height, const GLint attribList[]);
-extern void (*qfxMesaDestroyContext)(fxMesaContext ctx);
-extern void (*qfxMesaMakeCurrent)(fxMesaContext ctx);
-extern fxMesaContext (*qfxMesaGetCurrentContext)(void);
-extern void (*qfxMesaSwapBuffers)(void);
-*/
-
-//GLX Functions
-extern XVisualInfo * (*qglXChooseVisual)( Display *dpy, int screen, int *attribList );
-extern GLXContext (*qglXCreateContext)( Display *dpy, XVisualInfo *vis, GLXContext shareList, Bool direct );
-extern void (*qglXDestroyContext)( Display *dpy, GLXContext ctx );
-extern Bool (*qglXMakeCurrent)( Display *dpy, GLXDrawable drawable, GLXContext ctx);
-extern void (*qglXCopyContext)( Display *dpy, GLXContext src, GLXContext dst, GLuint mask );
-extern void (*qglXSwapBuffers)( Display *dpy, GLXDrawable drawable );
-
-// 3dfxSetPaletteEXT shunt
-void Fake_glColorTableEXT( GLenum target, GLenum internalformat,
-                             GLsizei width, GLenum format, GLenum type,
-                             const GLvoid *table );
-
-#endif // linux
 
 /*
 ** extension constants
@@ -479,15 +442,11 @@ void Fake_glColorTableEXT( GLenum target, GLenum internalformat,
 #define GL_SHARED_TEXTURE_PALETTE_EXT		GL_TEXTURE_COLOR_TABLE_SGI
 #else
 #define GL_SHARED_TEXTURE_PALETTE_EXT		0x81FB
+
 #endif
 
-
-#define GL_TEXTURE0_SGIS					0x835E
-#define GL_TEXTURE1_SGIS					0x835F
 #define GL_TEXTURE0_ARB						0x84C0
 #define GL_TEXTURE1_ARB						0x84C1
+#define GL_MAX_TEXTURE_UNITS_ARB				0x84E2
 
-extern int gl_texture0, gl_texture1;
-
-
-#endif
+#endif /* __QGL_H__ */

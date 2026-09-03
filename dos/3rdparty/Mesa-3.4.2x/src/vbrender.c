@@ -403,9 +403,6 @@ static void null_quad( GLcontext *ctx, GLuint v0, GLuint v1,
 #endif
 
 
-extern const char *gl_prim_name[];
-
-
 /*
  * Either the vertex buffer is full (VB->Count==VB_MAX) or glEnd() has been
  * called.  Render the primitives defined by the vertices and reset the

@@ -6,10 +6,10 @@
 #define HWSTR                   "3dfx Voodoo"
 #define COPYRIGHTSTR            "Copyright \251 Daniel Borca"
 
-#define VERSIONSTR              "0.9.0.2"
+#define VERSIONSTR              "0.9.0.4"
 #define MANVERSION              0
 #define MANREVISION             9
-#define BUILD_NUMBER            2
+#define BUILD_NUMBER            4
 
 VS_VERSION_INFO VERSIONINFO
  FILEVERSION MANVERSION, MANREVISION, 0, BUILD_NUMBER

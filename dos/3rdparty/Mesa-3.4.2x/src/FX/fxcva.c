@@ -414,7 +414,6 @@ extern void fxPointSmooth(GLcontext *ctx, GLuint first, GLuint last);
 extern void fxLineSmooth(GLcontext *ctx, GLuint v1, GLuint v2, GLuint pv);
 extern void fxTriangleSmooth(GLcontext *ctx, GLuint v1, GLuint v2, GLuint v3, 
 			     GLuint pv);
-extern const char *gl_prim_name[];
 
 
 /* static GLboolean edge_flag[GL_POLYGON+2] = { 0,0,0,0,1,0,0,1,0,1,0 }; */

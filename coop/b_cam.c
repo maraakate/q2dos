@@ -8,7 +8,24 @@
 
 #define SCANNER_UNIT 10
 
-static qboolean IsSpectator(edict_t * ent)
+static void Blinky_ResetView (edict_t *ent) /* FS */
+{
+	if (!ent || !ent->inuse || !ent->client)
+		return;
+
+	VectorClear(ent->s.angles);
+	VectorClear(ent->client->ps.viewangles);
+	VectorClear(ent->client->v_angle);
+	VectorClear(ent->client->kick_angles);
+	VectorClear(ent->client->kick_origin);
+	VectorClear(ent->client->oldviewangles);
+	VectorClear(ent->client->ps.gunangles);
+	VectorClear(ent->client->ps.kick_angles);
+	ent->client->v_dmg_pitch = ent->client->v_dmg_roll = ent->client->v_dmg_time = 0.0f;
+	ent->client->ps.pmove.delta_angles[0] = ent->client->ps.pmove.delta_angles[1] = ent->client->ps.pmove.delta_angles[2] = 0;
+}
+
+static qboolean IsSpectator (edict_t *ent)
 {
 	if (!ent || !ent->inuse || !ent->client)
 	{
@@ -18,12 +35,12 @@ static qboolean IsSpectator(edict_t * ent)
 	return ent->client->pers.spectator;
 }
 
-void Blinky_RunRun(edict_t *ent, usercmd_t *ucmd)
+void Blinky_RunRun (edict_t *ent, usercmd_t *ucmd)
 {
 	gclient_t *client = NULL;
 	BlinkyClient_t *bdata = NULL;
 
-	if(!ent || !ent->client || !ucmd)
+	if (!ent || !ent->inuse || !ent->client || !ucmd)
 	{
 		return;
 	}
@@ -34,15 +51,15 @@ void Blinky_RunRun(edict_t *ent, usercmd_t *ucmd)
 	/* the runrun code - continuous running	 */
 	if (bdata->runrun)
 	{
-		if (ucmd->forwardmove>0)
-			bdata->runrun=1;
-		else if (ucmd->forwardmove<0)
-			bdata->runrun=2;
-		else if (ucmd->sidemove>0)
-			bdata->runrun=3;
-		else if (ucmd->sidemove<0)
-			bdata->runrun=4;
-		switch(bdata->runrun)
+		if (ucmd->forwardmove > 0)
+			bdata->runrun = 1;
+		else if (ucmd->forwardmove < 0)
+			bdata->runrun = 2;
+		else if (ucmd->sidemove > 0)
+			bdata->runrun = 3;
+		else if (ucmd->sidemove < 0)
+			bdata->runrun = 4;
+		switch (bdata->runrun)
 		{
 			case 1: ucmd->forwardmove = 400; break;
 			case 2: ucmd->forwardmove = -400; break;
@@ -52,12 +69,12 @@ void Blinky_RunRun(edict_t *ent, usercmd_t *ucmd)
 	}
 }
 
-void Blinky_UpdateCameraThink(edict_t *ent)
+void Blinky_UpdateCameraThink (edict_t *ent)
 {
 	gclient_t *client = NULL;
 	BlinkyClient_t *bdata = NULL;
 
-	if (!ent || !ent->client)
+	if (!ent || !ent->inuse || !ent->client)
 	{
 		return;
 	}
@@ -65,7 +82,7 @@ void Blinky_UpdateCameraThink(edict_t *ent)
 	client = ent->client;
 	bdata = &client->blinky_client;
 
-	if(bdata->cam_target) /* FS: Follow the player and ignore input */
+	if (bdata->cam_target) /* FS: Follow the player and ignore input */
 	{
 		int i = 0;
 
@@ -81,7 +98,7 @@ void Blinky_UpdateCameraThink(edict_t *ent)
 		for (i = 0; i < 3; i++)
 		{
 			ent->client->ps.pmove.delta_angles[i] = ANGLE2SHORT(
-					bdata->cam_target->client->v_angle[i] - ent->client->resp.cmd_angles[i]);
+				bdata->cam_target->client->v_angle[i] - ent->client->resp.cmd_angles[i]);
 		}
 
 		if (bdata->cam_target->deadflag)
@@ -100,7 +117,7 @@ void Blinky_UpdateCameraThink(edict_t *ent)
 	if (bdata->cam_target && bdata->cam_target->inuse)
 	{
 		ent->client->ps.stats[STAT_CHASE] = CS_PLAYERSKINS +
-								   (bdata->cam_target - g_edicts) - 1;
+			(bdata->cam_target - g_edicts) - 1;
 	}
 	else
 	{
@@ -108,12 +125,12 @@ void Blinky_UpdateCameraThink(edict_t *ent)
 	}
 }
 
-static void Blinky_BeginServerFrameClient(edict_t * ent)
+static void Blinky_BeginServerFrameClient (edict_t *ent)
 {
 	edict_t *target = NULL;
 	edict_t *decoy = NULL;
 
-	if (!ent || !ent->client)
+	if (!ent || !ent->inuse || !ent->client)
 	{
 		return;
 	}
@@ -127,12 +144,12 @@ static void Blinky_BeginServerFrameClient(edict_t * ent)
 	}
 }
 
-void Blinky_BeginRunFrame()
+void Blinky_BeginRunFrame (void)
 {
-	int		i;
-	edict_t	*ent;
+	int i;
+	edict_t *ent;
 
-	for (i=0 ; i<maxclients->value ; i++)
+	for (i = 0; i < maxclients->intValue; i++)
 	{
 		ent = g_edicts + 1 + i;
 
@@ -145,53 +162,51 @@ void Blinky_BeginRunFrame()
 	}
 }
 
-static void
-ShowStats(edict_t *ent, edict_t *player)
+static void ShowStats (edict_t *ent, edict_t *player)
 {
 	vec3_t v;
 	char stats[500];
-	BlinkyClient_t * bdata;
 	char pname[11];
 	int health, armor, armorpow;
-	int xd,yd,zd;
-	vec3_t dp, normal={0,0,-1};
+	int xd, yd, zd;
+	vec3_t dp, normal = { 0,0,-1 };
 	static int CellsIndex = -1;
 	int index;
 
-	if (!ent || !player)
+	if (!ent || !player || !player->client)
 	{
 		return;
 	}
 
-	if (-1 == CellsIndex)
+	armor = 0;
+
+	if (CellsIndex == -1)
 	{
 		CellsIndex = ITEM_INDEX(FindItem("cells"));
 	}
 
-	bdata = &ent->client->blinky_client;
-
 	VectorSubtract(ent->s.origin, player->s.origin, v);
-	zd = -v[2]/SCANNER_UNIT; // save height differential
+	zd = -v[2] / SCANNER_UNIT; // save height differential
 	v[2] = 0; // remove height component
 
 	RotatePointAroundVector(dp, normal, v, ent->s.angles[1]);
-	xd = -dp[0]/SCANNER_UNIT;
-	yd = dp[1]/SCANNER_UNIT;
+	xd = -dp[0] / SCANNER_UNIT;
+	yd = dp[1] / SCANNER_UNIT;
 
-	if (player->client)
+	//if (player->client)
 	{
-		strncpy(pname, player->client->pers.netname, sizeof(pname)-1);
+		strncpy(pname, player->client->pers.netname, sizeof(pname) - 1);
 	}
-	else if (player->classname)
-	{
-		strncpy(pname, player->classname, sizeof(pname)-1);
-	}
-	else
-	{
-		Com_sprintf(pname, sizeof(pname), "unnamed");
-	}
+	//else if (player->classname)
+	//{
+	//	strncpy(pname, player->classname, sizeof(pname)-1);
+	//}
+	//else
+	//{
+	//	Com_sprintf(pname, sizeof(pname), "unnamed");
+	//}
 
-	pname[sizeof(pname)-1] = 0;
+	pname[sizeof(pname) - 1] = 0;
 	health = player->health;
 
 	armorpow = 0;
@@ -207,7 +222,7 @@ ShowStats(edict_t *ent, edict_t *player)
 	}
 
 	/* FS: See cl_scrn.c.  Values for armor can be negative and are ignored */
-	if(armor < 1)
+	if (armor < 1)
 	{
 		armor = 0;
 	}
@@ -219,48 +234,48 @@ ShowStats(edict_t *ent, edict_t *player)
 	if (armorpow)
 	{
 		Com_sprintf(stats, sizeof(stats), "%s: armor=%3d(%3d), health=%3d (f=%+5d,r=%+5d,u=%+5d)\n"
-			, pname, armor,armorpow,health,xd, yd, zd);
+			, pname, armor, armorpow, health, xd, yd, zd);
 	}
 	else
 	{
 		Com_sprintf(stats, sizeof(stats), "%s: armor=%3d, health=%3d (f=%+5d,r=%+5d,u=%+5d)\n"
-			, pname, armor,health,xd, yd, zd);
+			, pname, armor, health, xd, yd, zd);
 	}
 
 	gi.cprintf(ent, PRINT_CHAT, "%s", stats);
 }
 
-void MoveToAngles(edict_t * ent, vec3_t pv1)
+void MoveToAngles (edict_t *ent, vec3_t pv1)
 {
 	int i;
 
-	if (!ent || !ent->client)
+	if (!ent || !ent->inuse || !ent->client)
 	{
 		return;
 	}
 
-	for (i=0 ; i<3 ; i++)
+	for (i = 0; i < 3; i++)
 	{
 		ent->client->ps.pmove.delta_angles[i] = ANGLE2SHORT(pv1[i] - ent->client->resp.cmd_angles[i]);
 	}
 }
 
-void stopBlinkyCam(edict_t * ent)
+void stopBlinkyCam (edict_t *ent)
 {
 	BlinkyClient_t *bdata = NULL;
-		
-	if (!ent || !ent->client)
+
+	if (!ent || !ent->inuse || !ent->client)
 	{
 		return;
 	}
 
 	bdata = &ent->client->blinky_client;
-	if(!bdata || !bdata->cam_decoy)
+	if (!bdata->cam_decoy)
 	{
 		return;
 	}
 
-	bdata->cam_target = 0;
+	bdata->cam_target = NULL;
 	ent->svflags &= ~SVF_NOCLIENT;
 	ent->client->ps.pmove.pm_flags &= ~PMF_NO_PREDICTION;
 	bdata->cam_decoy->svflags |= SVF_NOCLIENT;
@@ -274,20 +289,17 @@ void stopBlinkyCam(edict_t * ent)
 	gi.linkentity(ent);
 
 	/* FS: Get rid of the decoy, free up some edicts */
-	if(bdata->cam_decoy)
-	{
-		G_FreeEdict(bdata->cam_decoy);
-		bdata->cam_decoy = NULL;
-	}
-//	gi.linkentity(bdata->cam_decoy);
+	G_FreeEdict(bdata->cam_decoy);
+	bdata->cam_decoy = NULL;
+	//	gi.linkentity(bdata->cam_decoy);
 }
 
-void StartCam(edict_t * ent, edict_t * target)
+void StartCam (edict_t *ent, edict_t *target)
 {
 	BlinkyClient_t *bdata = NULL;
 	edict_t *decoy = NULL;
 
-	if (!ent || !ent->client || !target || !target->client)
+	if (!ent || !ent->inuse || !ent->client || !target || !target->inuse || !target->client)
 	{
 		return;
 	}
@@ -320,11 +332,10 @@ void StartCam(edict_t * ent, edict_t * target)
 	gi.linkentity(bdata->cam_decoy);
 }
 
-
-void Cmd_Stats_f(edict_t *ent)
+void Cmd_Stats_f (edict_t *ent)
 {
-	char * name = gi.args();
-	edict_t * player;
+	char *name = gi.args();
+	edict_t *player;
 
 	if (!ent)
 	{
@@ -337,7 +348,7 @@ void Cmd_Stats_f(edict_t *ent)
 		return;
 	}
 
-	for (player = &g_edicts[0]+1; player< &g_edicts[0]+(int)(maxclients->value)+1; player++)
+	for (player = &g_edicts[0] + 1; player < &g_edicts[0] + (int)(maxclients->intValue) + 1; player++)
 	{
 		if (!player->inuse || !player->client || player->client->pers.spectator)
 			continue;
@@ -351,17 +362,16 @@ void Cmd_Stats_f(edict_t *ent)
 	}
 }
 
-
-void Cmd_Cam_f(edict_t *ent)
+void Cmd_Cam_f (edict_t *ent)
 {
 	char *name = gi.args();
 	qboolean bFindFailed = true;
- // obj1 is how to tell when we've looped
-	edict_t * obj1;
-	edict_t * target;
-	BlinkyClient_t * bdata;
+	// obj1 is how to tell when we've looped
+	edict_t *obj1;
+	edict_t *target;
+	BlinkyClient_t *bdata;
 
-	if (!ent || !ent->client || ent->client->pers.spectator)
+	if (!ent || !ent->inuse || !ent->client || ent->client->pers.spectator)
 	{
 		return;
 	}
@@ -375,7 +385,7 @@ void Cmd_Cam_f(edict_t *ent)
 	bdata = &ent->client->blinky_client;
 	obj1 = bdata->cam_target;
 
-	if (!coop->value || IsSpectator(ent))
+	if (!coop->intValue || IsSpectator(ent))
 	{
 		return;
 	}
@@ -386,40 +396,40 @@ void Cmd_Cam_f(edict_t *ent)
 		return;
 	}
 
-	if(name[0])
+	if (name[0])
 	{
-		if(!strncmp(name, "CL ", 3))
+		if (!strncmp(name, "CL ", 3))
 		{
 			int playernum;
 
-			name+=3;
+			name += 3;
 			playernum = atoi(name);
-			if(playernum > game.maxclients)
+			if (playernum > game.maxclients)
 			{
 				gi.cprintf(ent, PRINT_HIGH, "Player #%d greater than maxclients.  Aborting search!\n", playernum);
 				return;
 			}
 
-			target = &g_edicts[playernum+1];
-			if(!target || !target->inuse || !target->client)
+			target = &g_edicts[playernum + 1];
+			if (!target || !target->inuse || !target->client)
 			{
 				gi.cprintf(ent, PRINT_HIGH, "Couldn't find player #%d to chase!\n", playernum);
 				return;
 			}
 
-			if ((target) && (ent->client->blinky_client.cam_target) && (ent->client->blinky_client.cam_target == target)) /* FS: If we ask for it twice and we're already viewing them then bust out */
+			if (ent->client->blinky_client.cam_target == target) /* FS: If we ask for it twice and we're already viewing them then bust out */
 			{
 				stopBlinkyCam(ent);
 				return;
 			}
 
-			if(IsSpectator(target))
+			if (IsSpectator(target))
 			{
 				gi.cprintf(ent, PRINT_HIGH, "You can't chase a spectator!\n");
 				return;
 			}
 
-			if(target == ent)
+			if (target == ent)
 			{
 				gi.cprintf(ent, PRINT_HIGH, "You can't chase yourself!\n");
 				return;
@@ -430,9 +440,9 @@ void Cmd_Cam_f(edict_t *ent)
 			return;
 		}
 
-		if(!strncmp(name, "LIKE ", 5))
+		if (!strncmp(name, "LIKE ", 5))
 		{
-			name+=5;
+			name += 5;
 			target = Find_LikePlayer(ent, name, false);
 		}
 		else
@@ -440,25 +450,25 @@ void Cmd_Cam_f(edict_t *ent)
 			target = Find_LikePlayer(ent, name, true);
 		}
 
-		if(!target || !target->inuse || !target->client)
+		if (!target || !target->inuse || !target->client)
 		{
 			gi.cprintf(ent, PRINT_HIGH, "Couldn't find player %s to chase!\n", name);
 			return;
 		}
 
-		if ((target) && (ent->client->blinky_client.cam_target) && (ent->client->blinky_client.cam_target == target)) /* FS: If we ask for it twice and we're already viewing them then bust out */
+		if (ent->client->blinky_client.cam_target == target) /* FS: If we ask for it twice and we're already viewing them then bust out */
 		{
 			stopBlinkyCam(ent);
 			return;
 		}
 
-		if(IsSpectator(target))
+		if (IsSpectator(target))
 		{
 			gi.cprintf(ent, PRINT_HIGH, "You can't chase a spectator!\n");
 			return;
 		}
 
-		if(target == ent)
+		if (target == ent)
 		{
 			gi.cprintf(ent, PRINT_HIGH, "You can't chase yourself!\n");
 			return;
@@ -470,12 +480,6 @@ void Cmd_Cam_f(edict_t *ent)
 	}
 	else
 	{
-		if (obj1 && obj1->client && name[0] && !Q_stricmp(name, obj1->client->pers.netname)) /* FS: If we ask for it twice and we're already viewing them then bust out */
-		{
-			stopBlinkyCam(ent);
-			return;
-		}
-
 		if (!obj1)
 		{
 			gi.cprintf(ent, PRINT_HIGH, "Blinky cam setup\n");
@@ -489,14 +493,14 @@ void Cmd_Cam_f(edict_t *ent)
 
 		target = obj1;
 
-		while(1)
+		while (1)
 		{
 			// advance loop thru edicts
 			// to do - this ought to cycle at maxclients instead of num_edicts
-			if (target < &g_edicts[0]+(int)(maxclients->value)+1)
+			if (target < &g_edicts[0] + (int)(maxclients->intValue) + 1)
 				target++;
 			else
-				target = g_edicts+1;
+				target = g_edicts + 1;
 			if (target == obj1)
 				break;
 			// only look at (in use) players
@@ -518,33 +522,26 @@ void Cmd_Cam_f(edict_t *ent)
 			break;
 		}
 
-		if(bFindFailed)
+		if (bFindFailed)
 		{
-			if(name[0])
-			{
-				gi.cprintf(ent, PRINT_HIGH, "Can't find player \"%s\" to chase!\n", name);
-			}
-			else
-			{
-				gi.cprintf(ent, PRINT_HIGH, "Can't find a player to chase!\n");
-			}
+			gi.cprintf(ent, PRINT_HIGH, "Can't find a player to chase!\n");
 		}
 	}
 }
 
-static void Summon(edict_t *ent, edict_t *other)
+static void Summon (edict_t *ent, edict_t *other)
 {
 	vec3_t offset, forward, right, start;
-	trace_t		tr;
+	trace_t tr;
 
-	if (!ent || !ent->client || !other || !other->client)
+	if (!ent || !ent->inuse || !ent->client || !other || !other->inuse || !other->client)
 	{
 		return;
 	}
 
 	if (ent->client->summon_time > level.time)
 	{
-		gi.cprintf(ent, PRINT_HIGH, "You must wait at least %d second(s) before you can summon another player.\n", (int)ent->client->summon_time-(int)level.time);
+		gi.cprintf(ent, PRINT_HIGH, "You must wait at least %d second(s) before you can summon another player.\n", (int)ent->client->summon_time - (int)level.time);
 		return;
 	}
 
@@ -560,7 +557,7 @@ static void Summon(edict_t *ent, edict_t *other)
 		return;
 	}
 
-	VectorSet(offset, 40, 0, ent->viewheight-8);
+	VectorSet(offset, 40, 0, ent->viewheight - 8);
 	AngleVectors (ent->client->v_angle, forward, right, NULL);
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
 
@@ -570,7 +567,7 @@ static void Summon(edict_t *ent, edict_t *other)
 	gi.unlinkentity (other);
 
 	tr = gi.trace (start, other->mins, other->maxs, start, NULL, MASK_PLAYERSOLID);
-	if (tr.fraction < 1.0)
+	if (tr.fraction < 1.0f)
 	{
 		gi.cprintf(ent, PRINT_HIGH, "Collision issue.  Can not summon \"%s\".  Try from a different location.\n", other->client->pers.netname);
 		gi.linkentity (other);
@@ -583,7 +580,7 @@ static void Summon(edict_t *ent, edict_t *other)
 
 	// clear the velocity and hold them in place briefly
 	VectorClear (other->velocity);
-	other->client->ps.pmove.pm_time = 160>>3;		// hold time
+	other->client->ps.pmove.pm_time = 160 >> 3;		// hold time
 	other->client->ps.pmove.pm_flags |= PMF_TIME_TELEPORT;
 
 	// draw the teleport splash at source and on the player
@@ -592,16 +589,7 @@ static void Summon(edict_t *ent, edict_t *other)
 	// set angles
 	MoveToAngles(other, ent->s.angles);
 
-	/* FS: FIXME: Is this right? -- Do this again, view angles got jacked permanently a couple of times during live play? */
-	VectorClear (other->s.angles);
-	VectorClear (other->client->ps.viewangles);
-	VectorClear (other->client->v_angle);
-	VectorClear (other->client->kick_angles);
-	VectorClear (other->client->kick_origin);
-	VectorClear (other->client->oldviewangles);
-	VectorClear (other->client->ps.gunangles);
-	VectorClear (other->client->ps.kick_angles);
-	other->client->ps.pmove.delta_angles[0] = other->client->ps.pmove.delta_angles[1] = other->client->ps.pmove.delta_angles[2] = 0;
+	Blinky_ResetView(other); /* FS */
 
 	// kill anything at the destination
 	KillBox (other);
@@ -613,33 +601,24 @@ static void Summon(edict_t *ent, edict_t *other)
 
 	gi.linkentity (other);
 
-	/* FS: FIXME: Is this right? -- Do this again, view angles got jacked permanently a couple of times during live play? */
-	VectorClear (other->s.angles);
-	VectorClear (other->client->ps.viewangles);
-	VectorClear (other->client->v_angle);
-	VectorClear (other->client->kick_angles);
-	VectorClear (other->client->kick_origin);
-	VectorClear (other->client->oldviewangles);
-	VectorClear (other->client->ps.gunangles);
-	VectorClear (other->client->ps.kick_angles);
-	other->client->ps.pmove.delta_angles[0] = other->client->ps.pmove.delta_angles[1] = other->client->ps.pmove.delta_angles[2] = 0;
+	Blinky_ResetView(other); /* FS */
 
-	ent->client->summon_time = level.time + sv_coop_summon_time->value;
+	ent->client->summon_time = level.time + sv_coop_summon_time->intValue;
 }
 
-static void Teleport(edict_t *ent, edict_t *other)
+static void Teleport (edict_t *ent, edict_t *other)
 {
 	vec3_t offset, forward, right, start;
-	trace_t		tr;
+	trace_t tr;
 
-	if (!ent || !ent->client || !other || !other->client)
+	if (!ent || !ent->inuse || !ent->client || !other || !other->inuse || !other->client)
 	{
 		return;
 	}
 
 	if (other->client->summon_time > level.time)
 	{
-		gi.cprintf(other, PRINT_HIGH, "You must wait at least %d second(s) before you can teleport to another player.\n", (int)other->client->summon_time-(int)level.time);
+		gi.cprintf(other, PRINT_HIGH, "You must wait at least %d second(s) before you can teleport to another player.\n", (int)other->client->summon_time - (int)level.time);
 		return;
 	}
 
@@ -649,7 +628,7 @@ static void Teleport(edict_t *ent, edict_t *other)
 		return;
 	}
 
-	VectorSet(offset, 40, 0, ent->viewheight-8);
+	VectorSet(offset, 40, 0, ent->viewheight - 8);
 	AngleVectors (ent->client->v_angle, forward, right, NULL);
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
 
@@ -672,7 +651,7 @@ static void Teleport(edict_t *ent, edict_t *other)
 
 	// clear the velocity and hold them in place briefly
 	VectorClear (other->velocity);
-	other->client->ps.pmove.pm_time = 160>>3;		// hold time
+	other->client->ps.pmove.pm_time = 160 >> 3;		// hold time
 	other->client->ps.pmove.pm_flags |= PMF_TIME_TELEPORT;
 
 	// draw the teleport splash at source and on the player
@@ -681,23 +660,7 @@ static void Teleport(edict_t *ent, edict_t *other)
 	// set angles
 	MoveToAngles(other, ent->s.angles);
 
-	/* FS: FIXME: This isn't working. */
-#if 1
-	VectorClear (other->s.angles);
-	VectorClear (other->client->ps.viewangles);
-	VectorClear (other->client->v_angle);
-	VectorClear (other->client->kick_angles);
-	VectorClear (other->client->kick_origin);
-	VectorClear (other->client->oldviewangles);
-	VectorClear (other->client->ps.gunangles);
-	VectorClear (other->client->ps.kick_angles);
-	other->s.angles[PITCH] = other->client->ps.viewangles[PITCH] = 0;
-	other->s.angles[ROLL] = other->client->ps.viewangles[ROLL] = 0;
-
-	other->client->v_dmg_pitch = other->client->v_dmg_roll = 0;
-	other->client->v_dmg_time = 0.0f;
-	other->client->ps.pmove.delta_angles[0] = other->client->ps.pmove.delta_angles[1] = other->client->ps.pmove.delta_angles[2] = 0;
-#endif
+	Blinky_ResetView(other); /* FS */
 
 	// kill anything at the destination
 	KillBox (other);
@@ -707,12 +670,12 @@ static void Teleport(edict_t *ent, edict_t *other)
 	other->s.event = EV_OTHER_TELEPORT;
 	gi.linkentity (other);
 
-	other->client->summon_time = level.time + sv_coop_summon_time->value;
+	other->client->summon_time = level.time + sv_coop_summon_time->intValue;
 }
 
-void Cmd_NoSummon_f(edict_t *ent)
+void Cmd_NoSummon_f (edict_t *ent)
 {
-	if (!ent || !ent->client || ent->client->pers.spectator)
+	if (!ent || !ent->inuse || !ent->client || ent->client->pers.spectator)
 	{
 		return;
 	}
@@ -734,7 +697,7 @@ void Cmd_NoSummon_f(edict_t *ent)
 	ent->client->pers.noSummon = !ent->client->pers.noSummon;
 }
 
-void Cmd_Runrun_f(edict_t *ent)
+void Cmd_Runrun_f (edict_t *ent)
 {
 	int runrun;
 
@@ -762,7 +725,7 @@ void Cmd_Runrun_f(edict_t *ent)
 	ent->client->blinky_client.runrun = runrun;
 }
 
-void Cmd_Summon_f(edict_t *ent)
+void Cmd_Summon_f (edict_t *ent)
 {
 	char *name = gi.args();
 	edict_t *target = NULL;
@@ -779,40 +742,40 @@ void Cmd_Summon_f(edict_t *ent)
 		return;
 	}
 
-	if(name[0] && !Q_stricmp(name, ent->client->pers.netname))
+	if (name[0] && !Q_stricmp(name, ent->client->pers.netname))
 	{
 		gi.cprintf(ent, PRINT_HIGH, "You can't summon yourself!\n");
 		return;
 	}
 
-	if(name[0])
+	if (name[0])
 	{
-		if(!strncmp(name, "CL ", 3))
+		if (!strncmp(name, "CL ", 3))
 		{
 			int playernum;
 
-			name+=3;
+			name += 3;
 			playernum = atoi(name);
-			if(playernum > game.maxclients)
+			if (playernum > game.maxclients)
 			{
 				gi.cprintf(ent, PRINT_HIGH, "Player #%d greater than maxclients.  Aborting search!\n", playernum);
 				return;
 			}
 
-			target = &g_edicts[playernum+1];
-			if(!target || !target->inuse || !target->client)
+			target = &g_edicts[playernum + 1];
+			if (!target || !target->inuse || !target->client)
 			{
 				gi.cprintf(ent, PRINT_HIGH, "Couldn't find a player to summon!\n");
 				return;
 			}
 
-			if(IsSpectator(target))
+			if (IsSpectator(target))
 			{
 				gi.cprintf(ent, PRINT_HIGH, "You can't summon a spectator!\n");
 				return;
 			}
 
-			if(target == ent)
+			if (target == ent)
 			{
 				gi.cprintf(ent, PRINT_HIGH, "You can't summon yourself!\n");
 				return;
@@ -822,9 +785,9 @@ void Cmd_Summon_f(edict_t *ent)
 			return;
 		}
 
-		if(!strncmp(name, "LIKE ", 5))
+		if (!strncmp(name, "LIKE ", 5))
 		{
-			name+=5;
+			name += 5;
 			target = Find_LikePlayer(ent, name, false);
 		}
 		else
@@ -848,7 +811,7 @@ void Cmd_Summon_f(edict_t *ent)
 	{
 		for (i = 0; i < game.maxclients; i++)
 		{
-			target = &g_edicts[i+1];
+			target = &g_edicts[i + 1];
 
 			if (!target->inuse || !target->client || IsSpectator(target))
 				continue;
@@ -860,13 +823,13 @@ void Cmd_Summon_f(edict_t *ent)
 		}
 	}
 
-	if(target && target->inuse && !IsSpectator(target) && target != ent)
+	if (target && target->inuse && !IsSpectator(target) && target != ent)
 	{
 		Summon(ent, target);
 		return;
 	}
 
-	if(name[0])
+	if (name[0])
 	{
 		gi.cprintf(ent, PRINT_HIGH, "Couldn't find player \"%s\" to summon!\n", name);
 	}
@@ -876,10 +839,9 @@ void Cmd_Summon_f(edict_t *ent)
 	}
 }
 
-void Cmd_Teleport_f(edict_t *ent)
+void Cmd_Teleport_f (edict_t *ent)
 {
 	char *name = gi.args();
-	int i = 0;
 	edict_t *player;
 	qboolean exactMatch = true;
 
@@ -894,48 +856,48 @@ void Cmd_Teleport_f(edict_t *ent)
 		return;
 	}
 
-	if(!name[0])
+	if (!name[0])
 	{
 		gi.cprintf(ent, PRINT_HIGH, "Usage: teleport [LIKE/CL] <playername>\n");
 		return;
 	}
 
-	if(!Q_stricmp(name, ent->client->pers.netname))
+	if (!Q_stricmp(name, ent->client->pers.netname))
 	{
 		gi.cprintf(ent, PRINT_HIGH, "You can't teleport to yourself!\n");
 		return;
 	}
 
-	if(!strncmp(name, "LIKE ", 5))
+	if (!strncmp(name, "LIKE ", 5))
 	{
-		name+=5;
+		name += 5;
 		exactMatch = false;
 	}
 
-	if(!strncmp(name, "CL ", 3))
+	if (!strncmp(name, "CL ", 3))
 	{
 		int playernum;
 
-		name+=3;
+		name += 3;
 		playernum = atoi(name);
-		if(playernum > game.maxclients)
+		if (playernum > game.maxclients)
 		{
 			gi.cprintf(ent, PRINT_HIGH, "Player #%d greater than maxclients.  Aborting search!\n", playernum);
 		}
 
-		player = &g_edicts[playernum+1];
-		if(!player || !player->inuse || !player->client)
+		player = &g_edicts[playernum + 1];
+		if (!player || !player->inuse || !player->client)
 		{
 			gi.cprintf(ent, PRINT_HIGH, "Couldn't find player \"%s\" to teleport to!\n", name);
 		}
 
-		if(IsSpectator(player))
+		if (IsSpectator(player))
 		{
 			gi.cprintf(ent, PRINT_HIGH, "You can't teleport to spectators!\n");
 			return;
 		}
 
-		if(player == ent)
+		if (player == ent)
 		{
 			gi.cprintf(ent, PRINT_HIGH, "You can't teleport to yourself!\n");
 			return;
@@ -947,19 +909,19 @@ void Cmd_Teleport_f(edict_t *ent)
 
 	player = Find_LikePlayer(ent, name, exactMatch);
 
-	if(player && player->inuse && !IsSpectator(player) && player != ent)
+	if (player && player->inuse && !IsSpectator(player) && player != ent)
 	{
 		Teleport(player, ent);
 		return;
 	}
 
-	if((player) && (IsSpectator(player)))
+	if ((player) && (IsSpectator(player)))
 	{
 		gi.cprintf(ent, PRINT_HIGH, "You can't teleport to spectators!\n");
 		return;
 	}
 
-	if((player) && (player == ent))
+	if ((player) && (player == ent))
 	{
 		gi.cprintf(ent, PRINT_HIGH, "You can't teleport to yourself!\n");
 		return;
@@ -968,10 +930,10 @@ void Cmd_Teleport_f(edict_t *ent)
 	gi.cprintf(ent, PRINT_HIGH, "Couldn't find player \"%s\" to teleport to!\n", name);
 }
 
-void Blinky_OnClientTerminate(edict_t *self)
+void Blinky_OnClientTerminate (edict_t *self)
 {
-	edict_t * player;
-	BlinkyClient_t * bdata;
+	edict_t *player;
+	BlinkyClient_t *bdata;
 
 	if (!self)
 	{
@@ -979,7 +941,7 @@ void Blinky_OnClientTerminate(edict_t *self)
 	}
 
 	/* disconnect any cams */
-	for (player = &g_edicts[0]+1; player< &g_edicts[0]+(int)(maxclients->value)+1; player++)
+	for (player = &g_edicts[0] + 1; player < &g_edicts[0] + (int)(maxclients->intValue) + 1; player++)
 	{
 		if (!player->client || !player->inuse)
 			continue;
@@ -989,58 +951,34 @@ void Blinky_OnClientTerminate(edict_t *self)
 	}
 }
 
-void Blinky_CalcViewOffsets(edict_t * ent, vec3_t v)
+void Blinky_CalcViewOffsets (edict_t *ent, vec3_t v)
 {
 	int i;
-	BlinkyClient_t * bdata = &ent->client->blinky_client;
+	BlinkyClient_t *bdata = NULL;
 	vec3_t forward;
-	edict_t * target = bdata->cam_target;
-	int offset = coop_cameraoffset->value;
+	edict_t *target = NULL;
 
-	VectorSet(v,0,0,0);
-	for (i=0; i<3; i++)
+	if (!ent || !ent->inuse || !ent->client)
+		return;
+
+	bdata = &ent->client->blinky_client;
+	target = bdata->cam_target;
+	if (!target || !target->inuse || !target->client)
+		return;
+
+	VectorSet(v, 0.0f, 0.0f, 0.0f);
+
+	for (i = 0; i < 3; i++)
 	{
-		ent->client->ps.pmove.origin[i] = target->s.origin[i]*8;
+		ent->client->ps.pmove.origin[i] = target->s.origin[i] * 8;
 	}
 
 	v[2] += target->viewheight;
 
 	// move cam forward
-	if (offset)
+	if (coop_cameraoffset->intValue)
 	{
 		AngleVectors (target->client->v_angle, forward, NULL, NULL);
-		VectorMA (v, offset, forward, v);
+		VectorMA (v, coop_cameraoffset->intValue, forward, v);
 	}
-}
-
-void Cmd_Angles_Verbose_f(edict_t *self) /* FS: Debug test */
-{
-	vec3_t angles;
-	VectorCopy(self->s.angles, angles);
-	gi.cprintf(self, PRINT_HIGH, "self->s.angles: %f %f %f\n", angles[0], angles[1], angles[2]);
-
-	VectorCopy(self->client->ps.viewangles, angles);
-	gi.cprintf(self, PRINT_HIGH, "self->client->ps.viewangles: %f %f %f\n", angles[0], angles[1], angles[2]);
-
-	VectorCopy(self->client->v_angle, angles);
-	gi.cprintf(self, PRINT_HIGH, "self->client->v_angle: %f %f %f\n", angles[0], angles[1], angles[2]);
-
-	VectorCopy(self->client->kick_angles, angles);
-	gi.cprintf(self, PRINT_HIGH, "self->client->kick_angles: %f %f %f\n", angles[0], angles[1], angles[2]);
-
-	VectorCopy(self->client->kick_origin, angles);
-	gi.cprintf(self, PRINT_HIGH, "self->client->kick_origin: %f %f %f\n", angles[0], angles[1], angles[2]);
-
-	gi.cprintf(self, PRINT_HIGH, "self->client->v_dmg_pitch: %f\n", self->client->v_dmg_pitch);
-	gi.cprintf(self, PRINT_HIGH, "self->client->v_dmg_roll: %f\n", self->client->v_dmg_roll);
-	gi.cprintf(self, PRINT_HIGH, "self->client->v_dmg_time: %f\n", self->client->v_dmg_time);
-}
-
-void Blinky_SpawnEntities()
-{
-	
-	gi.dprintf (DEVELOPER_MSG_GAME, "Blinky - CoopCam version of 3.20, 2000/08/23\n");
-	gi.dprintf (DEVELOPER_MSG_GAME, "\x02""Use cam <name> to see through your buddy eyes, cam to turn back\n");
-	
-	srand( (unsigned)time( NULL ) );
 }

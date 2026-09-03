@@ -37,11 +37,13 @@ Cvar_InfoValidate
 */
 static qboolean Cvar_InfoValidate (char *s)
 {
-	if (strstr (s, "\\"))
+	if (strchr(s, '\\'))
 		return false;
-	if (strstr (s, "\""))
+	if (strchr(s, '\"'))
 		return false;
-	if (strstr (s, ";"))
+	if (strchr(s, ';'))
+		return false;
+	if (strchr(s, 'ÿ')) /* FS: Don't allow this crap in infostrings. */
 		return false;
 	return true;
 }
@@ -77,6 +79,20 @@ float Cvar_VariableValue (char *var_name)
 	return atof (var->string);
 }
 
+/*
+============
+Cvar_VariableValue
+============
+*/
+int Cvar_VariableValueInt (char *var_name) /* FS */
+{
+	cvar_t	*var;
+
+	var = Cvar_FindVar (var_name);
+	if (!var)
+		return 0;
+	return var->intValue;
+}
 
 /*
 ============
@@ -398,7 +414,7 @@ qboolean Cvar_Command (void)
 
 	if (!strcmp(v->name, "developer") && con_show_dev_flags->intValue) /* FS: Special case for showing enabled flags */
 	{
-		if(strlen(Cmd_Argv(1)) > 0)
+		if (Cmd_Argv(1)[0] != '\0')
 			Cvar_Set(developer->name, Cmd_Argv(1));
 		Cvar_ParseDeveloperFlags();
 		return true;
@@ -478,7 +494,19 @@ void Cvar_WriteVariables (char *path)
 	char	buffer[1024];
 	FILE	*f;
 
+	if (!path)
+	{
+		Com_Error(ERR_DROP, "Cvar_WriteVariables(): Null or empty path.  Aborting.\n");
+		return;
+	}
+
 	f = fopen (path, "a");
+	if (!f)
+	{
+		Com_Error(ERR_DROP, "Cvar_WriteVariables(): Failed to open %s for writing.\n", path);
+		return;
+	}
+
 	for (var = cvar_vars ; var ; var = var->next)
 	{
 		if (var->flags & CVAR_ARCHIVE)
@@ -490,6 +518,27 @@ void Cvar_WriteVariables (char *path)
 	fclose (f);
 }
 
+static int cmpr_cvars (const void *a, const void *b)
+{
+	cvar_t *aa = *(cvar_t **)a;
+	cvar_t *bb = *(cvar_t **)b;
+
+	return strcmp(aa->name, bb->name);
+}
+
+static int GetCVARCount (void)
+{
+	int i = 0;
+	cvar_t* cvar;
+
+	for (cvar = cvar_vars; cvar; cvar = cvar->next)
+	{
+		i++;
+	}
+
+	return i;
+}
+
 /*
 ============
 Cvar_List_f
@@ -498,72 +547,100 @@ Cvar_List_f
 */
 void Cvar_List_f (void)
 {
+	cvar_t **sorted_cvars = NULL; /* FS: Sort by name. */
+	cvar_t	*head = &cvar_vars[0];
 	cvar_t	*var;
-	qboolean endReached = false; /* FS: For the filter */
-	qboolean endIsAMatch = false; /* FS: For the filter */
-	int		i;
+	const char *search_filter = NULL;
+	int		i = 0, j = 0, q = 0, args = 0, search_filter_len = 0, cvar_count = 0;
 
-	i = 0;
+	args = Cmd_Argc();
 
-	for (var = cvar_vars ; var ; var = var->next, i++)
+	if (args > 1) /* FS */
 	{
-		/* FS: Filter it */
-		if(Cmd_Argc() > 1)
+		search_filter = Cmd_Argv(1);
+		if (search_filter != NULL)
 		{
-			if (i == 0)
-				Com_Printf("Listing matches for '%s'...\n", Cmd_Argv(1));
-			while( !strstr(var->name, Cmd_Argv(1)) && var->next)
-			{
-				if(var->next)
-					var = var->next;
-			}
+			Com_Printf("Listing matches for '%s'...\n", search_filter);
 
-			if(!var->next)
+			if (args > 2)
 			{
-				if(strstr(var->name, Cmd_Argv(1))) /* FS: The last one in the search actually matches, so don't break out */
-				{
-					endIsAMatch = true;
-				}
-
-				endReached = true;
+				search_filter_len = strlen(search_filter);
 			}
 		}
+	}
 
-		if(endReached && !endIsAMatch) /* FS: We're at the end, and it's not a match to the filter so bust out. */
+	cvar_count = GetCVARCount();
+
+	sorted_cvars = (cvar_t **)malloc(sizeof(cvar_t*)*cvar_count);
+	if (!sorted_cvars)
+	{
+		Com_Error(ERR_FATAL, "Cvar_List_f: Failed to allocate memory.");
+		return;
+	}
+
+	for (q = 0; q < cvar_count; q++)
+	{
+		sorted_cvars[q] = cvar_vars;
+		cvar_vars = cvar_vars->next;
+	}
+
+	qsort(sorted_cvars, cvar_count, sizeof(cvar_t*), &cmpr_cvars);
+
+	for (i = 0; i < cvar_count; i++)
+	{
+		var = sorted_cvars[i];
+		if (!var)
 		{
 			break;
 		}
 
+		if (search_filter) /* FS */
+		{
+			if (!strstr(var->name, search_filter))
+				continue;
+
+			if ((args > 2) && (strncmp(var->name, search_filter, search_filter_len)))
+				continue;
+
+			j++;
+		}
+
 		if (var->flags & CVAR_ARCHIVE)
-			Com_Printf ("*");
+			Com_Printf("*");
 		else
-			Com_Printf (" ");
+			Com_Printf(" ");
 		if (var->flags & CVAR_USERINFO)
-			Com_Printf ("U");
+			Com_Printf("U");
 		else
-			Com_Printf (" ");
+			Com_Printf(" ");
 		if (var->flags & CVAR_SERVERINFO)
-			Com_Printf ("S");
+			Com_Printf("S");
 		else
-			Com_Printf (" ");
+			Com_Printf(" ");
 		if (var->flags & CVAR_NOSET)
-			Com_Printf ("-");
+			Com_Printf("-");
 		else if (var->flags & CVAR_LATCH)
-			Com_Printf ("L");
+			Com_Printf("L");
 		else
-			Com_Printf (" ");
+			Com_Printf(" ");
 		if (var->description)
-			Com_Printf ("D");
+			Com_Printf("D");
 		else
-			Com_Printf (" ");
+			Com_Printf(" ");
 
 		if ( (var->flags & CVAR_LATCH) && var->latched_string)
-			Com_Printf ("\"%s\" is \"%s\", Default: \"%s\", Latched to: \"%s\"\n", var->name, var->string, var->defaultValue, var->latched_string);
+			Com_Printf("\"%s\" is \"%s\", Default: \"%s\", Latched to: \"%s\"\n", var->name, var->string, var->defaultValue, var->latched_string);
 		else
-			Com_Printf (" %s \"%s\", Default: \"%s\"\n", var->name, var->string, var->defaultValue);
+			Com_Printf(" %s \"%s\", Default: \"%s\"\n", var->name, var->string, var->defaultValue);
 	}
+
 	Com_Printf("Legend: * Archive. U Userinfo. S Serverinfo. - Write Protected. L Latched. D Containts a Help Description.\n"); /* FS: Added a legend */
-	Com_Printf ("%i cvars\n", i);
+	Com_Printf("%d cvars\n", search_filter ? j : i);
+
+	free(sorted_cvars);
+	sorted_cvars = NULL;
+
+	cvar_vars = (cvar_t *)head;
 }
 
 
@@ -607,15 +684,52 @@ Reads in all archived cvars
 void Cvar_Init (void)
 {
 	con_show_description = Cvar_Get("con_show_description", "1", CVAR_ARCHIVE); /* FS */
-	con_show_description->description = "Toggle descriptions for CVARs.";
+	Cvar_SetDescription("con_show_description", "Toggle descriptions for CVARs.");
 	con_show_dev_flags = Cvar_Get ("con_show_dev_flags", "1", CVAR_ARCHIVE); /* FS */
-	con_show_dev_flags->description = "Show toggled developer flags when using the developer CVAR.";
+	Cvar_SetDescription("con_show_dev_flags", "Show toggled developer flags when using the developer CVAR.");
 
 	Cmd_AddCommand ("set", Cvar_Set_f);
 	Cmd_AddCommand ("cvarlist", Cvar_List_f);
 	Cmd_AddCommand ("togglecvar", Cvar_Toggle_f); /* FS */
 	Cmd_AddCommand ("forcecvar", Cvar_Force_f); /* FS */
 	Cmd_AddCommand ("resetcvar", Cvar_Reset_f); /* FS */
+}
+
+void Cvar_Shutdown (void)
+{
+	cvar_t *var, *next;
+
+	for (var = cvar_vars; var; var = next)
+	{
+		next = var->next;
+
+		if (var->description)
+		{
+			free(var->description);
+			var->description = NULL;
+		}
+
+		if (var->defaultValue)
+		{
+			Z_Free(var->defaultValue);
+			var->defaultValue = NULL;
+		}
+
+		if (var->string)
+		{
+			Z_Free(var->string);
+			var->string = NULL;
+		}
+
+		if (var->name)
+		{
+			Z_Free(var->name);
+			var->name = NULL;
+		}
+
+		Z_Free(var);
+		var = NULL;
+	}
 }
 
 static cvar_t *Cvar_IsNoset (const char *var_name) /* FS: Make sure this isn't a NOSET CVAR! */
@@ -766,13 +880,13 @@ void Cvar_ParseDeveloperFlags (void) /* FS: Special stuff for showing all the de
 
 	Com_Printf("\"%s\" is \"%s\", Default: \"%s\"\n", developer->name, developer->string, developer->defaultValue);
 
-	if(developer->value > 0)
+	if (developer->intValue)
 	{
-		unsigned long devFlags = 0;
-		if(developer->value == 1)
+		unsigned int devFlags = 0;
+		if(developer->intValue == 1)
 			devFlags = 65534;
 		else
-			devFlags = (unsigned long)developer->value;
+			devFlags = (unsigned int)developer->intValue;
 		Com_Printf("Toggled flags:\n");
 		if(devFlags & DEVELOPER_MSG_STANDARD)
 			Com_Printf(" * Standard messages - 2\n");
@@ -823,8 +937,14 @@ void Cvar_SetDescription (char *var_name, const char *description) /* FS: Set de
 		Com_DPrintf(DEVELOPER_MSG_STANDARD, "Error: Can't set description for %s!\n", var_name);
 		return;
 	}
+
 	if (!description) {
 		Com_DPrintf(DEVELOPER_MSG_STANDARD, "NULL description for %s\n", var_name);
+		return;
 	}
-	var->description = description;
+
+	if (var->description)
+		free(var->description);
+
+	var->description = strdup(description);
 }

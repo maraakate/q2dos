@@ -5,6 +5,9 @@
 #include "c_cam.h"
 #include "m_player.h"
 
+char	*chat_text[NUM_CHATSECTIONS][MAX_LINES_PER_SECTION];
+int		chat_linecount[NUM_CHATSECTIONS];
+
 qboolean Bot_CanHearClient(edict_t *ent, edict_t *other)
 {
 	vec3_t	dist;

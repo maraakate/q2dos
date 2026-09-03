@@ -71,18 +71,18 @@ Debug print to server console
 ===============
 */
 void __attribute__((__format__(__printf__,2,3)))
-PF_dprintf (unsigned long developerFlags, char *fmt, ...)
+PF_dprintf (unsigned int developerFlags, const char *fmt, ...)
 {
 	char		msg[1024];
 	va_list		argptr;
-	unsigned long			devValue = 0;
+	unsigned int			devValue = 0;
 		
-	if (!developer || !developer->value)
+	if (!developer || !developer->intValue)
 		return;			// don't confuse non-developers with techie stuff...
 
-	devValue = (unsigned long)developer->value;
+	devValue = (unsigned int)developer->intValue;
 
-	if (developer->value == 1) /* FS: Show all except extremely verbose shit */
+	if (developer->intValue == 1) /* FS: Show all except extremely verbose shit */
 		devValue = 65534;
 
 	if (!(devValue & developerFlags))
@@ -105,11 +105,14 @@ Print to a single client
 ===============
 */
 void __attribute__((__format__(__printf__,3,4)))
-PF_cprintf (edict_t *ent, int level, char *fmt, ...)
+PF_cprintf (edict_t *ent, int level, const char *fmt, ...)
 {
 	char		msg[1024];
 	va_list		argptr;
 	int			n;
+
+	if (!fmt || fmt[0] == '\0') /* FS: Sanity check, but also don't waste packets from empty strings. */
+		return;
 
 	n = 0;
 	if (ent)
@@ -118,6 +121,7 @@ PF_cprintf (edict_t *ent, int level, char *fmt, ...)
 		if ((n < 1) || (n > maxclients->value))
 		{
 			Com_Error (ERR_DROP, "cprintf to a non-client");
+			return;
 		}
 	}
 
@@ -128,7 +132,11 @@ PF_cprintf (edict_t *ent, int level, char *fmt, ...)
 
 	if (ent)
 	{
-		SV_ClientPrintf (svs.clients+(n-1), level, "%s", msg);
+		client_t *cl = ( client_t *)( svs.clients+(n-1) );
+		if ( cl->state >= cs_connected )
+		{
+			SV_ClientPrintf (svs.clients+(n-1), level, "%s", msg);
+		}
 	}
 	else
 	{
@@ -144,11 +152,14 @@ centerprint to a single client
 ===============
 */
 void __attribute__((__format__(__printf__,2,3)))
-PF_centerprintf (edict_t *ent, char *fmt, ...)
+PF_centerprintf (edict_t *ent, const char *fmt, ...)
 {
 	char		msg[1024];
 	va_list		argptr;
 	int			n;
+
+	if (!fmt || fmt[0] == '\0') /* FS: Sanity check, but also don't waste packets from empty strings. */
+		return;
 
 	n = NUM_FOR_EDICT(ent);
 	if ((n < 1) || (n > maxclients->value))
@@ -175,10 +186,15 @@ Abort the server with a game error
 ===============
 */
 void __attribute__((__noreturn__, __format__(__printf__,1,2)))
-PF_error (char *fmt, ...)
+PF_error (const char *fmt, ...)
 {
 	char		msg[1024];
 	va_list		argptr;
+
+	if (!fmt || fmt[0] == '\0') /* FS: Sanity check, but also don't waste packets from empty strings. */
+	{
+		Com_Error(ERR_DROP, "Game Error sent with no message!\n");
+	}
 
 	va_start (argptr,fmt);
 	Q_vsnprintf (msg, sizeof(msg), fmt, argptr);
@@ -204,6 +220,7 @@ void PF_setmodel (edict_t *ent, char *name)
 	if (!name)
 	{
 		Com_Error (ERR_DROP, "PF_setmodel: NULL");
+		return;
 	}
 
 	i = SV_ModelIndex (name);
@@ -239,10 +256,17 @@ void PF_Configstring (int index, char *val)
 	if ((index < 0) || (index >= MAX_CONFIGSTRINGS))
 	{
 		Com_Error (ERR_DROP, "PF_Configstring: bad index %i\n", index);
+		return;
 	}
 
 	if (!val)
 		val = "";
+
+	if (val[0] == -1) /* FS: Don't let this happen or the client will parse a svc_bad. */
+	{
+		Com_Printf("PF_Configstring: -1 configstring sent.\n");
+		val = "";
+	}
 
 	// catch overflow of indvidual configstrings
 	len = strlen(val);
@@ -450,6 +474,7 @@ void SV_InitGameProgs (void)
 	import.cvar = Cvar_Get;
 	import.cvar_set = Cvar_Set;
 	import.cvar_forceset = Cvar_ForceSet;
+	import.cvar_setdescription = Cvar_SetDescription;
 
 	import.argc = Cmd_Argc;
 	import.argv = Cmd_Argv;

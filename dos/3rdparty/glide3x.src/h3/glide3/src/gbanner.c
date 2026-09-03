@@ -17,8 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/h3/glide3/src/gbanner.c,v 1.1.1.1.8.1 2005/06/09 18:32:28 jwrdegoede Exp $
-** $Log: gbanner.c,v $
 ** Revision 1.1.1.1.8.1  2005/06/09 18:32:28  jwrdegoede
 ** Fixed all warnings with gcc4 -Wall -W -Wno-unused-parameter, except for a couple I believe to be a gcc bug. This has been reported to gcc.
 **
@@ -119,236 +117,12 @@ getPlugdata (FxU32* w, FxU32* h, FxI32* strideInBytes,
       return (*gc->pluginInfo.plugProc)(w,h,strideInBytes,format);
   return NULL;
 }
-
-#elif defined(GLIDE_PLUG_TGAFILE)
-static FxU32 fxPlugWidth;
-static FxU32 fxPlugHeight;
-static FxI32 fxPlugStride;
-static FxU16 *fxPlugData;
-static GrLfbWriteMode_t fxPlugFormat = GR_LFBWRITEMODE_565;
-
-static const void *
-getPlugdata (FxU32* w, FxU32* h, FxI32* strideInBytes,
-             GrLfbWriteMode_t* format)
-{
-  if (fxPlugData == NULL) {
-    /* [dBorca]
-     * we should try to extract TGA resource from 3dfxspl3.dll
-     */
-    FILE *f;
-    if ((f = fopen("3dfxplug.tga", "rb")) != NULL) {
-       int bpp, skip;
-       unsigned int i, j, decoded;
-       unsigned char header[18], b1[4], b0;
-
-       /* read TGA header */
-       if (!fread(header, 18, 1, f)) {
-          fclose(f);
-          return NULL;
-       }
-
-       /* fill in values */
-       fxPlugWidth = ((unsigned short *)header)[6];
-       fxPlugHeight = ((unsigned short *)header)[7];
-       fxPlugStride = fxPlugWidth * 2;
-
-       /* compute bits/pixel, then bytes/pixel; also check TGA type */
-       bpp = header[16];
-       if (((bpp != 16) && (bpp != 24) && (bpp != 32)) || ((header[2] & ~0x8) != 2)) {
-          fclose(f);
-          return NULL;
-       }
-       bpp >>= 3;
-
-       /* skip colormap + junk */
-       skip = header[0];
-       if (header[1]) {
-          skip += *(unsigned short *)&header[5] * header[7] >> 3;
-       }
-       fseek(f, skip, SEEK_CUR);
-
-       /* allocate datablock */
-       if ((fxPlugData = malloc(fxPlugStride * fxPlugHeight)) == NULL) {
-          fclose(f);
-          return NULL;
-       }
-
-       if (header[2] == 10) {
-          /* RLE */
-          j = 0;
-          while (j < (fxPlugWidth * fxPlugHeight)) {
-                /* packet header */
-                if (!fread(&b0, 1, 1, f)) {
-                   free(fxPlugData);
-                   fxPlugData = NULL;
-                   fclose(f);
-                   return NULL;
-                }
-                if (b0 & 0x80) {
-                   /* replicate pixels */
-                   b0 &= 0x7f;
-                   if (!fread(b1, bpp, 1, f)) {
-                      free(fxPlugData);
-                      fxPlugData = NULL;
-                      fclose(f);
-                      return NULL;
-                   }
-                   switch (bpp) {
-                          case 2:
-                               decoded = *(unsigned short *)&b1[0];
-                               decoded = ((decoded & 0x7fe0) << 1)
-                                       | ((decoded & 0x0200) >> 4)
-                                       |  (decoded & 0x001f);
-                               break;
-                          case 3:
-                          case 4:
-                               decoded = (b1[0]>>3) + ((b1[1]>>2)<<5) + ((b1[2]>>3)<<11);
-                               break;
-                   }
-                   for (i = 0; i <= b0; i++) {
-                       fxPlugData[j++] = decoded;
-                   }
-                } else {
-                   /* read pixels */
-                   for (i = 0; i <= b0; i++) {
-                       if (!fread(b1, bpp, 1, f)) {
-                          free(fxPlugData);
-                          fxPlugData = NULL;
-                          fclose(f);
-                          return NULL;
-                       }
-                       switch (bpp) {
-                              case 2:
-                                   decoded = *(unsigned short *)&b1[0];
-                                   decoded = ((decoded & 0x7fe0) << 1)
-                                           | ((decoded & 0x0200) >> 4)
-                                           |  (decoded & 0x001f);
-                                   break;
-                              case 3:
-                              case 4:
-                                   decoded = (b1[0]>>3) + ((b1[1]>>2)<<5) + ((b1[2]>>3)<<11);
-                                   break;
-                       }
-                       fxPlugData[j++] = decoded;
-                   }
-                }
-          }
-          /* flip (RLE can cross scanlines, thus we can't use tricks) */
-          if (!(header[17] & 0x20)) {
-             for (i = 0; i < fxPlugHeight / 2; i++) {
-                 unsigned short *src = &fxPlugData[fxPlugWidth * i];
-                 unsigned short *dst = &fxPlugData[fxPlugWidth * (fxPlugHeight - i - 1)];
-                 for (j = 0; j < fxPlugWidth; j++) {
-                     decoded = dst[j];
-                     dst[j] = src[j];
-                     src[j] = decoded;
-                 }
-             }
-          }
-       } else if (header[2] == 2) {
-          /* normal (flip on-the-fly) */
-          for (i = 0; i < fxPlugHeight; i++) {
-              int l = (header[17] & 0x20) ? i : (fxPlugHeight-i-1);
-              unsigned short *line = &fxPlugData[fxPlugWidth * l];
-              for (j = 0; j < fxPlugWidth; j++) {
-                  if (!fread(b1, bpp, 1, f)) {
-                     free(fxPlugData);
-                     fxPlugData = NULL;
-                     fclose(f);
-                     return NULL;
-                  }
-                  switch (bpp) {
-                         case 2:
-                              decoded = *(unsigned short *)&b1[0];
-                              decoded = ((decoded & 0x7fe0) << 1)
-                                      | ((decoded & 0x0200) >> 4)
-                                      |  (decoded & 0x001f);
-                              break;
-                         case 3:
-                         case 4:
-                              decoded = (b1[0]>>3) + ((b1[1]>>2)<<5) + ((b1[2]>>3)<<11);
-                              break;
-                  }
-                  line[j] = decoded;
-              }
-          }
-       }
-
-       fclose(f);
-    }
-  }
-
-  *w = fxPlugWidth;
-  *h = fxPlugHeight;
-  *strideInBytes = fxPlugStride;
-  *format = fxPlugFormat;
-  return fxPlugData;
-}
-
-#elif defined(GLIDE_PLUG_TGAMEM) /* embedded tga data */
-#include "banner.inc"
-static FxU16 *fxPlugData;
-
-static const void *
-getPlugdata (FxU32* w, FxU32* h, FxI32* strideInBytes,
-             GrLfbWriteMode_t* format)
-{
-  if (fxPlugData == NULL) {
-    /* [dBorca]
-     * embedded image is always 16bit RLE and does not need to be flipped
-     */
-    int k = 0;
-    unsigned int i, j, decoded;
-    unsigned char b0;
-
-    /* allocate datablock */
-    if ((fxPlugData = malloc(fxPlugStride * fxPlugHeight)) == NULL) {
-       return NULL;
-    }
-
-    /* RLE */
-    j = 0;
-    while (j < (fxPlugWidth * fxPlugHeight)) {
-          /* packet header */
-          b0 = tga_16rle[k++];
-          if (b0 & 0x80) {
-             /* replicate pixels */
-             b0 &= 0x7f;
-             decoded = *(unsigned short *)&tga_16rle[k];
-             k += 2;
-             for (i = 0; i <= b0; i++) {
-                 fxPlugData[j++] = decoded;
-             }
-          } else {
-             /* read pixels */
-             for (i = 0; i <= b0; i++) {
-                 decoded = *(unsigned short *)&tga_16rle[k];
-                 k += 2;
-                 fxPlugData[j++] = decoded;
-             }
-          }
-    }
-  }
-
-  *w = fxPlugWidth;
-  *h = fxPlugHeight;
-  *strideInBytes = fxPlugStride;
-  *format = fxPlugFormat;
-  return fxPlugData;
-}
-
-#else /* embedded decoded image */
-#include "banner.inc"
-
+#else
 static __inline const void *
 getPlugdata (FxU32* w, FxU32* h, FxI32* strideInBytes,
              GrLfbWriteMode_t* format)
 {
-  *w = fxPlugWidth;
-  *h = fxPlugHeight;
-  *strideInBytes = fxPlugStride;
-  *format = fxPlugFormat;
-  return fxPlugData;
+  return NULL;
 }
 #endif
 
@@ -356,14 +130,16 @@ getPlugdata (FxU32* w, FxU32* h, FxI32* strideInBytes,
 void
 _grShamelessPlug(void)
 {
-  GR_BEGIN_NOFIFOCHECK("_grShamelessPlug", 80);
-  GDBG_INFO_MORE(gc->myLevel, "()\n");
-
   GrState state;
   FxU32 plugWidth, plugHeight;
   FxI32 plugStride;
   GrLfbWriteMode_t plugFormat;
-  const void* plugData =
+  const void* plugData;
+
+  GR_BEGIN_NOFIFOCHECK("_grShamelessPlug", 80);
+  GDBG_INFO_MORE(gc->myLevel, "()\n");
+
+  plugData =
     getPlugdata(&plugWidth, &plugHeight, &plugStride, &plugFormat);
 
   if (!plugData) return;

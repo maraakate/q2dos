@@ -89,9 +89,9 @@ void SocketShutDown(void);
 #endif
 
 #ifndef GAMESPY_HARD_LINKED
-/* not all libc may have strtok_r() */
-#define strtok_r gs_strtok
-char *strtok_r(char *s, const char *delim, char **last);
+char *gs_strtok(char *s, const char *delim, char **last);
+#else
+#define gs_strtok strtok_r
 #endif
 
 #ifdef __cplusplus

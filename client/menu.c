@@ -24,16 +24,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "qmenu.h"
 #include "snd_loc.h"
 
-#ifndef GAME_HARD_LINKED
-int maxclients;
-#endif
-
-#ifdef __DJGPP__
-extern int	havegus; /* FS: DOS GUS */
-#else
-static const int havegus = 0;
-#endif
-
 static int	m_main_cursor;
 
 #define NUM_CURSOR_FRAMES 15
@@ -97,7 +87,7 @@ void M_PushMenu ( void (*draw) (void), const char *(*key) (int k) )
 {
 	int		i;
 
-	if (Cvar_VariableValue ("maxclients") == 1 
+	if (Cvar_VariableValueInt("maxclients") == 1 
 		&& Com_ServerState ())
 		Cvar_Set ("paused", "1");
 
@@ -129,8 +119,8 @@ void M_PushMenu ( void (*draw) (void), const char *(*key) (int k) )
 
 void M_ForceMenuOff (void)
 {
-	m_drawfunc = 0;
-	m_keyfunc = 0;
+	m_drawfunc = NULL;
+	m_keyfunc = NULL;
 	cls.key_dest = key_game;
 	m_menudepth = 0;
 	Key_ClearStates ();
@@ -159,7 +149,7 @@ const char *Default_MenuKey( menuframework_s *m, int key )
 
 	if ( m )
 	{
-		if ( ( item = Menu_ItemAtCursor( m ) ) != 0 )
+		if ( ( item = Menu_ItemAtCursor( m ) ) != NULL )
 		{
 			if ( item->type == MTYPE_FIELD )
 			{
@@ -256,7 +246,6 @@ const char *Default_MenuKey( menuframework_s *m, int key )
 	case K_AUX30:
 	case K_AUX31:
 	case K_AUX32:
-		
 	case K_KP_ENTER:
 	case K_ENTER:
 		if ( m )
@@ -411,10 +400,10 @@ void M_Main_Draw (void)
 		"m_main_options",
 		"m_main_video",
 		"m_main_quit",
-		0
+		NULL
 	};
 
-	for ( i = 0; names[i] != 0; i++ )
+	for ( i = 0; names[i] != NULL; i++ )
 	{
 		re.DrawGetPicSize( &w, &h, names[i] );
 
@@ -426,7 +415,7 @@ void M_Main_Draw (void)
 	ystart = ( viddef.height / 2 - 110 );
 	xoffset = ( viddef.width - widest + 70 ) / 2;
 
-	for ( i = 0; names[i] != 0; i++ )
+	for ( i = 0; names[i] != NULL; i++ )
 	{
 		if ( i != m_main_cursor )
 			re.DrawPic( xoffset, ystart + i * 40 + 13, names[i] );
@@ -690,7 +679,7 @@ char *bindnames[][2] =
 {"invnext",			"next item"},
 
 {"cmd help", 		"help computer" }, 
-{ 0, 0 }
+{ NULL, NULL }
 };
 
 int				keys_cursor;
@@ -1194,31 +1183,31 @@ float ClampCvar( float min, float max, float value )
 
 static int Get_S_KHZ_Quality (void)  /* FS: Added */
 {
-	if(s_khz->intValue <= 19293)
+	if (s_khz->intValue <= 19293)
 	{
 		return 0;
 	}
-	else if(s_khz->intValue > 19293 && s_khz->intValue <= 22050)
+	else if (s_khz->intValue <= 22050)
 	{
 		return 1;
 	}
-	else if(s_khz->intValue > 22050 && s_khz->intValue <= 44100)
+	else if (s_khz->intValue <= 44100)
 	{
 		return 2;
 	}
-	else if(s_khz->intValue > 44100 && s_khz->intValue <= 48000 )
+	else if (s_khz->intValue <= 48000)
 	{
-		if(havegus == 1) /* FS: Max of GUS Classic is 44100 */
+		if (havegus == 1) /* FS: Max of GUS Classic is 44100 */
 		{
 			return 2;
 		}
 		return 3;
 	}
-	else if(s_khz->intValue > 48000 )
+	else
 	{
 		if (havegus)
 		{
-			if(havegus == 1)
+			if (havegus == 1)
 			{
 				return 2; /* FS: Max of GUS Classic is 44100 */
 			}
@@ -1397,20 +1386,20 @@ void Options_MenuInit( void )
 	{
 		"disabled",
 		"enabled",
-		0
+		NULL
 	};
 
 #ifdef WIN32
 	static const char *compatibility_items[] =
 	{
-		"max compatibility", "max performance", 0
+		"max compatibility", "max performance", NULL
 	};
 #endif
 	static const char *yesno_names[] =
 	{
 		"no",
 		"yes",
-		0
+		NULL
 	};
 
 	static const char *crosshair_names[] =
@@ -1419,7 +1408,7 @@ void Options_MenuInit( void )
 		"cross",
 		"dot",
 		"angle",
-		0
+		NULL
 	};
 
 #ifdef WIN32
@@ -1430,7 +1419,7 @@ void Options_MenuInit( void )
 		"44100",
 		"48000",
 		"96000",
-		0
+		NULL
 	};
 #else
 
@@ -1440,7 +1429,7 @@ void Options_MenuInit( void )
 		"22050",
 		"44100",
 		"48000",
-		0
+		NULL
 	};
 
 	static const char *skhz_gusclassic_frequency[] =
@@ -1448,7 +1437,7 @@ void Options_MenuInit( void )
 		"19293",
 		"22050",
 		"44100",
-		0
+		NULL
 	};
 
 	static const char *skhz_generic_dos_frequency[] =
@@ -1458,7 +1447,7 @@ void Options_MenuInit( void )
 		"44100",
 		"48000",
 		"96000",
-		0
+		NULL
 	};
 #endif // WIN32
 
@@ -1466,7 +1455,7 @@ void Options_MenuInit( void )
 	{
 		"8-bit",
 		"16-bit",
-		0
+		NULL
 	};
 
 #ifndef __DJGPP__
@@ -1791,7 +1780,7 @@ void Extended_Options_MenuInit( void )
 	{
 		"no",
 		"yes",
-		0
+		NULL
 	};
 
 	static const char *showtime_names[] =
@@ -1799,7 +1788,7 @@ void Extended_Options_MenuInit( void )
 		"no",
 		"military",
 		"AM/PM",
-		0
+		NULL
 	};
 
 	static const char *showuptime_names[] =
@@ -1807,7 +1796,7 @@ void Extended_Options_MenuInit( void )
 		"no",
 		"map uptime",
 		"total uptime",
-		0
+		NULL
 	};
 
 	/*
@@ -2016,7 +2005,7 @@ static const char *idcredits[] =
 	"trademark of Activision, Inc. All",
 	"other trademarks and trade names are",
 	"properties of their respective owners.",
-	0
+	NULL
 };
 
 static const char *xatcredits[] =
@@ -2157,7 +2146,7 @@ static const char *xatcredits[] =
 	"Inc. All other trademarks and trade",
 	"names are properties of their",
 	"respective owners.",
-	0
+	NULL
 };
 
 static const char *roguecredits[] =
@@ -2271,7 +2260,7 @@ static const char *roguecredits[] =
 	"Inc. All other trademarks and trade",
 	"names are properties of their",
 	"respective owners.",
-	0
+	NULL
 };
 
 
@@ -2299,10 +2288,9 @@ void M_Credits_MenuDraw( void )
 	{
 		int j, stringoffset = 0;
 		int bold = false;
+		size_t credLen = strlen(credits[i]);
 
 		if ( y <= -8 )
-			continue;
-		if (y > viddef.height)
 			continue;
 
 		if ( credits[i][0] == '+' )
@@ -2320,7 +2308,7 @@ void M_Credits_MenuDraw( void )
 		{
 			int x;
 
-			x = ( viddef.width - strlen( credits[i] ) * 8 - stringoffset * 8 ) / 2 + ( j + stringoffset ) * 8;
+			x = ( viddef.width - credLen * 8 - stringoffset * 8 ) / 2 + ( j + stringoffset ) * 8;
 
 			if ( bold )
 				re.DrawChar( x, y, credits[i][j+stringoffset] + 128 );
@@ -2381,7 +2369,7 @@ void M_Menu_Credits_f( void )
 			if (--count == 0)
 				break;
 		}
-		creditsIndex[++n] = 0;
+		creditsIndex[++n] = NULL;
 		credits = (const char **)creditsIndex; /* FS: Compiler warning */
 	}
 	else
@@ -3007,7 +2995,7 @@ static void SearchGamespyGames (void)
 	int		i;
 
 	m_num_gamespy_servers = 0;
-	for (i=0 ; i<=MAX_GAMESPY_MENU_SERVERS ; i++)
+	for (i = 0; i < MAX_GAMESPY_MENU_SERVERS; i++)
 	{
 		strcpy (gamespy_server_names[i], NO_SERVER_STRING);
 	}
@@ -3070,10 +3058,8 @@ static int Get_Vidscale(void)
 		return 30;
 	if (viddef.height <= 800)
 		return 36;
-	if (viddef.height > 800)
-		return 38;
-	/* FS: We must have some weirdo mode, so 20 should be OK. */
-	return 18;
+
+	return 38; /* > 800 */
 }
 #endif /* GAMESPY */
 
@@ -3188,7 +3174,7 @@ static void JoinGamespyServer_MenuInit(void)
 
 	vidscale = Get_Vidscale();
 
-	for (i = 0; i <= MAX_GAMESPY_MENU_SERVERS; i++)
+	for (i = 0; i < MAX_GAMESPY_MENU_SERVERS; i++)
 	{
 		strcpy (gamespy_server_names[i], NO_SERVER_STRING);
 		memset (&gamespy_connect_string, 0, sizeof(gamespy_connect_string));
@@ -3261,7 +3247,7 @@ static void JoinGamespyServer_Redraw( int serverscale )
 
 	vidscale = Get_Vidscale();
 
-	for (i = 0; i <= MAX_GAMESPY_MENU_SERVERS; i++)
+	for (i = 0; i < MAX_GAMESPY_MENU_SERVERS; i++)
 	{
 		strcpy (gamespy_server_names[i], NO_SERVER_STRING);
 	}
@@ -3546,7 +3532,7 @@ void StartServer_MenuInit( void )
 	{
 		"deathmatch",
 		"cooperative",
-		0
+		NULL
 	};
 //=======
 //PGM
@@ -3556,7 +3542,7 @@ void StartServer_MenuInit( void )
 		"cooperative",
 		"tag",
 //		"deathball",
-		0
+		NULL
 	};
 //PGM
 //=======
@@ -3571,7 +3557,7 @@ void StartServer_MenuInit( void )
 	** load the list of map names
 	*/
 	Com_sprintf( mapsname, sizeof( mapsname ), "%s/maps.lst", FS_Gamedir() );
-	if ( ( fp = fopen( mapsname, "rb" ) ) == 0 )
+	if ( (fp = fopen(mapsname, "rb")) == NULL )
 	{
 		if ( ( length = FS_LoadFile( "maps.lst", ( void ** ) &buffer ) ) == -1 )
 			Com_Error( ERR_DROP, "couldn't find maps.lst\n" );
@@ -3586,6 +3572,11 @@ void StartServer_MenuInit( void )
 		fseek(fp, 0, SEEK_SET);
 #endif
 		buffer = malloc( length );
+		if (!buffer)
+		{
+			Com_Error(ERR_FATAL, "StartServer_MenuInit:  Failed to allocate memory.\n");
+			return;
+		}
 		fread( buffer, length, 1, fp );
 	}
 
@@ -3594,18 +3585,24 @@ void StartServer_MenuInit( void )
 	i = 0;
 	while ( i < length )
 	{
-		if ( s[i] == '\r' )
+		if ( s && s[i] == '\r' )
 			nummaps++;
 		i++;
 	}
 
-	if ( nummaps == 0 )
-		Com_Error( ERR_DROP, "no maps in maps.lst\n" );
+	if (nummaps == 0)
+	{
+		Com_Error(ERR_DROP, "no maps in maps.lst\n");
+		return;
+	}
 
 	mapnames = malloc( sizeof( char * ) * ( nummaps + 1 ) );
+	if (!mapnames)
+	{
+		Com_Error(ERR_FATAL, "StartServer_MenuInit:  Failed to allocate memory.\n");
+		return;
+	}
 	memset( mapnames, 0, sizeof( char * ) * ( nummaps + 1 ) );
-
-	s = buffer;
 
 	for ( i = 0; i < nummaps; i++ )
 	{
@@ -3619,13 +3616,18 @@ void StartServer_MenuInit( void )
 		Com_sprintf( scratch, sizeof( scratch ), "%s\n%s", longname, shortname );
 
 		mapnames[i] = malloc( strlen( scratch ) + 1 );
+		if (!mapnames[i])
+		{
+			Com_Error(ERR_FATAL, "StartServer_MenuInit:  Failed to allocate memory.\n");
+			return;
+		}
 		strcpy( mapnames[i], scratch );
 	}
-	mapnames[nummaps] = 0;
+	mapnames[nummaps] = NULL;
 
-	if ( fp != 0 )
+	if ( fp != NULL )
 	{
-		fp = 0;
+		fp = NULL;
 		free( buffer );
 	}
 	else
@@ -3658,7 +3660,7 @@ void StartServer_MenuInit( void )
 		s_rules_box.itemnames = dm_coop_names;
 //PGM
 
-	if (Cvar_VariableValue("coop"))
+	if (Cvar_VariableValueInt("coop"))
 		s_rules_box.curvalue = 1;
 	else
 		s_rules_box.curvalue = 0;
@@ -3698,7 +3700,7 @@ void StartServer_MenuInit( void )
 	s_maxclients_field.generic.statusbar = NULL;
 	s_maxclients_field.length = 3;
 	s_maxclients_field.visible_length = 3;
-	if ( Cvar_VariableValue( "maxclients" ) == 1 )
+	if ( Cvar_VariableValueInt( "maxclients" ) == 1 )
 		strcpy( s_maxclients_field.buffer, "8" );
 	else 
 		strcpy( s_maxclients_field.buffer, Cvar_VariableString("maxclients") );
@@ -3761,7 +3763,7 @@ const char *StartServer_MenuKey( int key )
 				free( mapnames[i] );
 			free( mapnames );
 		}
-		mapnames = 0;
+		mapnames = NULL;
 		nummaps = 0;
 	}
 
@@ -3955,11 +3957,11 @@ void DMOptions_MenuInit( void )
 {
 	static const char *yes_no_names[] =
 	{
-		"no", "yes", 0
+		"no", "yes", NULL
 	};
 	static const char *teamplay_names[] = 
 	{
-		"disabled", "by skin", "by model", 0
+		"disabled", "by skin", "by model", NULL
 	};
 	int dmflags = Cvar_VariableValue( "dmflags" );
 	int y = 0;
@@ -4158,7 +4160,7 @@ void DMOptions_MenuInit( void )
 //	Menu_Center( &s_dmoptions_menu );
 
 	// set the original dmflags statusbar
-	DMFlagCallback( 0 );
+	DMFlagCallback( NULL );
 	Menu_SetStatusBar( &s_dmoptions_menu, dmoptions_statusbar );
 }
 
@@ -4237,7 +4239,7 @@ void DownloadOptions_MenuInit( void )
 {
 	static const char *yes_no_names[] =
 	{
-		"no", "yes", 0
+		"no", "yes", NULL
 	};
 	int y = 0;
 
@@ -4369,8 +4371,8 @@ void AddressBook_MenuInit( void )
 		adr = Cvar_Get( buffer, "", CVAR_ARCHIVE );
 
 		s_addressbook_fields[i].generic.type = MTYPE_FIELD;
-		s_addressbook_fields[i].generic.name = 0;
-		s_addressbook_fields[i].generic.callback = 0;
+		s_addressbook_fields[i].generic.name = NULL;
+		s_addressbook_fields[i].generic.callback = NULL;
 		s_addressbook_fields[i].generic.x		= 0;
 		s_addressbook_fields[i].generic.y		= i * 18 + 0;
 		s_addressbook_fields[i].generic.localdata[0] = i;
@@ -4448,7 +4450,7 @@ static int s_numplayermodels;
 
 static int rate_tbl[] = { 2500, 3200, 5000, 10000, 25000, 0 };
 static const char *rate_names[] = { "28.8 Modem", "33.6 Modem", "Single ISDN",
-	"Dual ISDN/Cable", "T1/LAN", "User defined", 0 };
+	"Dual ISDN/Cable", "T1/LAN", "User defined", NULL };
 
 void DownloadOptionsFunc( void *self )
 {
@@ -4481,7 +4483,7 @@ static void FreeFileList( char **list, int n )
 		if ( list[i] )
 		{
 			free( list[i] );
-			list[i] = 0;
+			list[i] = NULL;
 		}
 	}
 	free( list );
@@ -4511,7 +4513,7 @@ static qboolean IsValidSkin (char **filelist, int numFiles, int index)
 
 	if ( !strcmp (filelist[index]+max(len-4,0), ".pcx") )
 	{
-		if ( strcmp (filelist[index]+max(len-6,0), "_i.pcx") )
+		if ( strcmp (filelist[index]+max(len-6,0), "_i.pcx") != 0 )
 		{
 			if ( IconOfSkinExists (filelist[index], filelist, numFiles-1) )
 			{
@@ -4547,7 +4549,7 @@ static qboolean PlayerConfig_ScanDirectories( void )
 			path = FS_NextPath( path );
 			Com_sprintf( findname, sizeof(findname), "%s/players/*.*", path );
 
-			if ( ( dirnames = FS_ListFiles( findname, &ndirs, SFF_SUBDIR, 0 ) ) != 0 )
+			if ( (dirnames = FS_ListFiles(findname, &ndirs, SFF_SUBDIR, 0)) != NULL )
 			{
 				break;
 			}
@@ -4582,7 +4584,7 @@ static qboolean PlayerConfig_ScanDirectories( void )
 			int			nskins = 0;
 			qboolean	already_added = false;	
 
-			if ( dirnames[i] == 0 )
+			if ( dirnames[i] == NULL )
 				continue;
 
 			// Knightmare- check if dirnames[i] is already added to the ui_pmi[i].directory list
@@ -4604,7 +4606,7 @@ static qboolean PlayerConfig_ScanDirectories( void )
 			if ( !Sys_FindFirst( scratch, 0, SFF_SUBDIR | SFF_HIDDEN | SFF_SYSTEM ) )
 			{
 				free( dirnames[i] );
-				dirnames[i] = 0;
+				dirnames[i] = NULL;
 				Sys_FindClose();
 				continue;
 			}
@@ -4618,7 +4620,7 @@ static qboolean PlayerConfig_ScanDirectories( void )
 			if ( !pcxnames )
 			{
 				free( dirnames[i] );
-				dirnames[i] = 0;
+				dirnames[i] = NULL;
 				continue;
 			}
 
@@ -4639,6 +4641,11 @@ static qboolean PlayerConfig_ScanDirectories( void )
 				continue;
 
 			skinnames = malloc( sizeof( char * ) * ( nskins + 1 ) );
+			if (!skinnames)
+			{
+				Com_Error(ERR_FATAL, "PlayerConfig_ScanDirectories:  Failed to allocate memory.\n");
+				return false;
+			}
 			memset( skinnames, 0, sizeof( char * ) * ( nskins + 1 ) );
 
 			// copy the valid skins
@@ -4725,7 +4732,7 @@ qboolean PlayerConfig_MenuInit( void )
 
 	cvar_t *hand = Cvar_Get( "hand", "0", CVAR_USERINFO | CVAR_ARCHIVE );
 
-	static const char *handedness[] = { "right", "left", "center", 0 };
+	static const char *handedness[] = { "right", "left", "center", NULL };
 
 	PlayerConfig_ScanDirectories();
 
@@ -4793,7 +4800,7 @@ qboolean PlayerConfig_MenuInit( void )
 
 	s_player_name_field.generic.type = MTYPE_FIELD;
 	s_player_name_field.generic.name = "name";
-	s_player_name_field.generic.callback = 0;
+	s_player_name_field.generic.callback = NULL;
 	s_player_name_field.generic.x		= 0;
 	s_player_name_field.generic.y		= 0;
 	s_player_name_field.length	= 20;
@@ -4822,8 +4829,8 @@ qboolean PlayerConfig_MenuInit( void )
 	s_player_skin_box.generic.type = MTYPE_SPINCONTROL;
 	s_player_skin_box.generic.x	= -56;
 	s_player_skin_box.generic.y	= 94;
-	s_player_skin_box.generic.name	= 0;
-	s_player_skin_box.generic.callback = 0;
+	s_player_skin_box.generic.name	= NULL;
+	s_player_skin_box.generic.callback = NULL;
 	s_player_skin_box.generic.cursor_offset = -48;
 	s_player_skin_box.curvalue = currentskinindex;
 	s_player_skin_box.itemnames = (const char **)s_pmi[currentdirectoryindex].skindisplaynames;
@@ -4836,7 +4843,7 @@ qboolean PlayerConfig_MenuInit( void )
 	s_player_handedness_box.generic.type = MTYPE_SPINCONTROL;
 	s_player_handedness_box.generic.x	= -56;
 	s_player_handedness_box.generic.y	= 118;
-	s_player_handedness_box.generic.name	= 0;
+	s_player_handedness_box.generic.name	= NULL;
 	s_player_handedness_box.generic.cursor_offset = -48;
 	s_player_handedness_box.generic.callback = HandednessCallback;
 	s_player_handedness_box.curvalue = Cvar_VariableValue( "hand" );
@@ -4854,7 +4861,7 @@ qboolean PlayerConfig_MenuInit( void )
 	s_player_rate_box.generic.type = MTYPE_SPINCONTROL;
 	s_player_rate_box.generic.x	= -56;
 	s_player_rate_box.generic.y	= 166;
-	s_player_rate_box.generic.name	= 0;
+	s_player_rate_box.generic.name	= NULL;
 	s_player_rate_box.generic.cursor_offset = -48;
 	s_player_rate_box.generic.callback = RateCallback;
 	s_player_rate_box.curvalue = i;
@@ -4884,6 +4891,8 @@ qboolean PlayerConfig_MenuInit( void )
 
 	return true;
 }
+
+static entity_t playerconfig_Entity[2]; /* FS: Moved here as it will leave scope. */
 
 void PlayerConfig_MenuDraw( void )
 {
@@ -4920,17 +4929,17 @@ void PlayerConfig_MenuDraw( void )
 	{
 		int			yaw; // was static
 		vec3_t		modelOrg;
-		entity_t	entity[2], *ent;
+		entity_t	*ent;
 
 		refdef.num_entities = 0;
-		refdef.entities = entity;
+		refdef.entities = playerconfig_Entity;
 
 		yaw = anglemod(cl.time/10);
 		VectorSet (modelOrg, 80, 0, 0);
 
 		// Setup player model
-		ent = &entity[0];
-		memset( &entity[0], 0, sizeof( entity[0] ) );
+		ent = &playerconfig_Entity[0];
+		memset( &playerconfig_Entity[0], 0, sizeof(playerconfig_Entity[0] ) );
 
 		Com_sprintf( scratch, sizeof( scratch ), "players/%s/tris.md2", s_pmi[s_player_model_box.curvalue].directory );
 		ent->model = re.RegisterModel( scratch );
@@ -4946,8 +4955,8 @@ void PlayerConfig_MenuDraw( void )
 		refdef.num_entities++;
 
 		// Setup weapon model
-		ent = &entity[1];
-		memset( &entity[1], 0, sizeof( entity[1] ) );
+		ent = &playerconfig_Entity[1];
+		memset( &playerconfig_Entity[1], 0, sizeof(playerconfig_Entity[1] ) );
 
 		Com_sprintf( scratch, sizeof( scratch ), "players/%s/weapon.md2", s_pmi[s_player_model_box.curvalue].directory );
 		ent->model = re.RegisterModel( scratch );
@@ -4964,8 +4973,8 @@ void PlayerConfig_MenuDraw( void )
 			refdef.num_entities++;
 		}
 
-		refdef.areabits = 0;
-		refdef.lightstyles = 0;
+		refdef.areabits = NULL;
+		refdef.lightstyles = NULL;
 		refdef.rdflags = RDF_NOWORLDMODEL;
 
 		Menu_Draw( &s_player_config_menu );
@@ -5014,10 +5023,10 @@ const char *PlayerConfig_MenuKey (int key)
 			{
 				if ( s_pmi[i].skindisplaynames[j] )
 					free( s_pmi[i].skindisplaynames[j] );
-				s_pmi[i].skindisplaynames[j] = 0;
+				s_pmi[i].skindisplaynames[j] = NULL;
 			}
 			free( s_pmi[i].skindisplaynames );
-			s_pmi[i].skindisplaynames = 0;
+			s_pmi[i].skindisplaynames = NULL;
 			s_pmi[i].nskins = 0;
 		}
 	}
@@ -5188,7 +5197,7 @@ void M_Keydown (int key)
 
 	if (m_keyfunc)
 	{
-		if ( ( s = m_keyfunc( key ) ) != 0 )
+		if ( (s = m_keyfunc(key)) != NULL )
 		{
 			S_StartLocalSound( ( char * ) s );
 		}

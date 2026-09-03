@@ -17,8 +17,6 @@
 ;; 
 ;; COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 ;;
-;; $Header: /cvsroot/glide/glide3x/cvg/glide3/src/cpudtect.asm,v 1.1.1.1.8.1 2003/11/03 13:34:29 dborca Exp $
-;; $Log: cpudtect.asm,v $
 ;; Revision 1.1.1.1.8.1  2003/11/03 13:34:29  dborca
 ;; Voodoo2 happiness (DJGPP & Linux)
 ;;
@@ -56,7 +54,7 @@ CPUTypeP6       equ 6h
         
 ;;; References to external data:
     
-segment		TEXT
+segment		SEG_TEXT
 ;;
 ;;  _cpu_detect_asm - detect the type of CPU 
 ;; 

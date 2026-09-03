@@ -1,14 +1,11 @@
 # Linux makefile for Texus
 #
-# $Id: makefile.linux,v 1.5.8.3 2006/11/30 09:45:33 guillemj Exp $
-#
 #  Copyright (c) 2003 - Daniel Borca
 #  Email : dborca@users.sourceforge.net
 #  Web   : http://www.geocities.com/dborca
 #
 #  Copyright (c) 2006 - Guillem Jover <guillem@hadrons.org>
 #
-
 
 #
 #  Available options:

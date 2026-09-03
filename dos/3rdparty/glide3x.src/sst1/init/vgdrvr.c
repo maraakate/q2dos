@@ -16,11 +16,6 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-**
-** $Revision: 1.1.2.2 $ 
-** $Date: 2005/06/09 18:32:37 $ 
-**
 */
 
 #include <3dfx.h>
@@ -29,6 +24,8 @@
 #include "fxinit.h"
 #include <sst1init.h>
 #include <sst.h>
+
+#include <stddef.h> /* NULL */
 
 static FxBool setVideo( FxU32                   hWnd,
                         GrScreenResolution_t    sRes,
@@ -41,10 +38,11 @@ static FxBool setVideo( FxU32                   hWnd,
                         int                     *yres,
                         int                     *fbStride,
                         sst1VideoTimingStruct   *vidTimings) {
-    FxBool rv;
+
     static int _w[] = {320,320,400,512,640,640,640,640,800,960,856,512};
     static int _h[] = {200,240,256,384,200,350,400,480,600,720,480,256};
-    
+
+    FxBool rv;
     rv = sst1InitVideo( (FxU32*)context->info.hwDep.vgInfo.vgBaseAddr,
                         sRes,
                         vRefresh, 
@@ -100,38 +98,35 @@ static FxBool enableTransport( InitFIFOData *info ) {
 static void disableTransport( void ) {
 }
 
-static void swapBuffers( FxU32 code ) {
-} 
+static /*InitSwapType_t*/ void swapBuffers( FxU32 code ) {
+/*  return INIT_SWAP_FLIP;*/
+}
 
 static FxU32 status( void ) {
   return sst1InitReturnStatus((FxU32 *) context->info.hwDep.vgInfo.vgBaseAddr);
-} 
+}
 
 static FxBool busy(void) {
   FxU32 stat = status();
   FxBool ret = (stat & SST_BUSY) ? FXTRUE : FXFALSE;
-  
   return ret;
-} 
+}
 
 static void idle( void ) {
   sst1InitIdle((FxU32 *)context->info.hwDep.vgInfo.vgBaseAddr);
 }
 
 static void *getBufferPtr( InitBuffer_t buffer, int *strideBytes ) {
-    return 0;
+    return NULL;
 }
 
 static void renderBuffer( InitBuffer_t buffer ) {
-    return;
 }
 
 static void origin( InitOriginLocation_t origin ) {
-    return;
 }
 
 static void ioCtl( FxU32 token, void *argument ) {
-    return;
 }
 
 static FxBool control( FxU32 code ) {
@@ -197,4 +192,3 @@ void vgDriverInit( InitContext *context ) {
     context->findVidTimingStruct = findvidtiming;
 
 }
-

@@ -35,7 +35,6 @@ typedef enum
 static dmacard_t		 dmacard;
 
 
-int	havegus;
 void GUS_ClearDMA(void)
 {
 }

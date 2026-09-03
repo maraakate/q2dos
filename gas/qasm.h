@@ -27,6 +27,39 @@
 // !!! must be kept the same as in d_iface.h !!!
 #define TRANSPARENT_COLOR	255
 
+// !!! must be kept the same as in qfiles.h !!!
+#define DTRIVERTX_V0		0
+#define DTRIVERTX_V1		1
+#define DTRIVERTX_V2		2
+#define DTRIVERTX_LNI		3
+#define DTRIVERTX_SIZE		4
+
+// !!! must be kept the same as in r_local.h !!!
+#define FINALVERT_V0		0
+#define FINALVERT_V1		4
+#define FINALVERT_V2		8
+#define FINALVERT_V3		12
+#define FINALVERT_V4		16
+#define FINALVERT_V5		20
+#define FINALVERT_FLAGS		24
+#define FINALVERT_X			28
+#define FINALVERT_Y			32
+#define FINALVERT_Z			36
+#define FINALVERT_SIZE		40
+
+// !!! must be kept the same as in r_local.h !!!
+#define ALIAS_LEFT_CLIP		0x0001
+#define ALIAS_TOP_CLIP		0x0002
+#define ALIAS_RIGHT_CLIP	0x0004
+#define ALIAS_BOTTOM_CLIP	0x0008
+#define ALIAS_Z_CLIP		0x0010
+#define ALIAS_XY_CLIP_MASK	0x000F
+
+// !!! must be kept the same as in ref.h !!!
+#define ENTITY_FLAGS		68
+
+// old as from Apple cctools does not recognize .extern
+#ifndef __APPLE__
 #ifndef GLQUAKE
 	.extern C(d_zistepu)
 	.extern C(d_pzbuffer)
@@ -55,7 +88,6 @@
 	.extern	C(cacheblock)
 	.extern	C(d_viewbuffer)
 	.extern	C(cachewidth)
-	.extern	C(d_pzbuffer)
 	.extern	C(d_zrowbytes)
 	.extern	C(d_zwidth)
 	.extern C(d_scantable)
@@ -199,10 +231,25 @@
 	.extern C(r_zistepy)
 	.extern C(D_PolysetSetEdgeTable)
 	.extern C(D_RasterizeAliasPolySmooth)
-	.extern C(d_pdrawspans) /* FS: For R_PolysetCalcGradients */
-	.extern C(alphamap) /* FS: For r_part.s TODO: from vid.alpha */
+	.extern C(R_PolysetDrawSpans8_Opaque)
+	.extern C(d_pdrawspans)
+	.extern C(alphamap)
 	.extern C(irtable)
 	.extern C(iractive)
+	.extern C(vright)
+	.extern C(vup)
+	.extern C(vpn)
+	.extern C(partparms)
+	.extern C(s_prefetch_address)
+	.extern C(r_screenwidth)
+	.extern C(vid)
+	.extern C(r_lerp_backv)
+	.extern C(r_lerp_frontv)
+	.extern C(r_lerp_move)
+	.extern C(currententity)
+	.extern C(s_ziscale)
+	.extern C(aliasxscale)
+	.extern C(aliasyscale)
 
 	.extern float_point5
 	.extern Float2ToThe31nd
@@ -217,7 +264,7 @@
 	.extern fp_64k
 	.extern fp_1m
 	.extern fp_1m_minus_1
-	.extern fp_8 
+	.extern fp_8
 	.extern entryvec_table
 	.extern advancetable
 	.extern sstep
@@ -249,8 +296,10 @@
 	.extern tdivz8stepu
 	.extern reciprocal_table_16
 	.extern entryvec_table_16
-	.extern ceil_cw
-	.extern single_cw
+	.extern fpu_ceil_cw
+	.extern fpu_sp24_ceil_cw
+	.extern fpu_single_cw
+	.extern fpu_chop_cw
 	.extern fp_64kx64k
 	.extern pz
 	.extern spr8entryvec_table
@@ -266,6 +315,7 @@
 	.extern C(vup)
 	.extern C(vpn)
 	.extern C(BOPS_Error)
+#endif
 
 //
 // !!! note that this file must match the corresponding C structures at all
@@ -370,7 +420,7 @@
 #define spanpackage_t_tfrac				20
 #define spanpackage_t_light				24
 #define spanpackage_t_zi				28
-#define spanpackage_t_size				32 
+#define spanpackage_t_size				32
 
 // edge_t structure
 // !!! if this is changed, it must be changed in r_shared.h too !!!
@@ -459,5 +509,18 @@
 #define mtri_size			16	// !!! if this changes, array indexing in !!!
 								// !!! d_polysa.s must be changed to match !!!
 #define mtri_shift			4
+
+// partparms_t structure
+#define partparms_particle		0
+#define partparms_level			4
+#define partparms_color			8
+
+// vid_t structure
+#define vid_buffer				0
+#define vid_colormap			4
+#define vid_alphamap			8
+#define vid_rowbytes			12
+#define vid_width				16
+#define vid_height				20
 
 #endif

@@ -16,9 +16,6 @@
 ;; 
 ;; COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 ;;
-;; $Header: /cvsroot/glide/glide3x/h3/glide3/src/xtexdl.asm,v 1.1.1.1.8.2 2005/06/09 18:32:29 jwrdegoede Exp $
-;; $Revision: 1.1.1.1.8.2 $
-;; $Log: xtexdl.asm,v $
 ;; Revision 1.1.1.1.8.2  2005/06/09 18:32:29  jwrdegoede
 ;; Fixed all warnings with gcc4 -Wall -W -Wno-unused-parameter, except for a couple I believe to be a gcc bug. This has been reported to gcc.
 ;;
@@ -114,7 +111,7 @@ _texData$   equ 24 + STACKOFFSET
 ;
 ;--------------------------------------------------------------------------
 
-segment		TEXT
+segment		SEG_TEXT
 
               ALIGN  32
 
@@ -330,7 +327,7 @@ endp
 ;
 ;--------------------------------------------------------------------------
 
-segment		TEXT
+segment		SEG_TEXT
 
               ALIGN  32
 
@@ -521,7 +518,7 @@ endp
 
 
 
-;segment		TEXT
+;segment		SEG_TEXT
 
               ALIGN  32
 

@@ -17,8 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/sst1/glide3/src/Attic/distrip.c,v 1.1.2.6 2005/05/10 11:27:23 jwrdegoede Exp $
-** $Log: distrip.c,v $
 ** Revision 1.1.2.6  2005/05/10 11:27:23  jwrdegoede
 ** sst1 gcc4 compile fixes
 **

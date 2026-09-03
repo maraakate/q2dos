@@ -190,7 +190,7 @@ typedef struct
 //
 typedef struct
 {
-	void	(*Sys_Error) (int err_level, char *str, ...) __fp_attribute__((__noreturn__, __format__(__printf__,2,3)));
+	void	(*Sys_Error) (int err_level, const char *str, ...) __fp_attribute__((__noreturn__, __format__(__printf__,2,3)));
 
 	void	(*Cmd_AddCommand) (char *name, void(*cmd)(void));
 	void	(*Cmd_RemoveCommand) (char *name);
@@ -198,7 +198,7 @@ typedef struct
 	char	*(*Cmd_Argv) (int i);
 	void	(*Cmd_ExecuteText) (int exec_when, char *text);
 
-	void	(*Con_Printf) (int print_level, char *str, ...) __fp_attribute__((__format__(__printf__,2,3)));
+	void	(*Con_Printf) (int print_level, const char *str, ...) __fp_attribute__((__format__(__printf__,2,3)));
 
 	// files will be memory mapped read only
 	// the returned buffer may be part of a larger pak file,
@@ -215,6 +215,8 @@ typedef struct
 	cvar_t	*(*Cvar_Get) (char *name, char *value, int flags);
 	cvar_t	*(*Cvar_Set)( char *name, char *value );
 	void	 (*Cvar_SetValue)( char *name, float value );
+	void	(*Cvar_SetDescription) (char *name, const char *description); /* FS */
+	cvar_t	*(*Cvar_ForceSet) (char *name, char* value); /* FS */
 
 	qboolean	(*Vid_GetModeInfo)( int *width, int *height, int mode );
 	void		(*Vid_MenuInit)( void );

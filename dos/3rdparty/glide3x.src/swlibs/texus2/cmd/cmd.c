@@ -13,9 +13,6 @@
 ** and Computer Software clause at DFARS 252.227-7013, and/or in similar or
 ** successor clauses in the FAR, DOD or NASA FAR Supplement. Unpublished  -
 ** rights reserved under the Copyright Laws of the United States.
-**
-** $Revision: 1.1.1.1.8.1 $
-** $Date: 2004/02/02 07:47:13 $
 */
 
 #include <stdio.h>

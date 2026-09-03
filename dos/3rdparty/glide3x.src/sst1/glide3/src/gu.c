@@ -17,8 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/sst1/glide3/src/Attic/gu.c,v 1.1.2.2 2004/10/04 09:36:00 dborca Exp $
-** $Log: gu.c,v $
 ** Revision 1.1.2.2  2004/10/04 09:36:00  dborca
 ** second cut at Glide3x for Voodoo1/Rush (massive update):
 ** delayed validation, vertex snapping, clip coordinates, strip/fan_continue, bugfixes.
@@ -57,7 +55,7 @@
 #include <sst1init.h>
 #endif
 
-const FxU32 _grResolutionXY[16][2] = 
+static const FxU32 _grResolutionXY[16][2] = 
 {
   { 320, 200 },                 /* 320x200 */
   { 320, 240 },                 /* 320x240 */

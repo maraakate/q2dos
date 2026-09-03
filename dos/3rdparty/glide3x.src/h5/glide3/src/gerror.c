@@ -18,7 +18,6 @@
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVE
 **
 **
-** $Header: /cvsroot/glide/glide3x/h5/glide3/src/gerror.c,v 1.3.4.7 2005/05/25 08:56:26 jwrdegoede Exp $
 ** $Log: 
 **  6    3dfx      1.1.1.2.1.0 10/11/00 Brent           Forced check in to enforce
 **       branching.

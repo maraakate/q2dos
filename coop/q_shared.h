@@ -39,12 +39,28 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <time.h>
 
 
-typedef unsigned char 		byte;
-#if defined(__cplusplus)
+typedef unsigned char		byte;
+/* some structures have qboolean members and the x86 asm code expect
+ * those members to be 4 bytes long.  i.e.: qboolean must be 32 bits.  */
 typedef int			qboolean;
+#if !defined(__cplusplus)
+/* include stdbool.h for C99 or better, or with GCC >= 3 which has a
+ * standarts-compliant header.  */
+#if (defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L)) || \
+    (defined(__GNUC__) && (__GNUC__ >= 3))                       || \
+    (defined(_MSC_VER) && (_MSC_VER >= 1910 /* VS2017 */))
+#include <stdbool.h>
+#elif !defined(__bool_true_false_are_defined)
+#define false 0
+#define true  1
+#if defined(__APPLE__) && (defined(__POWERPC__) || defined(__ppc__))
+#define bool  int
 #else
-typedef enum {false, true}	qboolean;
+#define bool  unsigned char
 #endif
+#define __bool_true_false_are_defined 1
+#endif
+#endif /* */
 
 #ifndef id386
 #define id386 0
@@ -195,7 +211,7 @@ extern vec3_t vec3_origin;
 //float Q_fabs (float f);
 //#define	fabs(f) Q_fabs(f)
 #if defined(_MSC_VER) && defined(_M_IX86) && !defined(C_ONLY)
-extern long Q_ftol( float f );
+extern int Q_ftol( float f );
 #else
 #define Q_ftol( f ) (int) (f)
 #endif
@@ -267,7 +283,7 @@ void COM_DefaultExtension (char *path, char *extension);
 char *COM_Parse (char **data_p);
 // data is an in/out parm, returns a parsed out token
 
-void Com_sprintf (char *dest, int size, char *fmt, ...) __attribute__((__format__(__printf__,3,4)));
+void Com_sprintf (char *dest, int size, const char *fmt, ...) __attribute__((__format__(__printf__,3,4)));
 // Knightmare added
 void Com_strcpy (char *dest, int destSize, const char *src);
 void Com_strcat (char *dest, int destSize, const char *src);
@@ -278,9 +294,9 @@ void Com_PageInMemory (byte *buffer, int size);
 //=============================================
 
 // portable case insensitive compare
-int Q_stricmp (char *s1, char *s2);
-int Q_strcasecmp (char *s1, char *s2);
-int Q_strncasecmp (char *s1, char *s2, int n);
+int Q_stricmp (const char *s1, const char *s2);
+int Q_strcasecmp (const char *s1, const char *s2);
+int Q_strncasecmp (const char *s1, const char *s2, int n);
 /* FS: From KMQ2 */
 void Q_strncpyz (char *dst, const char *src, int dstSize);
 void Q_strncatz (char *dst, const char *src, int dstSize);
@@ -297,7 +313,7 @@ float	BigFloat (float l);
 float	LittleFloat (float l);
 
 void	Swap_Init (void);
-char	*va(char *format, ...) __attribute__((__format__(__printf__,1,2)));
+char	*va(const char *format, ...) __attribute__((__format__(__printf__,1,2)));
 
 //=============================================
 
@@ -358,8 +374,8 @@ char	*Sys_FindNext ( unsigned musthave, unsigned canthave );
 void	Sys_FindClose (void);
 
 // this is only here so the functions in q_shared.c and q_shwin.c can link
-void Sys_Error (char *error, ...) __attribute__((__noreturn__, __format__(__printf__,1,2)));
-void Com_Printf (char *msg, ...) __attribute__((__format__(__printf__,1,2)));
+void Sys_Error (const char *error, ...) __attribute__((__noreturn__, __format__(__printf__,1,2)));
+void Com_Printf (const char *msg, ...) __attribute__((__format__(__printf__,1,2)));
 
 
 /*
@@ -1090,6 +1106,7 @@ typedef enum
 
 #define	MAX_STATS				32
 
+#define	LAYOUT_MAX_LENGTH		1400
 
 // dmflags->value flags
 #define	DF_NO_HEALTH		0x00000001	// 1

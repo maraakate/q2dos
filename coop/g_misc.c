@@ -629,8 +629,11 @@ path_corner_touch(edict_t *self, edict_t *other, cplane_t *plane /* unused */, c
 	}
 	else
 	{
-		VectorSubtract(other->goalentity->s.origin, other->s.origin, v);
-		other->ideal_yaw = vectoyaw(v);
+		if (other->goalentity)
+		{
+			VectorSubtract(other->goalentity->s.origin, other->s.origin, v);
+			other->ideal_yaw = vectoyaw(v);
+		}
 	}
 }
 
@@ -746,7 +749,7 @@ SP_point_combat(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;
@@ -881,7 +884,7 @@ SP_light(edict_t *self)
 	}
 
 	/* no targeted lights in deathmatch, because they cause global messages */
-	if (!self->targetname || deathmatch->value)
+	if (!self->targetname || deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;
@@ -1014,7 +1017,7 @@ SP_func_wall(edict_t *self)
 void
 func_object_touch(edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf /* unused */)
 {
-	if (!self || !other || !plane)
+	if (!self || !other)
 	{
 		return;
 	}
@@ -1306,7 +1309,7 @@ SP_func_explosive_rogue (edict_t *self) /* FS: Coop: Rogue specific */
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		/* auto-remove for deathmatch */
 		G_FreeEdict(self);
@@ -1383,7 +1386,7 @@ SP_func_explosive(edict_t *self)
 		SP_func_explosive_rogue(self);
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		/* auto-remove for deathmatch */
 		G_FreeEdict(self);
@@ -1650,7 +1653,7 @@ SP_misc_explobox(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		/* auto-remove for deathmatch */
 		G_FreeEdict(self);
@@ -1674,7 +1677,7 @@ SP_misc_explobox(edict_t *self)
 
 	self->model = "models/objects/barrels/tris.md2";
 	self->s.modelindex = gi.modelindex(self->model);
-	VectorSet(self->mins, -16, -16, 0);
+	VectorSet(self->mins, -16, -16, 0); /* FS: NOTE: DO NOT MERGE IN Z CHANGE TO -8 CAUSES BARRELS TO ORIENT WRONG AND FALL THROUGH FLOOR. */
 	VectorSet(self->maxs, 16, 16, 40);
 
 	if (!self->mass)
@@ -2071,7 +2074,7 @@ SP_misc_deadsoldier(edict_t *ent)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		/* auto-remove for deathmatch */
 		G_FreeEdict(ent);

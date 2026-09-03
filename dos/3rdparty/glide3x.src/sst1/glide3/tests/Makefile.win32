@@ -5,9 +5,6 @@
 #  Email : dborca@users.sourceforge.net
 #  Web   : http://www.geocities.com/dborca
 #
-# $Header: /cvsroot/glide/glide3x/sst1/glide3/tests/Attic/Makefile.win32,v 1.1.2.1 2004/10/04 08:55:20 dborca Exp $
-#
-
 
 #
 #  Available options:
@@ -22,10 +19,9 @@
 #	<file.exe>	build a specific file
 #
 
-
 .PHONY: all
 .SUFFIXES: .c .obj .exe
-.SECONDARY: tlib.obj
+.SECONDARY: tlib.obj fxos.obj
 
 FX_GLIDE_HW ?= sst1
 ifeq ($(FX_GLIDE_HW),sst1)
@@ -36,19 +32,19 @@ HWDEF = -DSST96
 endif
 endif
 
-override FX_GLIDE_HW = sst1
+override FX_HW_BASE = sst1
 TOP = ../../..
 CPU ?= 6
 
 CC = cl
 CFLAGS = -nologo -W3 -WX -D__MSC__=1 -DNDEBUG -G$(CPU) -O2 -MT
-CFLAGS += -I$(TOP)/$(FX_GLIDE_HW)/glide3/src -I$(TOP)/$(FX_GLIDE_HW)/incsrc -I$(TOP)/$(FX_GLIDE_HW)/init
+CFLAGS += -I$(TOP)/$(FX_HW_BASE)/glide3/src -I$(TOP)/$(FX_HW_BASE)/incsrc -I$(TOP)/$(FX_HW_BASE)/init
 CFLAGS += -I$(TOP)/swlibs/fxmisc
 CFLAGS += -D__WIN32__ $(HWDEF)
 
 LD = link
 LDFLAGS = -nologo -opt:WIN98 -machine:IX86
-LDLIBS = user32.lib gdi32.lib $(TOP)/$(FX_GLIDE_HW)/lib/glide3x.lib
+LDLIBS = user32.lib gdi32.lib $(TOP)/$(FX_HW_BASE)/lib/$(FX_GLIDE_HW)/glide3x.lib
 
 .c.obj:
 	$(CC) -Fo$@ $(CFLAGS) -c $<
@@ -57,3 +53,9 @@ LDLIBS = user32.lib gdi32.lib $(TOP)/$(FX_GLIDE_HW)/lib/glide3x.lib
 
 all:
 	$(error Must specify <filename.exe> to build)
+
+sbench.exe: sbench.obj fxos.obj tlib.obj
+	$(LD) -out:$@ $(LDFLAGS) $^ $(LDLIBS)
+
+fxos.obj: $(TOP)/swlibs/fxmisc/fxos.c
+	$(CC) -Fo$@ $(CFLAGS) -c $<

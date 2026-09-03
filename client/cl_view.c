@@ -82,7 +82,7 @@ void V_AddEntity (entity_t *ent)
 		int i;
 		for (i=0;i<3;i++)
 			ent->oldorigin[i] = ent->origin[i] = cl.predicted_origin[i];
-		if (cl_3dcam->value)
+		if (cl_3dcam->intValue)
 			ent->flags&=~RF_VIEWERMODEL;
 	}
 
@@ -262,6 +262,7 @@ void CL_PrepRefresh (void)
 	char		name[MAX_QPATH];
 	float		rotate;
 	vec3_t		axis;
+	size_t		mapnameLen;
 
 	if (!cl.configstrings[CS_MODELS+1][0])
 		return;		// no map loaded
@@ -270,9 +271,19 @@ void CL_PrepRefresh (void)
 	SCR_AddDirtyPoint (viddef.width-1, viddef.height-1);
 
 	// let the render dll load the map
-//	strncpy (mapname, cl.configstrings[CS_MODELS+1] + 5);	// skip "maps/"
 	Q_strncpyz (mapname, cl.configstrings[CS_MODELS+1] + 5, sizeof(mapname));	// skip "maps/"
-	mapname[strlen(mapname)-4] = 0;		// cut off ".bsp"
+	mapnameLen = strlen(mapname);
+	if (mapnameLen < 4) /* FS: Shut up SCAs. */
+	{
+		Com_Printf("CL_PrepRefresh(): mapnameLen is < 4 [%zd]!\n", mapnameLen);
+		return;
+	}
+	mapname[mapnameLen-4] = 0;		// cut off ".bsp"
+	if (mapname[0] == '\0') /* FS: Ditto. */
+	{
+		Com_Printf("CL_PrepRefresh(): mapname is null!\n");
+		return;
+	}
 
 	// register models, pics, and skins
 	Com_Printf ("Map: %s\r", mapname); 
@@ -289,7 +300,6 @@ void CL_PrepRefresh (void)
 	CL_RegisterTEntModels ();
 
 	num_cl_weaponmodels = 1;
-//	strncpy(cl_weaponmodels[0], "weapon.md2");
 	Q_strncpyz(cl_weaponmodels[0], "weapon.md2", sizeof(cl_weaponmodels[0]));
 
 	for (i=1 ; i<MAX_MODELS && cl.configstrings[CS_MODELS+i][0] ; i++)
@@ -439,7 +449,7 @@ SCR_DrawCrosshair
 */
 void SCR_DrawCrosshair (void)
 {
-	if (!crosshair->value)
+	if (!crosshair->intValue)
 		return;
 
 	if (crosshair->modified)
@@ -471,7 +481,7 @@ void V_RenderView( float stereo_separation )
 	if (!cl.refresh_prepped)
 		return;			// still loading
 
-	if (cl_timedemo->value)
+	if (CL_IsDemoWithTimeDemo())
 	{
 		if (!cl.timedemo_start)
 			cl.timedemo_start = Sys_Milliseconds ();
@@ -480,7 +490,7 @@ void V_RenderView( float stereo_separation )
 
 	// an invalid frame will just use the exact previous refdef
 	// we can't use the old frame if the video mode has changed, though...
-	if ( cl.frame.valid && (cl.force_refdef || !cl_paused->value) )
+	if ( cl.frame.valid && (cl.force_refdef || !cl_paused->intValue) )
 	{
 		cl.force_refdef = false;
 
@@ -491,13 +501,13 @@ void V_RenderView( float stereo_separation )
 		// v_forward, etc.
 		CL_AddEntities ();
 
-		if (cl_testparticles->value)
+		if (cl_testparticles->intValue)
 			V_TestParticles ();
-		if (cl_testentities->value)
+		if (cl_testentities->intValue)
 			V_TestEntities ();
-		if (cl_testlights->value)
+		if (cl_testlights->intValue)
 			V_TestLights ();
-		if (cl_testblend->value)
+		if (cl_testblend->intValue)
 		{
 			cl.refdef.blend[0] = 1;
 			cl.refdef.blend[1] = 0.5;
@@ -505,7 +515,7 @@ void V_RenderView( float stereo_separation )
 			cl.refdef.blend[3] = 0.5;
 		}
 
-		if (!r_contentblend->value) /* FS: Fucking hate palette blends from gun fire, etc. */
+		if (!r_contentblend->intValue) /* FS: Fucking hate palette blends from gun fire, etc. */
 		{
 			cl.refdef.blend[0] = 0;
 			cl.refdef.blend[1] = 0;
@@ -538,13 +548,13 @@ void V_RenderView( float stereo_separation )
 
 		cl.refdef.areabits = cl.frame.areabits;
 
-		if (!cl_add_entities->value)
+		if (!cl_add_entities->intValue)
 			r_numentities = 0;
-		if (!cl_add_particles->value)
+		if (!cl_add_particles->intValue)
 			r_numparticles = 0;
-		if (!cl_add_lights->value)
+		if (!cl_add_lights->intValue)
 			r_numdlights = 0;
-		if (!cl_add_blend->value)
+		if (!cl_add_blend->intValue)
 		{
 			VectorClear (cl.refdef.blend);
 		}
@@ -558,20 +568,20 @@ void V_RenderView( float stereo_separation )
 		cl.refdef.lightstyles = r_lightstyles;
 
 		cl.refdef.rdflags = cl.frame.playerstate.rdflags;
-		if (fov_adapt->value)
+		if (fov_adapt->intValue)
 #ifdef __MSDOS__
 		    if ((cl.refdef.height / cl.refdef.width) * (320.0f / 240.0f) <= 1.10f)
 #endif
 			cl.refdef.rdflags |= RDF_FOVADAPT;
 
 		// sort entities for better cache locality
-        qsort( cl.refdef.entities, cl.refdef.num_entities, sizeof( cl.refdef.entities[0] ), (int (*)(const void *, const void *))entitycmpfnc );
+		qsort( cl.refdef.entities, cl.refdef.num_entities, sizeof( cl.refdef.entities[0] ), (int (*)(const void*, const void*))entitycmpfnc );
 	}
 
 	re.RenderFrame (&cl.refdef);
-	if (cl_stats->value)
+	if (cl_stats->intValue)
 		Com_Printf ("ent:%i  lt:%i  part:%i\n", r_numentities, r_numdlights, r_numparticles);
-	if ( log_stats->value && ( log_stats_file != 0 ) )
+	if ( log_stats->intValue && ( log_stats_file != NULL ) )
 		fprintf( log_stats_file, "%i,%i,%i,",r_numentities, r_numdlights, r_numparticles);
 
 

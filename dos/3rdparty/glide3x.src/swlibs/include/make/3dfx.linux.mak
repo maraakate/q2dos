@@ -13,9 +13,6 @@
 # and Computer Software clause at DFARS 252.227-7013, and/or in similar or
 # successor clauses in the FAR, DOD or NASA FAR Supplement. Unpublished  -
 # rights reserved under the Copyright Laws of the United States.
-#
-# $Revision: 1.3.8.1 $
-# $Date: 2003/06/29 18:28:55 $
 
 #
 # If we call make recursively, we may want to print the subdirectory to which

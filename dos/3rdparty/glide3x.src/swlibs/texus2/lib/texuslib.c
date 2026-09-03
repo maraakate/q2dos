@@ -13,8 +13,6 @@
 ** and Computer Software clause at DFARS 252.227-7013, and/or in similar or
 ** successor clauses in the FAR, DOD or NASA FAR Supplement. Unpublished -
 ** rights reserved under the Copyright Laws of the United States.
-**
-** $Id: texuslib.c,v 1.1.1.1.8.3 2005/08/13 21:07:04 jwrdegoede Exp $
 */
 #include <stdlib.h>
 #include <string.h>

@@ -473,7 +473,15 @@ void VID_MenuInit( void )
 		"trilinear",
 		0
 	};
-
+	static const char *fullscreen_names[] =
+	{
+		"windowed",
+		"fullscreen",
+#ifdef _WIN32 /* FS: Linux too if we make an SDL port someday */
+		"borderless",
+#endif
+		0
+	};
 	int		i;
 	float	temp;
 
@@ -555,7 +563,7 @@ void VID_MenuInit( void )
 		s_fs_box[i].generic.x			= 0;
 		s_fs_box[i].generic.y			= 20;
 		s_fs_box[i].generic.name		= "fullscreen";
-		s_fs_box[i].itemnames			= yesno_names;
+		s_fs_box[i].itemnames			= fullscreen_names;
 		s_fs_box[i].curvalue			= Cvar_VariableValue("vid_fullscreen");
 		s_fs_box[i].generic.statusbar	= "changes bettween fullscreen and windowed display";
 

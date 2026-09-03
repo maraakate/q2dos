@@ -6,11 +6,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#ifndef __linux__
-#include <conio.h>
-#else
-#include <linutil.h>
-#endif
 #include <assert.h>
 #include <string.h>
 
@@ -52,7 +47,7 @@ static int loadTexture( const char *filename,
                         void *table );
 static GrTexTable_t texTableType( GrTextureFormat_t format );
 
-void main( int argc, char **argv) {
+int main( int argc, char **argv) {
     char match; 
     char **remArgs;
     int  rv;
@@ -75,13 +70,13 @@ void main( int argc, char **argv) {
 
     strcpy(texfilename, "miro.3df");
     /* Process Command Line Arguments */
-    while( rv = tlGetOpt( argc, argv, "nrdt", &match, &remArgs ) ) {
+    while ((rv = tlGetOpt(argc, argv, "nrdt", &match, &remArgs)) != 0) {
         if ( rv == -1 ) {
             printf( "Unrecognized command line argument\n" );
             printf( "%s %s\n", name, usage );
             printf( "Available resolutions:\n%s\n",
                     tlGetResolutionList() );
-            return;
+            return -1;
         }
         switch( match ) {
         case 'n':
@@ -296,7 +291,7 @@ void main( int argc, char **argv) {
           cnt = strcspn(filename, ".");
           strncpy(fname, filename, cnt);
           fname[cnt] = 0;
-          sprintf(tmp,"_%d\0", subframe);
+          sprintf(tmp,"_%d", subframe);
           strcat(fname, tmp);
           strcat(fname, filename+cnt);
           if (!tlScreenDump(fname, (FxU16)scrWidth, (FxU16)scrHeight))
@@ -350,7 +345,7 @@ void main( int argc, char **argv) {
     }
     
     grGlideShutdown();
-    return;
+    return 0;
 }
 
 

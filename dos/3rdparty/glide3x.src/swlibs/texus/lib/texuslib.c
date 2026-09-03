@@ -16,8 +16,6 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-** $Id: texuslib.c,v 1.2 2000/06/15 00:11:40 joseph Exp $
 */
 #include <string.h>
 #include <glide.h>
@@ -719,5 +717,3 @@ FxBool txConvert( Gu3dfInfo *info, GrTextureFormat_t srcFormat,
 
   return FXTRUE;
 }
-
-

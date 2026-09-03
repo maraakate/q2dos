@@ -5,11 +5,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#ifndef __linux__
-#include <conio.h>
-#else
-#include <linutil.h>
-#endif
 #include <assert.h>
 #include <string.h>
 #include <math.h>
@@ -27,7 +22,7 @@ static const char name[]    = "sbench";
 static const char purpose[] = "benchmark grDrawVertexArray for gouraud shaded triangle";
 static const char usage[]   = "-n <frames> -r <res> -d <filename> -l <primitive type> -v <vertex array size> -t <triangel size> -p -a";
 
-char *Usage(void)
+void Usage(void)
 {
     printf ("       -l <type> => primitive type\n");
     printf ("                 => 0 point\n");
@@ -41,7 +36,6 @@ char *Usage(void)
     printf ("       -t <size> => triangle size\n");
     printf ("       -p        => packed color\n");
     printf ("       -a        => antialiased\n");
-    return NULL;
 }
 
 void
@@ -65,7 +59,7 @@ setVertexXyzRgbaSt( FxFloat *v, FxFloat x, FxFloat y, FxFloat z,
     *(v+GR_VERTEX_TOW_TMU1_OFFSET) = t * 1.f;
 }
 
-void
+int
 main( int argc, char **argv)
 {
   char
@@ -105,14 +99,14 @@ main( int argc, char **argv)
   FxU32 wrange[2];
   
   /* Process Command Line Arguments */
-  while( rv = tlGetOpt( argc, argv, args, &match, &remArgs ) ) {
+  while((rv = tlGetOpt(argc, argv, args, &match, &remArgs)) != 0) {
     if ( rv == -1 ) {
       printf( "Unrecognized command line argument\n" );
       printf( "%s %s\n", name, usage );
       printf( "Available resolutions:\n%s\n",
              tlGetResolutionList() );
       Usage();
-      return;
+      return -1;
     }
     switch( match ) {
     case 'n':
@@ -281,15 +275,15 @@ main( int argc, char **argv)
                               0.5f, 0.5f);
 
           if (packedrgb) {
-            (FxU32) vPtrArray[v][GR_VERTEX_R_OFFSET] =
+            *(FxU32*) &vPtrArray[v][GR_VERTEX_R_OFFSET] =
               ((unsigned char) (vPtrArray[v][GR_VERTEX_R_OFFSET]) << 16) |
               ((unsigned char) (vPtrArray[v][GR_VERTEX_G_OFFSET]) << 8) |
               ((unsigned char) (vPtrArray[v][GR_VERTEX_B_OFFSET]));
-            (FxU32) vPtrArray[v][GR_VERTEX_R_OFFSET] |= 0xff000000;
+            *(FxU32*) &vPtrArray[v][GR_VERTEX_R_OFFSET] |= 0xff000000;
           }
         }
       } else { /* listType == GR_TRIANGLE_FAN */
-#define PI 3.1415f
+#define FX_PI 3.1415f
 
 #if 0
 
@@ -307,7 +301,7 @@ main( int argc, char **argv)
             float
               theta;
 
-            theta = PI - ((((float) v / (float) nVerts)) * PI);
+            theta = FX_PI - ((((float) v / (float) nVerts)) * FX_PI);
 
             x = ((float) cos(theta) + 1.f) / 2.f;
             y = (float) sin(theta);
@@ -326,7 +320,7 @@ main( int argc, char **argv)
 
           float x, y;
           float area = tSize * tSize / 2;
-          float r = (float)sqrt((vsize - 2) * area / PI);
+          float r = (float)sqrt((vsize - 2) * area / FX_PI);
 
           if (v == 0) {
             x = 0.5f;
@@ -342,7 +336,7 @@ main( int argc, char **argv)
             float
               theta;
 
-            theta = PI - ((((float) (v-1) / (float) (vsize - 2))) * 2.f * PI);
+            theta = FX_PI - ((((float) (v-1) / (float) (vsize - 2))) * 2.f * FX_PI);
 
             x = (float) cos(theta) * r;
             y = (float) sin(theta) * r;
@@ -356,11 +350,11 @@ main( int argc, char **argv)
             vPtrArray[v][GR_VERTEX_A_OFFSET] = 255.f;
           }
           if (packedrgb) {
-            (FxU32) vPtrArray[v][GR_VERTEX_R_OFFSET] =
+            *(FxU32*) &vPtrArray[v][GR_VERTEX_R_OFFSET] =
               ((unsigned char) (vPtrArray[v][GR_VERTEX_R_OFFSET]) << 16) |
               ((unsigned char) (vPtrArray[v][GR_VERTEX_G_OFFSET]) << 8) |
               ((unsigned char) (vPtrArray[v][GR_VERTEX_B_OFFSET]));
-            (FxU32) vPtrArray[v][GR_VERTEX_R_OFFSET] |= 0xff000000;
+            *(FxU32*) &vPtrArray[v][GR_VERTEX_R_OFFSET] |= 0xff000000;
           }
         }
 #endif
@@ -427,10 +421,5 @@ main( int argc, char **argv)
   }
   
   grGlideShutdown();
-  return;
+  return 0;
 } /* main */
-
-
-
-
-

@@ -359,7 +359,7 @@ mutant_check_refire(edict_t *self)
 		return;
 	}
 
-	if (((skill->value == 3) && (random() < 0.5)) || (range(self, self->enemy) == RANGE_MELEE))
+	if (((skill->intValue == 3) && (random() < 0.5)) || (range(self, self->enemy) == RANGE_MELEE))
 	{
 		self->monsterinfo.nextframe = FRAME_attack09;
 	}
@@ -665,7 +665,7 @@ mutant_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
 
 	if (self->health < (self->max_health / 2))
 	{
-		self->s.skinnum = 1;
+		self->s.skinnum |= 1;
 	}
 
 	if (level.time < self->pain_debounce_time)
@@ -675,7 +675,7 @@ mutant_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
 
 	self->pain_debounce_time = level.time + 3;
 
-	if (skill->value == 3)
+	if (skill->intValue == 3)
 	{
 		return; /* no pain anims in nightmare */
 	}
@@ -793,7 +793,7 @@ mutant_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /* 
 	gi.sound(self, CHAN_VOICE, sound_death, 1, ATTN_NORM, 0);
 	self->deadflag = DEAD_DEAD;
 	self->takedamage = DAMAGE_YES;
-	self->s.skinnum = 1;
+	self->s.skinnum |= 1;
 
 	if (random() < 0.5)
 	{
@@ -816,7 +816,7 @@ SP_monster_mutant(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;

@@ -17,8 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/cvg/glide3/src/diglide.c,v 1.1.1.1.8.1 2005/05/25 08:51:49 jwrdegoede Exp $
-** $Log: diglide.c,v $
 ** Revision 1.1.1.1.8.1  2005/05/25 08:51:49  jwrdegoede
 ** Add #ifdef GL_X86 around x86 specific code
 **

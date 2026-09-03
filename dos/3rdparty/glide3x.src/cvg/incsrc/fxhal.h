@@ -1,4 +1,3 @@
-/*-*-c++-*-*/
 #ifndef __FXHAL_H__
 #define __FXHAL_H__
 
@@ -20,9 +19,6 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-** $Revision: 1.1.1.1 $
-** $Date: 1999/12/07 21:42:43 $
 */
 
 #if defined(BUILD_HAL)
@@ -31,9 +27,6 @@
 #include <fxdll.h>
 
 #include <cvginfo.h>
-
-// Allow SourceSafe to track Revision values
-#define HAL_H_REV "$Revision: 1.1.1.1 $"
 
 // Just to unconfuse myself:
 //

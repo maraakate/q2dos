@@ -17,8 +17,6 @@
  ** 
  ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
  **
- ** $Header: /cvsroot/glide/glide3x/h3/glide3/src/gxdraw.c,v 1.1.1.1.8.1 2005/06/17 14:18:50 jwrdegoede Exp $
- ** $Log: gxdraw.c,v $
  ** Revision 1.1.1.1.8.1  2005/06/17 14:18:50  jwrdegoede
  ** Fix few warnings when USE_X86=1 is not set
  **

@@ -212,55 +212,6 @@ void TransformVector (vec3_t in, vec3_t out)
 }
 #endif
 
-#if (id386) && defined(_MSC_VER)
-__declspec( naked ) void TransformVector( vec3_t vin, vec3_t vout )
-{
-	__asm mov eax, dword ptr [esp+4]
-	__asm mov edx, dword ptr [esp+8]
-
-	__asm fld  dword ptr [eax+0]
-	__asm fmul dword ptr [vright+0]
-	__asm fld  dword ptr [eax+0]
-	__asm fmul dword ptr [vup+0]
-	__asm fld  dword ptr [eax+0]
-	__asm fmul dword ptr [vpn+0]
-
-	__asm fld  dword ptr [eax+4]
-	__asm fmul dword ptr [vright+4]
-	__asm fld  dword ptr [eax+4]
-	__asm fmul dword ptr [vup+4]
-	__asm fld  dword ptr [eax+4]
-	__asm fmul dword ptr [vpn+4]
-
-	__asm fxch st(2)
-
-	__asm faddp st(5), st(0)
-	__asm faddp st(3), st(0)
-	__asm faddp st(1), st(0)
-
-	__asm fld  dword ptr [eax+8]
-	__asm fmul dword ptr [vright+8]
-	__asm fld  dword ptr [eax+8]
-	__asm fmul dword ptr [vup+8]
-	__asm fld  dword ptr [eax+8]
-	__asm fmul dword ptr [vpn+8]
-
-	__asm fxch st(2)
-
-	__asm faddp st(5), st(0)
-	__asm faddp st(3), st(0)
-	__asm faddp st(1), st(0)
-
-	__asm fstp dword ptr [edx+8]
-	__asm fstp dword ptr [edx+4]
-	__asm fstp dword ptr [edx+0]
-
-	__asm ret
-}
-
-#endif
-
-
 /*
 ================
 R_TransformPlane

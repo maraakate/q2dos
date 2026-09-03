@@ -17,14 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/cvg/init/init.rc,v 1.2 2000/04/20 21:20:22 joseph Exp $
-** $Log: init.rc,v $
-** Revision 1.2  2000/04/20 21:20:22  joseph
-** Copied windows init code to fix incompatibility with Athlon
-**
-** Revision 1.1.1.1  1999/12/07 21:49:24  joseph
-** Initial checkin into SourceForge.
-**
 */
 
 #define OFFICIAL   1 

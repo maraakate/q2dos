@@ -140,7 +140,7 @@ ChaseNext(edict_t *ent)
 	{
 		i++;
 
-		if (i > maxclients->value)
+		if (i > maxclients->intValue)
 		{
 			i = 1;
 		}
@@ -187,7 +187,7 @@ ChasePrev(edict_t *ent)
 
 		if (i < 1)
 		{
-			i = maxclients->value;
+			i = maxclients->intValue;
 		}
 
 		e = g_edicts + i;
@@ -219,7 +219,7 @@ GetChaseTarget(edict_t *ent)
 		return;
 	}
 
-	for (i = 1; i <= maxclients->value; i++)
+	for (i = 1; i <= maxclients->intValue; i++)
 	{
 		other = g_edicts + i;
 

@@ -1,0 +1,74 @@
+CC = gcc
+
+# SDL or X11 implementation:
+USE_SDL=1
+
+CFLAGS = -Wall -O2 -fPIC
+CFLAGS+= -fomit-frame-pointer
+CFLAGS+= -ffast-math
+CPPFLAGS+= -Did386=0
+CPPFLAGS+= -DNDEBUG
+CPPFLAGS+= -I. -I../client -I../qcommon -I../game
+LDFLAGS = -shared
+# make sure that this flags is supported..
+LDFLAGS+= -Wl,--no-undefined
+# export only the relevant functions:
+LDFLAGS+= -Wl,--version-script=ref.version
+LDLIBS =
+
+ifeq ($(USE_SDL),0)
+# FIXME: x11 version not implemented yet
+SWIMP = rw_x11
+CPPFLAGS+= -DSWIMP_X11
+LDLIBS+= -lX11 -lXext -lXxf86dga -lXxf86vm
+else
+SWIMP = rw_sdl
+CPPFLAGS+= -DSWIMP_SDL
+SDL_CONFIG =sdl-config
+SDL_CFLAGS = $(shell $(SDL_CONFIG) --cflags 2> /dev/null)
+SDL_LIBS   = $(shell $(SDL_CONFIG) --libs 2> /dev/null)
+CFLAGS+= $(SDL_CFLAGS)
+LDLIBS+= $(SDL_LIBS)
+endif
+LDLIBS+= -lm
+
+REFSOFT = ../game/q_shared.o \
+	../linux/glob.o \
+	../linux/q_shlinux.o \
+	../linux/$(SWIMP).o \
+	r_alias.o \
+	r_main.o \
+	r_light.o \
+	r_misc.o \
+	r_model.o \
+	r_part.o \
+	r_poly.o \
+	r_polyse.o \
+	r_rast.o \
+	r_scan.o \
+	r_sprite.o \
+	r_surf.o \
+	r_aclip.o \
+	r_bsp.o \
+	r_draw.o \
+	r_edge.o \
+	r_image.o
+
+.PHONY: all test clean
+#
+
+OBJECTS = $(REFSOFT)
+
+all: ref_soft.so
+
+ref_soft.so: $(OBJECTS)
+	$(CC) -o ref_soft.so $(LDFLAGS) $(OBJECTS) $(LDLIBS)
+
+clean:
+	rm -f *.o
+	rm -f ../linux/*.o
+	rm -f ../game/*.o
+	rm -f ../qcommon/*.o
+
+%.o: %.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@

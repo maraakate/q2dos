@@ -91,7 +91,7 @@ DIRECT LINK GLUE
 
 #define	MAXPRINTMSG	4096
 static void __attribute__((__format__(__printf__,2,3)))
-VID_Printf (int print_level, char *fmt, ...)
+VID_Printf (int print_level, const char *fmt, ...)
 {
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
@@ -107,7 +107,7 @@ VID_Printf (int print_level, char *fmt, ...)
 }
 
 static void __attribute__((__noreturn__, __format__(__printf__,2,3)))
-VID_Error (int err_level, char *fmt, ...)
+VID_Error (int err_level, const char *fmt, ...)
 {
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
@@ -280,7 +280,7 @@ static qboolean VID_LoadRefresh (const char *name)
 		Com_Printf("dlopen(\"%s\") failed\n", name);
 		return false;
 	}
-	if ((GetRefAPI = (void *) Sys_dlsym(reflib_library, "_GetRefAPI")) == NULL)
+	if ((GetRefAPI = (GetRefAPI_t) Sys_dlsym(reflib_library, "_GetRefAPI")) == NULL)
 	{
 		Com_Error(ERR_FATAL, "dlsym() failed on %s\n", name);
 		return false;
@@ -300,6 +300,8 @@ static qboolean VID_LoadRefresh (const char *name)
 	ri.Cvar_Get = Cvar_Get;
 	ri.Cvar_Set = Cvar_Set;
 	ri.Cvar_SetValue = Cvar_SetValue;
+	ri.Cvar_SetDescription = Cvar_SetDescription; /* FS */
+	ri.Cvar_ForceSet = Cvar_ForceSet; /* FS */
 	ri.Vid_GetModeInfo = VID_GetModeInfo;
 	ri.Vid_MenuInit = VID_MenuInit;
 	ri.Vid_NewWindow = VID_NewWindow;
@@ -342,6 +344,9 @@ static qboolean VID_LoadRefresh (const char *name)
 	return true;
 }
 
+static char fxmesa_env_multitex[32] = "FX_DONT_FAKE_MULTITEX=1";
+static char fxglide_env_nosplash[32] = "FX_GLIDE_NO_SPLASH=1";
+
 void	VID_Init (void)
 {
 	/* putenv() from DJGPP libc will copy, so
@@ -352,11 +357,11 @@ void	VID_Init (void)
 	viddef.height = 240;
 
 	vid_ref = Cvar_Get ("vid_ref", "soft", CVAR_ARCHIVE);
-	vid_ref->description = "Video renderer to use.";
+	Cvar_SetDescription("vid_ref", "Video renderer to use.");
 	vid_fullscreen = Cvar_Get ("vid_fullscreen", "1", CVAR_ARCHIVE);
-	vid_fullscreen->description = "Enable fullscreen video.  Locked to fullscreen in Q2DOS.";
+	Cvar_SetDescription("vid_fullscreen", "Enable fullscreen video.  Locked to fullscreen in Q2DOS.");
 	vid_gamma = Cvar_Get("vid_gamma", "1", CVAR_ARCHIVE);
-	vid_gamma->description = "Video gamma.  Use lower values for a brighter screen display.";
+	Cvar_SetDescription("vid_gamma", "Video gamma.  Use lower values for a brighter screen display.");
 
 	/* cvars for vga/vesa code */
 	Cvar_Get("vid_vgaonly", (COM_CheckParm("-vgaonly"))? "1" : "0", 0);
@@ -382,9 +387,9 @@ void	VID_Init (void)
 	Cmd_AddCommand("vid_listmodes", VID_ListModes_f);
 
 	/* don't let fxMesa cheat multitexturing */
-	putenv("FX_DONT_FAKE_MULTITEX=1");
+	putenv(fxmesa_env_multitex);
 	/* disable the 3dfx splash screen. */
-	putenv("FX_GLIDE_NO_SPLASH=1");
+	putenv(fxglide_env_nosplash);
 
 	/* Start the graphics mode and load refresh DLL */
 	VID_CheckChanges ();
@@ -459,14 +464,14 @@ void	VID_MenuInit (void)
 	{
 		"[software      ]",
 		"[3Dfx OpenGL   ]",
-		0
+		NULL
 	};
 
 	static const char *filter_names[] =
 	{
 		"bilinear",
 		"trilinear",
-		0
+		NULL
 	};
 
 	int		i;

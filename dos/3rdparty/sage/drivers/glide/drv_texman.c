@@ -301,7 +301,7 @@ tmu_movein (TEX_OBJ *obj, GLuint where)
  *
  * \param tmu texture unit
  */
-static void
+static int
 tmu_init (GLuint tmu)
 {
     MEM_RANGE *range, *last;
@@ -309,6 +309,9 @@ tmu_init (GLuint tmu)
 
     start = grTexMinAddress(tmu);
     end = grTexMaxAddress(tmu);
+    if (end == 0) {
+	return -1; /* FS: This is bad, so let's early out. */
+    }
 
     chunk = tex_bound_mask + 1;
     if (chunk == 0) {
@@ -336,6 +339,8 @@ tmu_init (GLuint tmu)
 
 	blockstart += chunk;
     }
+
+    return 0;
 }
 
 
@@ -403,9 +408,13 @@ tm_init (void)
 	grEnable(GR_TEXTURE_UMA_EXT);
     }
 
-    tmu_init(GR_TMU0);
+    if (tmu_init(GR_TMU0) < 0) {
+	return -1;
+    }
     if (!allow_texuma && allow_multitex) {
-	tmu_init(GR_TMU1);
+	if (tmu_init(GR_TMU1) < 0) {
+	    return -1;
+	}
     }
 
     return 0;

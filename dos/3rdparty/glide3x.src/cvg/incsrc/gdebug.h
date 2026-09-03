@@ -1,4 +1,3 @@
-/*-*-c++-*-*/
 #ifndef __GDEBUG_H__
 #define __GDEBUG_H__
 
@@ -20,9 +19,6 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-** $Revision: 1.1.1.1.8.4 $
-** $Date: 2003/08/04 12:45:47 $
 */
 
 #include <stdarg.h>

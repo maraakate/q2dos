@@ -7,6 +7,38 @@
 #include "stdlog.h"
 #include "gslog.h"
 
+int numbots = 0;
+int numred = 0;
+int numblue = 0;
+int red_base = 0, blue_base = 0;
+int numturrets = 0;
+int numplayers = 0;
+
+edict_t	*players[MAX_CLIENTS];
+//edict_t	*turrets[2];
+edict_t	*turrets[4];
+edict_t	*weapon_list;
+edict_t	*health_list;
+edict_t	*powerup_list;
+edict_t	*ammo_list;
+edict_t	*vortex_pointer;
+
+cvar_t	*node_debug;
+cvar_t	*lightsoff;
+cvar_t	*botchat;
+cvar_t	*blindtime;
+cvar_t	*poisontime;
+cvar_t	*lasertime;
+cvar_t	*proxytime;
+cvar_t	*defence_turret_ammo;
+cvar_t	*rocket_turret_ammo;
+cvar_t	*dntg;
+cvar_t	*lasermine_health;
+cvar_t	*ex_arrow_damage;
+cvar_t	*ex_arrow_radius;
+cvar_t	*cosg;
+cvar_t	*start_invulnerable_time;
+
 ///------------------------------------------------------------------------------------------
 /// Command handling
 ///------------------------------------------------------------------------------------------

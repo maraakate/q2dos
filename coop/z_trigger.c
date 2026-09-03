@@ -75,7 +75,7 @@ int internalSoundIndex(char *name)
 	{
 		soundNumRejected++;
 		// ok, we cannot precache anymore
-//		if (printSoundRejects->value)
+//		if (printSoundRejects->intValue)
 			gi.dprintf(DEVELOPER_MSG_GAME, "%s precache rejected\n", name);
 		return 0;
 	}
@@ -98,7 +98,7 @@ void printSoundNum()
 {
 	int numSounds = listLength(soundList);
 	gi.dprintf(DEVELOPER_MSG_GAME, "%i precached sounds\n", numSounds);
-//	if (printSoundRejects->value)
+//	if (printSoundRejects->intValue)
 		gi.dprintf(DEVELOPER_MSG_GAME, "%i sounds rejected\n", soundNumRejected);
 }
 #endif
@@ -270,7 +270,7 @@ void SP_misc_commdish (edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{	// auto-remove for deathmatch
 		G_FreeEdict (self);
 		return;

@@ -747,7 +747,9 @@ static GrScreenResolution_t fxBestResolution(int width, int height, int aux)
   int i,fbmem;
   GrScreenResolution_t lastvalidres=resolutions[4][2];
 
-  fxQueryHardware();
+  if (fxQueryHardware() < 0) {
+    return lastvalidres;
+  }
 
   if(glbHWConfig.SSTs[glbCurrentBoard].type==GR_SSTTYPE_VOODOO) {
     fbmem=glbHWConfig.SSTs[glbCurrentBoard].sstBoard.VoodooConfig.fbRam;
@@ -819,8 +821,8 @@ fxMesaContext GLAPIENTRY fxMesaCreateBestContext(GLuint win,GLint width, GLint h
       }
     }
 
+  /* fxMesaCreateContext() handles fxQueryHardware() error returns */
   res=fxBestResolution(width,height,aux);
-
   return fxMesaCreateContext(win,res,refresh,attribList);
 }
 
@@ -1388,7 +1390,7 @@ int GLAPIENTRY fxQueryHardware(void)
     fprintf(stderr,"fxmesa: fxQueryHardware() End (voodooo)\n");
   }
 
-  return glbHWConfig.SSTs[glbCurrentBoard].type;
+  return (glb3DfxPresent) ? glbHWConfig.SSTs[glbCurrentBoard].type : -1;
 }
 
 

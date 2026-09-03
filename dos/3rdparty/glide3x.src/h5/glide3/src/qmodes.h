@@ -1,4 +1,3 @@
-/* $Header: /cvsroot/glide/glide3x/h5/glide3/src/qmodes.h,v 1.3.4.2 2003/06/05 08:23:55 koolsmoky Exp $ */
 /*
 **
 ** THIS SOFTWARE IS SUBJECT TO COPYRIGHT PROTECTION AND IS OFFERED ONLY
@@ -22,9 +21,6 @@
 ** File name:   qmodes.h
 **
 ** Description: Structures, macros, etc to support query mode.
-**
-** $Revision: 1.3.4.2 $ 
-** $Date: 2003/06/05 08:23:55 $
 **
 ** $History: qmodes.h $
 ** 

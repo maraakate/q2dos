@@ -291,4 +291,4 @@ align 16, db 0xCB
 ;
 ; asmpkt_inf gets allocated here at run time
 ;
-end
+;end

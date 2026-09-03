@@ -17,8 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/cvg/glide3/src/gstrip.c,v 1.1.1.1.8.2 2005/08/13 21:06:57 jwrdegoede Exp $
-** $Log: gstrip.c,v $
 ** Revision 1.1.1.1.8.2  2005/08/13 21:06:57  jwrdegoede
 ** Last needed 64 bit fixes for h5/h3, complete 64 bit support for cvg
 **
@@ -127,6 +125,7 @@
  * DD code for strips
 **
 */
+
 #ifdef GLIDE3
 #include <3dfx.h>
 #include <glidesys.h>

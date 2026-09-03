@@ -17,7 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/h5/minihwc/hwcio.h,v 1.3.4.2 2003/06/05 08:23:59 koolsmoky Exp $
 ** $Log: 
 **  5    3dfx      1.2.1.0.1.0 10/11/00 Brent           Forced check in to enforce
 **       branching.
@@ -43,10 +42,10 @@
 #ifndef HWCIO_H
 #define HWCIO_H
 
-extern char *ioRegNames[];
-extern char *cmdAGPRegNames[];
-extern char *waxRegNames[];
-extern char *sstRegNames[];
+extern const char *ioRegNames[];
+extern const char *cmdAGPRegNames[];
+extern const char *waxRegNames[];
+extern const char *sstRegNames[];
 
 #ifndef GET
 #  define GET(s) s
@@ -123,4 +122,4 @@ val = GET(((SstRegs *) regInfo.sstBase)->reg);\
 GDBG_INFO(120, "Loaded 0x%x from WAX Register %s\n", val,\
  sstRegNames[(offsetof(SstRegs, reg)) >> 2]);
 
-#endif                          /* HWCIO_H not defined */
+#endif /* HWCIO_H */

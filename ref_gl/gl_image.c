@@ -73,19 +73,19 @@ void GL_EnableMultitexture( qboolean enable )
 
 	if ( enable )
 	{
-		GL_SelectTexture( gl_texture1 );
+		GL_SelectTexture( GL_TEXTURE1_ARB );
 		qglEnable( GL_TEXTURE_2D );
 		GL_TexEnv( GL_REPLACE );
 		gl_state.multitextureEnabled = true;	/* Knightmare added */
 	}
 	else
 	{
-		GL_SelectTexture( gl_texture1 );
+		GL_SelectTexture( GL_TEXTURE1_ARB );
 		qglDisable( GL_TEXTURE_2D );
 		GL_TexEnv( GL_REPLACE );
 		gl_state.multitextureEnabled = false;	/* Knightmare added */
 	}
-	GL_SelectTexture( gl_texture0 );
+	GL_SelectTexture( GL_TEXTURE0_ARB );
 	GL_TexEnv( GL_REPLACE );
 }
 
@@ -96,7 +96,7 @@ void GL_SelectTexture( GLenum texture )
 	if ( !gl_config.multitexture )
 		return;
 
-	if ( texture == gl_texture0 )
+	if ( texture == GL_TEXTURE0_ARB )
 	{
 		tmu = 0;
 	}
@@ -112,11 +112,7 @@ void GL_SelectTexture( GLenum texture )
 
 	gl_state.currenttmu = tmu;
 
-	if ( qglSelectTextureSGIS )
-	{
-		qglSelectTextureSGIS( texture );
-	}
-	else if ( qglActiveTextureARB )
+	if ( qglActiveTextureARB )
 	{
 		qglActiveTextureARB( texture );
 		qglClientActiveTextureARB( texture );
@@ -149,7 +145,7 @@ void GL_Bind (int texnum)
 void GL_MBind( GLenum target, int texnum )
 {
 	GL_SelectTexture( target );
-	if ( target == gl_texture0 )
+	if ( target == GL_TEXTURE0_ARB )
 	{
 		if ( gl_state.currenttextures[0] == texnum )
 			return;
@@ -193,6 +189,11 @@ gltmode_t gl_alpha_modes[] = {
 	{"GL_RGB5_A1", GL_RGB5_A1},
 	{"GL_RGBA4", GL_RGBA4},
 	{"GL_RGBA2", GL_RGBA2},
+	/* FS: Added compresed texture formats */
+	{"GL_COMP_RGBA_S3TC_DXT1", GL_COMPRESSED_RGBA_S3TC_DXT1_EXT},
+	{"GL_COMP_RGBA_S3TC_DXT3", GL_COMPRESSED_RGBA_S3TC_DXT3_EXT},
+	{"GL_COMP_RGBA_S3TC_DXT5", GL_COMPRESSED_RGBA_S3TC_DXT5_EXT},
+	{"GL_COMP_RGBA_3DFX", GL_COMPRESSED_RGBA_FXT1_3DFX},
 };
 
 #define NUM_GL_ALPHA_MODES (sizeof(gl_alpha_modes) / sizeof (gltmode_t))
@@ -207,6 +208,9 @@ gltmode_t gl_solid_modes[] = {
 #ifdef GL_RGB2_EXT
 	{"GL_RGB2", GL_RGB2_EXT},
 #endif
+	/* FS: Added compresed texture formats */
+	{"GL_COMP_RGB_S3TC", GL_COMPRESSED_RGB_S3TC_DXT1_EXT},
+	{"GL_COMP_RGB_3DFX", GL_COMPRESSED_RGB_FXT1_3DFX},
 };
 
 #define NUM_GL_SOLID_MODES (sizeof(gl_solid_modes) / sizeof (gltmode_t))
@@ -216,23 +220,38 @@ gltmode_t gl_solid_modes[] = {
 GL_TextureAlphaMode
 ===============
 */
-void GL_TextureAlphaMode (char *string)
+void GL_TextureAlphaMode (char *string) /* FS: Redid this to initialize a default, add a list, and store prevMode */
 {
 	int		i;
+	static char	prevAlphaTextureMode[32] = "default";
 
-	for (i=0; i< NUM_GL_ALPHA_MODES; i++)
+	if (!Q_stricmp(string, "list"))
 	{
-		if ( !Q_stricmp( gl_alpha_modes[i].name, string ) )
+		for (i = 0; i < NUM_GL_ALPHA_MODES; i++)
+			ri.Con_Printf (PRINT_ALL, "Alpha texture mode [%d]: %s\n", i + 1, gl_alpha_modes[i].name);
+
+		ri.Cvar_ForceSet("gl_texturealphamode", prevAlphaTextureMode);
+		gl_texturealphamode->modified = false;
+		return;
+	}
+
+	for (i = 0; i < NUM_GL_ALPHA_MODES; i++)
+	{
+		if (!Q_stricmp(gl_alpha_modes[i].name, string))
 			break;
 	}
 
 	if (i == NUM_GL_ALPHA_MODES)
 	{
-		ri.Con_Printf (PRINT_ALL, "bad alpha texture mode name\n");
+		ri.Con_Printf (PRINT_ALL, "Bad alpha texture mode name.  Use gl_texturealphamode list to get a list of valid modes.\n");
+
+		ri.Cvar_ForceSet("gl_texturealphamode", prevAlphaTextureMode);
+		gl_texturealphamode->modified = false;
 		return;
 	}
 
 	gl_tex_alpha_format = gl_alpha_modes[i].mode;
+	Com_sprintf(prevAlphaTextureMode, sizeof(prevAlphaTextureMode), "%s", gl_alpha_modes[i].name);
 }
 
 /*
@@ -240,23 +259,38 @@ void GL_TextureAlphaMode (char *string)
 GL_TextureSolidMode
 ===============
 */
-void GL_TextureSolidMode (char *string)
+void GL_TextureSolidMode (char *string) /* FS: Redid this to initialize a default, add a list, and store prevMode */
 {
 	int		i;
+	static char	prevTextureMode[32] = "default";
 
-	for (i=0; i< NUM_GL_SOLID_MODES; i++)
+	if (!Q_stricmp(string, "list"))
 	{
-		if ( !Q_stricmp( gl_solid_modes[i].name, string ) )
+		for (i = 0; i < NUM_GL_SOLID_MODES; i++)
+			ri.Con_Printf (PRINT_ALL, "Solid texture mode [%d]: %s\n", i + 1, gl_solid_modes[i].name);
+
+		ri.Cvar_ForceSet("gl_texturesolidmode", prevTextureMode);
+		gl_texturesolidmode->modified = false;
+		return;
+	}
+
+	for (i = 0; i < NUM_GL_SOLID_MODES; i++)
+	{
+		if (!Q_stricmp(gl_solid_modes[i].name, string))
 			break;
 	}
 
 	if (i == NUM_GL_SOLID_MODES)
 	{
-		ri.Con_Printf (PRINT_ALL, "bad solid texture mode name\n");
+		ri.Con_Printf (PRINT_ALL, "Bad solid texture mode name.  Use gl_texturesolidmode list to get a list of valid modes.\n");
+
+		ri.Cvar_ForceSet("gl_texturesolidmode", prevTextureMode);
+		gl_texturesolidmode->modified = false;
 		return;
 	}
 
 	gl_tex_solid_format = gl_solid_modes[i].mode;
+	Com_sprintf(prevTextureMode, sizeof(prevTextureMode), "%s", gl_solid_modes[i].name);
 }
 //#endif	/* end Knightmare */
 
@@ -429,9 +463,9 @@ int Scrap_AllocBlock (int w, int h, int *x, int *y)
 {
 	int		i, j;
 	int		best, best2;
-	int		texnum;
+	int		texnum = 0;
 
-	for (texnum=0 ; texnum<MAX_SCRAPS ; texnum++)
+//	for (texnum=0 ; texnum<MAX_SCRAPS ; texnum++) /* FS: MAX_SCRAPS is 1. */
 	{
 		best = BLOCK_HEIGHT;
 
@@ -454,7 +488,10 @@ int Scrap_AllocBlock (int w, int h, int *x, int *y)
 		}
 
 		if (best + h > BLOCK_HEIGHT)
-			continue;
+		{
+			// continue;
+			return -1;
+		}
 
 		for (i=0 ; i<w ; i++)
 			scrap_allocated[texnum][*x + i] = best + h;
@@ -836,19 +873,17 @@ void R_FloodFillSkin( byte *skin, int skinwidth, int skinheight )
 	byte				fillcolor = *skin; // assume this is the pixel to fill
 	floodfill_t			fifo[FLOODFILL_FIFO_SIZE];
 	int					inpt = 0, outpt = 0;
-	int					filledcolor = -1;
+	int					filledcolor = 0;
 	int					i;
 
-	if (filledcolor == -1)
+	// attempt to find opaque black
+	for (i = 0; i < 256; ++i)
 	{
-		filledcolor = 0;
-		// attempt to find opaque black
-		for (i = 0; i < 256; ++i)
-			if (d_8to24table[i] == (255 << 0)) // alpha 1.0
-			{
-				filledcolor = i;
-				break;
-			}
+		if (d_8to24table[i] == (255 << 0)) // alpha 1.0
+		{
+			filledcolor = i;
+			break;
+		}
 	}
 
 	// can't fill to filled color or to transparent color (used as visited marker)

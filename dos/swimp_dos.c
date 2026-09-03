@@ -141,7 +141,7 @@ qboolean SWimp_Init(void *nummodes, void *modeinfos)
 
 	/* HACK HACK HACK: sending the video mode infos to vid_dos.c
 	 * by exploiting our params. See: vid_dos.c:VID_LoadRefresh() */
-	vi = malloc(vga_nummodes * sizeof(vmodeinfo_t));
+	vi = (vmodeinfo_t *) malloc(vga_nummodes * sizeof(vmodeinfo_t));
 	for (i = 0; i < vga_nummodes; ++i)
 	{
 		vi[i].height = vga_modes[i].height;
@@ -214,7 +214,7 @@ rserr_t SWimp_SetMode(int *pwidth, int *pheight, int mode, qboolean fullscreen)
 	vid.rowbytes = vid.width;
 
 	free(vid.buffer);
-	vid.buffer = malloc(vid.width*vid.height);
+	vid.buffer = (pixel_t *) malloc(vid.width*vid.height);
 
 	/* FS: Make sure mode 13 is set again because if we go to
 	 * high res mode and back it gets funky with banked modes.
@@ -235,7 +235,7 @@ rserr_t SWimp_SetMode(int *pwidth, int *pheight, int mode, qboolean fullscreen)
 			memset (VGA_pagebase, 0, VGA_rowbytes * VGA_height);
 		}
 
-		VGA_pagebase = vga_modes[mode].address;
+		VGA_pagebase = (byte *) vga_modes[mode].address;
 
 		VideoRegisterSet(vrs320x240x256planar); /* FS: 320x240x8 only. */
 

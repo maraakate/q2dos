@@ -19,7 +19,7 @@ check_dodge(edict_t *self, vec3_t start, vec3_t dir, int speed)
 	}
 
 	/* easy mode only ducks one quarter the time */
-	if (skill->value == 0)
+	if (skill->intValue == 0)
 	{
 		if (random() > 0.25)
 		{
@@ -248,7 +248,7 @@ fire_lead(edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick,
 			}
 			else
 			{
-				if (strncmp(tr.surface->name, "sky", 3) != 0)
+				if (tr.surface && strncmp(tr.surface->name, "sky", 3) != 0)
 				{
 					gi.WriteByte(svc_temp_entity);
 					gi.WriteByte(te_impact);
@@ -819,7 +819,7 @@ rocket_touch(edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf)
 	else
 	{
 		/* don't throw any debris in net games */
-		if (!deathmatch->value && !coop->value)
+		if (!deathmatch->intValue && !coop->intValue)
 		{
 			if ((surf) &&
 				!(surf->flags &
@@ -1122,7 +1122,7 @@ bfg_think(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		dmg = 5;
 	}
@@ -1806,7 +1806,7 @@ void Trap_Think (edict_t *ent) /* FS: Coop: Xatrix specific */
 				VectorCopy(ent->s.origin, ent->s.old_origin);
 				ent->timestamp = level.time + 30;
 
-				if (deathmatch->value)
+				if (deathmatch->intValue)
 				{
 					ent->mass = best->mass / 4;
 				}

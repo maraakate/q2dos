@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
+CFLAGS = -Wall -O2
 CPPFLAGS = -Did386=1 -DGAMESPY
 DXE3GEN = dxe3gen
 
@@ -28,14 +28,5 @@ clean:
 	rm -f CEngine/*.o
 	rm -f Sdk/*.o
 
-DO_AS=$(CC) -x assembler-with-cpp
-
 %.o : %.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(WATT32_CFLAGS) -c $< -o $@
-
-%.o: %.S
-	$(DO_AS) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
-
-%.o: %.s
-	$(DO_AS) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
-

@@ -743,6 +743,7 @@ extern	int lastgibframe;
 #define MOD_SONICCANNON		  60 /* FS: Zaero specific changes */
 #define MOD_AUTOCANNON		  61 /* FS: Zaero specific changes */
 #define MOD_GL_POLYBLEND	62 /* FS: Zaero specific changes */
+#define MOD_GRAPPLE         64 /* Stross & Asa */
 
 extern	int	meansOfDeath;
 
@@ -777,8 +778,10 @@ extern	cvar_t	*sv_coop_summon_time; /* FS: Added */
 extern	cvar_t	*sv_coop_announce_name_change; /* FS: Added */
 extern	cvar_t	*sv_coop_name_timeout; /* FS: Added */
 extern	cvar_t	*sv_coop_blinky_cam_disallowflags; /* FS: Added */
+extern	cvar_t	*sv_drop_timeout; /* FS: Added */
 extern	cvar_t	*sv_spawn_protection; /* FS: Coop: Spawn protection */
 extern	cvar_t	*sv_spawn_protection_time; /* FS: Coop: Spawn protection */
+extern	cvar_t	*sv_allow_hook; /* FS: Coop: Added */
 extern	cvar_t	*motd; /* FS: Coop: Added */
 extern	cvar_t	*adminpass; /* FS: Coop: Admin goodies */
 extern	cvar_t	*vippass; /* FS: Coop: VIP goodies */
@@ -797,6 +800,8 @@ extern	cvar_t	*g_select_empty;
 extern	cvar_t	*dedicated;
 
 extern	cvar_t	*filterban;
+extern	cvar_t	*flashlightmode; //QW/ mode for flashlight code.
+extern	cvar_t	*sv_filter_wallfly_ip; /* FS */
 
 extern	cvar_t	*sv_gravity;
 extern	cvar_t	*sv_maxvelocity;
@@ -941,6 +946,7 @@ char	*vtos (vec3_t v);
 float vectoyaw (vec3_t vec);
 void vectoangles (vec3_t vec, vec3_t angles);
 edict_t *Find_LikePlayer (edict_t *ent, char *name, qboolean exact); /* FS: People want this for various Tastyspleen-like commands */
+qboolean G_SpawnCheck (int cap); /* FS: Added */
 
 //ROGUE
 void G_ProjectSource2(vec3_t point, vec3_t distance, vec3_t forward, vec3_t right,
@@ -1133,6 +1139,7 @@ void player_die(edict_t *self, edict_t *inflictor, edict_t *attacker,
 //
 void	ServerCommand (void);
 qboolean SV_FilterPacket (char *from);
+qboolean SV_FilterName (char *from); /* FS: Added */
 
 //
 // p_view.c
@@ -1395,8 +1402,10 @@ typedef struct
 	qboolean	spectator;			// client is a spectator
 	qboolean	isAdmin; /* FS: Coop: Admin goodies */
 	qboolean	isVIP; /* FS: Coop: VIP goodies */
+	qboolean	isWallFly; /* FS: Added. */
 	qboolean	didMotd; /* FS: Coop: MOTD */
 	qboolean	noSummon; /* FS: Blinky Cam */
+	qboolean	isSilenced; /* FS: Added for troublemakers. */
 
 //=========
 //ROGUE
@@ -1423,6 +1432,7 @@ typedef struct
 	qboolean	spectator;			// client is a spectator
 	qboolean	isAdmin; /* FS: Coop: Admin goodies */
 	qboolean	isVIP; /* FS: Coop: VIP goodies */
+	qboolean	isSilenced; /* FS: For troublemakers. */
 	qboolean	didMotd; /* FS: Coop: MOTD */
 	qboolean	noSummon; /* FS: Blinky Cam */
 } client_respawn_t;
@@ -1557,6 +1567,15 @@ struct gclient_s
 	float startFireTime; /* FS: Zaero specific game dll changes */
 
 	float summon_time; /* FS: Added */
+	float dropTimeout; /* FS: Added */
+
+	// flashlight
+	edict_t* flashlight;
+	int		flashtype;
+
+	// hook
+	int		hook_state;
+	edict_t	*hook;
 };
 
 struct edict_s
@@ -1779,6 +1798,11 @@ struct edict_s
 
 	float bossFireTimeout;
 	int bossFireCount;
+
+	// Knightmare- this sets blood type on damage for monsters
+	int			blood_type;
+
+	edict_t	*hook_laser;
 };
 
 //zaero debug includes (need type info)

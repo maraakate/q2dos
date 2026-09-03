@@ -1227,4 +1227,4 @@
 {"ai_stand", (byte *)ai_stand},
 {"ai_move", (byte *)ai_move},
 {"AI_SetSightClient", (byte *)AI_SetSightClient},
-{0, 0}
+{NULL, NULL}

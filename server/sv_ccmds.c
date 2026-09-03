@@ -41,7 +41,7 @@ void SV_SetMaster_f (void)
 	int		i, slot;
 
 	// only dedicated servers send heartbeats
-	if (!dedicated->value)
+	if (!dedicated->intValue)
 	{
 		Com_Printf ("Only dedicated servers use masters.\n");
 		return;
@@ -494,7 +494,7 @@ qboolean SV_NotCinematic (char *map)
 	if(strstr(mapTemp, ".cin") || strstr(mapTemp, ".pcx"))
 	{
 //		Com_Printf("Found cin\n");
-		ch = strstr(mapTemp, "+");
+		ch = strchr(mapTemp, '+');
 		if (ch && (strstr(ch, ".cin") || strstr(ch, ".pcx")) ) /* FS: Stepped forward and it's level+cinematic */
 		{
 //			Com_Printf("Found cinematic at the end: %s\n", ch);
@@ -612,11 +612,11 @@ void SV_Map_f (void)
 	// if not a pcx, demo, or cinematic, check to make sure the level exists
 	map = Cmd_Argv(1);
 
-	if (!strstr(map, ".") && !strstr(map, "$") && (*map != '*'))
+	if (!strchr(map, '.') && !strchr(map, '$') && (*map != '*'))
 	{
 		Com_sprintf (expanded, sizeof(expanded), "maps/%s.bsp", map);
 
-		if (FS_LoadFile (expanded, NULL) == -1)
+		if (!FS_FileExists(expanded))
 		{
 			Com_Printf ("Can't find %s\n", expanded);
 			return;
@@ -658,9 +658,10 @@ void SV_Loadgame_f (void)
 	Com_Printf ("Loading game...\n");
 
 	dir = Cmd_Argv(1);
-	if (strstr (dir, "..") || strstr (dir, "/") || strstr (dir, "\\") )
+	if (strstr(dir, "..") || strchr(dir, '/') || strchr(dir, '\\'))
 	{
 		Com_Printf ("Bad savedir.\n");
+		return;
 	}
 
 	// make sure the server.ssv file exists
@@ -716,7 +717,7 @@ void SV_Savegame_f (void)
 		return;
 	}
 
-	if (Cvar_VariableValue("deathmatch"))
+	if (Cvar_VariableValueInt("deathmatch"))
 	{
 		Com_Printf ("Can't savegame in a deathmatch\n");
 		return;
@@ -728,16 +729,17 @@ void SV_Savegame_f (void)
 		return;
 	}
 
-	if (maxclients->value == 1 && svs.clients[0].edict->client->ps.stats[STAT_HEALTH] <= 0)
+	if (maxclients->intValue == 1 && svs.clients[0].edict->client->ps.stats[STAT_HEALTH] <= 0)
 	{
 		Com_Printf ("\nCan't savegame while dead!\n");
 		return;
 	}
 
 	dir = Cmd_Argv(1);
-	if (strstr (dir, "..") || strstr (dir, "/") || strstr (dir, "\\") )
+	if (strstr(dir, "..") || strchr(dir, '/') || strchr(dir, '\\'))
 	{
 		Com_Printf ("Bad savedir.\n");
+		return;
 	}
 
 	Com_Printf ("Saving game...\n");
@@ -1042,8 +1044,8 @@ void SV_ServerRecord_f (void)
 	}
 
 	if (strstr(Cmd_Argv(1), "..") || 
-		strstr(Cmd_Argv(1), "/") || 
-		strstr(Cmd_Argv(1), "\\"))
+		strchr(Cmd_Argv(1), '/') || 
+		strchr(Cmd_Argv(1), '\\'))
 	{
 		Com_Printf("Illegal filename.\n");
 		return;
@@ -1231,7 +1233,7 @@ void SV_InitOperatorCommands (void)
 	Cmd_AddCommand ("gamemap", SV_GameMap_f);
 	Cmd_AddCommand ("setmaster", SV_SetMaster_f);
 
-	if ( dedicated->value )
+	if (dedicated->intValue)
 	{
 		Cmd_AddCommand ("say", SV_ConSay_f);
 	}

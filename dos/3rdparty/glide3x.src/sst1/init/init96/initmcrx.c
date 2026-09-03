@@ -17,12 +17,9 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-**
-** $Revision: 1.1.2.3 $ 
-** $Date: 2005/06/09 18:32:37 $ 
-**
 */
-static char revString[] = "@#%$Workfile: initmcrx.c $ $Revision: 1.1.2.3 $";
+
+#undef FX_DLL_ENABLE /* so that we don't dllexport the symbols */
 
 #include <3dfx.h>
 
@@ -51,6 +48,22 @@ static char revString[] = "@#%$Workfile: initmcrx.c $ $Revision: 1.1.2.3 $";
 
 #ifdef __WIN32__
 #include <windows.h>
+#ifdef __MINGW32__
+static inline unsigned char _inp_asm (unsigned short _port) {
+  unsigned char rc;
+  __asm__ __volatile__ ("inb %w1,%b0" : "=a" (rc) : "Nd" (_port));
+  return rc;
+}
+static inline void _outp_asm (unsigned short _port, unsigned char _data) {
+  __asm__ __volatile__ ("outb %b0,%w1" : : "a" (_data), "Nd" (_port));
+}
+static inline void _outpw_asm (unsigned short _port, unsigned short _data) {
+  __asm__ __volatile__ ("outw %w0,%w1" : : "a" (_data), "Nd" (_port));
+}
+#define _outpw  _outpw_asm
+#define _inp  _inp_asm
+#define _outp  _outp_asm
+#endif
 #endif /* __WIN32__ */
 
 #define INIT_MCRX_LIB
@@ -158,13 +171,13 @@ INITMCRXENTRY(initMCRXSetVideo, FxBool, (GrScreenResolution_t res, GrScreenRefre
 {
 #define FN_NAME "initMCRXSetVideo"
   FxBool rv = FXTRUE;
-#if /*defined(INIT_ACCESS_DIRECT) &&*/ defined(__DOS32__)
+#if defined(INIT_ACCESS_DIRECT) && defined(__DOS32__)
   union REGS r0, r1;
 #endif
   
   GDBG_INFO((80, "%s: \n", FN_NAME));
 
-#if /*defined(INIT_ACCESS_DIRECT) &&*/ defined(__DOS32__)
+#if defined(INIT_ACCESS_DIRECT) && defined(__DOS32__)
   switch( res ) {
   case GR_RESOLUTION_320x200:
     /* Set up VESA Mode 0x136 - 320x200x16 */
@@ -602,9 +615,6 @@ INITMCRXENTRY(initMCRXGetInfo,FxBool,(VG96Info *info))
 
   /* We care about bit 5 & 6 */
   mBytesPow = ((res >> 5) & 3);
-
-  /* Watcom warning suppression */
-  revString[0] = revString[0];
   
   info->vgaChip = 0;
   info->vg96Rev = 0;

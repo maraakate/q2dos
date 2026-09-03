@@ -41,13 +41,14 @@ cvar_t *timelimit;
 cvar_t *password;
 cvar_t *spectator_password;
 cvar_t *needpass;
-cvar_t *maxclients;
 cvar_t *maxspectators;
 cvar_t *maxentities;
 cvar_t *g_select_empty;
 #ifndef GAME_HARD_LINKED
+cvar_t *maxclients;
 cvar_t  *dedicated;
 #else
+extern cvar_t *maxclients;
 extern cvar_t *dedicated;
 #endif
 cvar_t	*filterban;
@@ -144,7 +145,7 @@ game_export_t *GetGameAPI (game_import_t *import)
 
 #ifndef GAME_HARD_LINKED
 // this is only here so the functions in q_shared.c and q_shwin.c can link
-void Sys_Error (char *error, ...)
+void Sys_Error (const char *error, ...)
 {
 	va_list		argptr;
 	char		text[1024];
@@ -157,7 +158,7 @@ void Sys_Error (char *error, ...)
 	gi.error ("%s", text);
 }
 
-void Com_Printf (char *msg, ...)
+void Com_Printf (const char *msg, ...)
 {
 	va_list		argptr;
 	char		text[1024];

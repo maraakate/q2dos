@@ -79,7 +79,7 @@ void R_RenderDlights (void)
 	int		i;
 	dlight_t	*l;
 
-	if (!gl_flashblend->value)
+	if (!gl_flashblend->intValue)
 		return;
 
 	r_dlightframecount = r_framecount + 1;	// because the count hasn't
@@ -166,7 +166,7 @@ void R_PushDlights (void)
 	int		i;
 	dlight_t	*l;
 
-	if (gl_flashblend->value)
+	if (gl_flashblend->intValue)
 		return;
 
 	r_dlightframecount = r_framecount + 1;	// because the count hasn't
@@ -304,7 +304,7 @@ void R_LightPoint (vec3_t p, vec3_t color)
 	vec3_t		dist;
 	float		add;
 	
-	if (!r_worldmodel->lightdata)
+	if (!r_worldmodel->lightdata || !currententity)
 	{
 		color[0] = color[1] = color[2] = 1.0;
 		return;

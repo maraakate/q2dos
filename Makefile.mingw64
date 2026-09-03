@@ -17,11 +17,13 @@ CC = gcc
 RC = windres
 ifeq ($(DEBUG),1)
 CFLAGS = -m64 -Wall -g -fno-strict-aliasing
+CPPFLAGS =
 else
 CFLAGS = -m64 -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
 CFLAGS+= -ffast-math
+CPPFLAGS = -DNDEBUG
 endif
-CPPFLAGS = -DCLIENT_SPLIT_NETFRAME
+CPPFLAGS+= -DCLIENT_SPLIT_NETFRAME
 LDFLAGS = -m64 -mwindows
 LDLIBS = -lwinmm -lws2_32
 EXE = q2.exe
@@ -101,6 +103,7 @@ endif
 endif
 
 QCOMMON = qcommon/cmd.o \
+	qcommon/cmd_auto.o \
 	qcommon/cmodel.o \
 	qcommon/common.o \
 	qcommon/crc.o \

@@ -17,8 +17,6 @@
  ** 
  ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
  **
- ** $Header: /cvsroot/glide/glide3x/sst1/glide3/src/Attic/distate.c,v 1.1.2.3 2004/10/04 09:35:59 dborca Exp $
- ** $Log: distate.c,v $
  ** Revision 1.1.2.3  2004/10/04 09:35:59  dborca
  ** second cut at Glide3x for Voodoo1/Rush (massive update):
  ** delayed validation, vertex snapping, clip coordinates, strip/fan_continue, bugfixes.
@@ -412,12 +410,6 @@ GR_DIENTRY(_grChromaRangeExt, void , (GrColor_t color, GrColor_t range, GrChroma
 {
 #define FN_NAME "_grChromaRangeExt"
   GR_BEGIN_NOFIFOCHECK("_grChromaRangeExt",85);
-
-#if 0
-  GR_CHECK_F(myName,
-             (_GlideRoot.hwConfig.SSTs[_GlideRoot.current_sst].type != GR_SSTTYPE_Voodoo2),
-             "grChromaRange not supported.");
-#endif
 
   INVALIDATE(chromaKey);
 

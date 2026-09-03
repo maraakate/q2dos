@@ -17,8 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/h3/glide3/src/gtexdl.c,v 1.1.1.1.6.2 2004/09/27 09:02:11 dborca Exp $
-** $Log: gtexdl.c,v $
 ** Revision 1.1.1.1.6.2  2004/09/27 09:02:11  dborca
 ** fixed trilinearness bug. reorg brackets
 **
@@ -1342,7 +1340,7 @@ GR_ENTRY(grTexDownloadMipMapLevelPartial,
                             ? 1   /* 16-bit texture */
                             : 2); /* 8-bit texture */
 
-        if (max_s <= 0) max_s = 1;
+        if (max_s < 1) max_s = 1;
         if (widthSel > 2) widthSel = 3;
     
         gc->stats.texBytes += max_s * (max_t - t + 1) * 4;

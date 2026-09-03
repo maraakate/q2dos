@@ -16,11 +16,6 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-**
-** $Revision: 1.1.2.3 $ 
-** $Date: 2005/06/09 18:32:37 $ 
-**
 */
 
 #include <3dfx.h>
@@ -35,9 +30,6 @@
 #include <string.h>
 #include <gdebug.h>
 
-/* This is currently disabled, thus breaking rush, until we can get some
- * sources from Aliance Semiconductor */
-#if SST96
 static FxBool setVideo( FxU32                   hWnd,
                         GrScreenResolution_t    sRes,
                         GrScreenRefresh_t       vRefresh,
@@ -49,7 +41,8 @@ static FxBool setVideo( FxU32                   hWnd,
                         int                     *yres,
                         int                     *fbStride,
                         sst1VideoTimingStruct   *vidTimings) {
-    return init96SetVideo( hWnd, sRes, vRefresh, cFormat, yOrigin, 
+
+    return init96SetVideo( hWnd, sRes, vRefresh, cFormat, yOrigin,
                            nColBuffers, nAuxBuffers,
                            &context->info.regs,
                            xres, yres, fbStride );
@@ -67,22 +60,21 @@ static void disableTransport( void ) {
     init96DisableTransport();
 }
 
-static void swapBuffers( FxU32 code ) {
+static /*InitSwapType_t*/ void swapBuffers( FxU32 code ) {
     if ( context && context->writeMethod )
         init96Swap( code, &context->info.regs, context->writeMethod );
-} 
+/*  return INIT_SWAP_FLIP;*/
+}
 
 static FxU32 status( void ) {
   return *(context->info.regs.hwDep.VG96RegDesc.serialStatus);
-} 
+}
 
 static FxBool busy(void) {
   FxBool rv;
-
   rv = (status() & 0x1) ? FXTRUE : FXFALSE;
-
   return rv;
-} 
+}
 
 static void idle( void ) {
     init96Idle(context->writeMethod);
@@ -94,16 +86,13 @@ static void *getBufferPtr( InitBuffer_t buffer, int *strideBytes ) {
 
 static void renderBuffer( InitBuffer_t buffer ) {
     init96RenderBuffer( buffer, context->writeMethod );
-    return;
 }
 
 static void origin( InitOriginLocation_t origin ) {
     init96Origin( origin, context->writeMethod );
-    return;
 }
 
 static void ioCtl( FxU32 token, void *argument ) {
-    return;
 }
 
 static FxBool control( FxU32 code ) {
@@ -158,34 +147,4 @@ void vg96DriverInit( InitContext *context ) {
     context->gammaRGB         = gammargb;
     context->initGammaTable   = gammatable;
     context->findVidTimingStruct = findvidtiming;
-} 
-#else
-/* I've got to stub this one to get the Voodoo Graphics glide to link */
-void vg96DriverInit( InitContext *context ) {
-    context->setVideo         = NULL;
-    context->restoreVideo     = NULL;
-    context->enableTransport  = NULL;
-    context->disableTransport = NULL;
-    context->swapBuffers      = NULL;
-    context->status           = NULL;
-    context->busy             = NULL;
-    context->idle             = NULL;
-    context->getBufferPtr     = NULL;
-    context->renderBuffer     = NULL;
-    context->origin           = NULL;
-    context->ioCtl            = NULL;
-    context->control          = NULL;
-    context->wrapFIFO         = NULL;
-
-    context->gamma            = NULL;
-    context->sliPciOwner      = NULL;
-
-    context->gammaRGB         = NULL;
-    context->initGammaTable   = NULL;
-    context->findVidTimingStruct = NULL; 
-
 }
-#endif
-
-
-

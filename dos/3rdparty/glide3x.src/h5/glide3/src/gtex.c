@@ -17,7 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/h5/glide3/src/gtex.c,v 1.3.4.11 2007/09/29 14:19:23 koolsmoky Exp $
 ** $Log:
 **  39   3dfx      1.34.1.0.1.211/14/00 Jonny Cochrane  Implement multisample LOD
 **       Dithering for 2x and 4x FSAA modes 

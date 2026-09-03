@@ -4,9 +4,6 @@
 #  Email : dborca@users.sourceforge.net
 #  Web   : http://www.geocities.com/dborca
 #
-# $Header: /cvsroot/glide/glide3x/cvg/glide3/tests/Attic/Makefile.DJ,v 1.1.2.1 2003/11/03 13:34:30 dborca Exp $
-#
-
 
 #
 #  Available options:
@@ -21,10 +18,9 @@
 #	<file.exe>	build a specific file
 #
 
-
-.PHONY: all
+.PHONY: all clean
 .SUFFIXES: .c .o .exe
-.SECONDARY: tlib.o
+.SECONDARY: tlib.o fxos.o
 
 FX_GLIDE_HW = cvg
 TOP = ../../..
@@ -54,6 +50,12 @@ endif
 
 all:
 	$(error Must specify <filename.exe> to build)
+
+sbench.exe: sbench.o fxos.o tlib.o
+	$(CC) -o $@ $(LDFLAGS) $^ $(LDLIBS)
+
+fxos.o: $(TOP)/swlibs/fxmisc/fxos.c
+	$(CC) -o $@ $(CFLAGS) -c $<
 
 clean:
 	-$(call UNLINK,*.o)

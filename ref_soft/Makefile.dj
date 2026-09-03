@@ -44,11 +44,13 @@ ifeq ($(USE_ASM),1)
 REFASM = ../gas/math_ref.o \
 	../gas/math.o \
 	../gas/d_copy.o \
-	../gas/d_polysa.o \
 	../gas/r_aclipa.o \
+	../gas/r_aliasa.o \
 	../gas/r_draw16.o \
 	../gas/r_drawa.o \
 	../gas/r_edgea.o \
+	../gas/r_parta.o \
+	../gas/r_polysa.o \
 	../gas/r_scana.o \
 	../gas/r_spr8.o \
 	../gas/r_surf8.o \

@@ -1,19 +1,10 @@
 /*
 ** Insert new header here
 **
-**
-** $Revision: 1.1 $ 
-** $Date: 2000/01/19 18:16:19 $ 
-**
 */
 
 #include <stdlib.h>
 #include <stdio.h>
-#ifndef __linux__
-#include <conio.h>
-#else
-#include <linutil.h>
-#endif
 #include <assert.h>
 
 #include <glide.h>
@@ -29,7 +20,7 @@ static const char usage[]   = "-n <frames> -r <res>";
 static int rRandom(int s, int e);
 static unsigned int iRandom (unsigned int maxr);
 
-void main( int argc, char **argv) {
+int main( int argc, char **argv) {
     char match; 
     char **remArgs;
     int  rv;
@@ -48,13 +39,13 @@ void main( int argc, char **argv) {
     assert( hwconfig = tlVoodooType() );
 
     /* Process Command Line Arguments */
-    while( rv = tlGetOpt( argc, argv, "Nnr", &match, &remArgs ) ) {
+    while ((rv = tlGetOpt(argc, argv, "Nnr", &match, &remArgs)) != 0) {
         if ( rv == -1 ) {
             printf( "Unrecognized command line argument\n" );
             printf( "%s %s\n", name, usage );
             printf( "Available resolutions:\n%s\n",
                     tlGetResolutionList() );
-            return;
+            return -1;
         }
         switch( match ) {
         case 'n':
@@ -161,7 +152,7 @@ doNothing:
     }
     
     grGlideShutdown();
-    return;
+    return 0;
 }
 
 static unsigned long randx = 1;

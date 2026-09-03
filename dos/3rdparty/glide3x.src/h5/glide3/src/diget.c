@@ -17,7 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/h5/glide3/src/diget.c,v 1.4.4.9 2007/06/23 09:22:41 koolsmoky Exp $
 ** $Log: 
 **  22   3dfx      1.17.1.0.1.210/11/00 Brent           Forced check in to enforce
 **       branching.
@@ -528,7 +527,7 @@ GR_DIENTRY(grGet, FxU32, (FxU32 pname, FxU32 plength, FxI32 *params))
     break;
   case GR_LFB_PIXEL_PIPE:
     if (plength == 4) {
-      *params = (_GlideRoot.hwConfig.SSTs[_GlideRoot.current_sst].type != GR_SSTTYPE_SST96);
+      *params = FXTRUE;
       retVal = plength;
     }
     break;

@@ -21,8 +21,6 @@
 **
 ** Description: Structures for the hwc extensions.
 **
-** $Header: /cvsroot/glide/glide3x/h3/minihwc/hwcext.h,v 1.1.1.1.6.2 2005/05/25 08:56:24 jwrdegoede Exp $
-**
 ** $History: hwcext.h $
 ** 
 ** *****************  Version 5  *****************

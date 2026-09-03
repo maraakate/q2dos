@@ -22,11 +22,6 @@
 #ifndef __NCC_H__
 #define __NCC_H__
 
-/*
-** $Revision: 1.1.2.1 $
-** $Date: 2004/03/02 07:56:00 $
-*/
-
 // translation tables for decompressing NCC format
 typedef struct {
     unsigned char yRGB[16];

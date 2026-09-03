@@ -1,8 +1,6 @@
 #ifndef __H3REGS_H__
 #define __H3REGS_H__
 
-/* -*-c++-*- */
-/* $Header: /cvsroot/glide/glide3x/h3/incsrc/h3regs.h,v 1.1.1.1.6.2 2005/06/09 18:32:30 jwrdegoede Exp $ */
 /*
 ** THIS SOFTWARE IS SUBJECT TO COPYRIGHT PROTECTION AND IS OFFERED ONLY
 ** PURSUANT TO THE 3DFX GLIDE GENERAL PUBLIC LICENSE. THERE IS NO RIGHT
@@ -21,9 +19,6 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-** $Revision: 1.1.1.1.6.2 $
-** $Date: 2005/06/09 18:32:30 $
 **
 ** $History: h3regs.h $
 ** 

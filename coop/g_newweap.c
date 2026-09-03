@@ -38,7 +38,7 @@ flechette_touch(edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf
 {
 	vec3_t dir;
 
-	if (!self || !other || !plane || !surf)
+	if (!self || !other || !surf)
 	{
 		return;
 	}
@@ -190,7 +190,7 @@ prox_die(edict_t *self, edict_t *inflictor, edict_t *attacker /* unused */,
 		return;
 	}
 
-	if (inflictor->classname && strcmp(inflictor->classname, "prox"))
+	if (inflictor->classname && strcmp(inflictor->classname, "prox") != 0)
 	{
 		self->takedamage = DAMAGE_NO;
 		Prox_Explode(self);
@@ -307,7 +307,7 @@ prox_open(edict_t *ent)
 			   blow up */
 			if (((((search->svflags & SVF_MONSTER) ||
 				   (search->client)) && (search->health > 0)) ||
-				   ((deathmatch->value) &&(((search->classname) && (!strcmp(search->classname, "info_player_deathmatch"))) ||
+				   ((deathmatch->intValue) &&(((search->classname) && (!strcmp(search->classname, "info_player_deathmatch"))) ||
 				   ((search->classname) && (!strcmp(search->classname, "info_player_start"))) ||
 				   ((search->classname) && (!strcmp(search->classname, "info_player_coop"))) ||
 				   ((search->classname) && (!strcmp(search->classname, "misc_teleporter_dest")))))) &&
@@ -319,7 +319,7 @@ prox_open(edict_t *ent)
 			}
 		}
 
-		if (strong_mines && (strong_mines->value))
+		if (strong_mines && (strong_mines->intValue))
 		{
 			ent->wait = level.time + PROX_TIME_TO_LIVE;
 		}
@@ -410,10 +410,12 @@ prox_land(edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf)
 	{
 		/* Here we need to check to see if we can stop on this entity. */
 		vec3_t out;
+		vec3_t zeroVec = { 0 };
+
 		float backoff, change;
 		int i;
 
-		if (!plane->normal) /* this happens if you hit a point object, maybe other cases */
+		if (VectorCompare(plane->normal, zeroVec)) /* this happens if you hit a point object, maybe other cases */
 		{
 			Prox_Explode(ent);
 			return;
@@ -745,7 +747,7 @@ void
 nuke_die(edict_t *self, edict_t *inflictor /* unused */,
 		edict_t *attacker, int damage, vec3_t point)
 {
-	if (!self || !attacker)
+	if (!self)
 	{
 		return;
 	}
@@ -1055,7 +1057,7 @@ tesla_think_active(edict_t *self)
 		/* don't hit clients in single-player or coop */
 		if (hit->client)
 		{
-			if (coop->value || !deathmatch->value)
+			if (coop->intValue || !deathmatch->intValue)
 			{
 				continue;
 			}
@@ -1127,7 +1129,7 @@ tesla_activate(edict_t *self)
 	}
 
 	/* only check for spawn points in deathmatch */
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		search = NULL;
 
@@ -1164,7 +1166,7 @@ tesla_activate(edict_t *self)
 	VectorClear(self->s.angles);
 
 	/* clear the owner if in deathmatch */
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		self->owner = NULL;
 	}
@@ -1300,7 +1302,7 @@ fire_tesla(edict_t *self, vec3_t start, vec3_t aimdir,
 	/* blow up on contact with lava & slime code */
 	tesla->touch = tesla_lava;
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		tesla->health = 20;
 	}
@@ -1391,7 +1393,7 @@ fire_beams(edict_t *self, vec3_t start, vec3_t aimdir, vec3_t offset,
 			}
 			else
 			{
-				if ((!water) && (strncmp(tr.surface->name, "sky", 3)))
+				if ((!water) && (tr.surface) && (strncmp(tr.surface->name, "sky", 3)))
 				{
 					/* This is the truncated steam entry - uses 1+1+2 extra bytes of data */
 					gi.WriteByte(svc_temp_entity);
@@ -1484,7 +1486,7 @@ blaster2_touch(edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf)
 	int mod;
 	int damagestat;
 
-	if (!self || !other || !plane || !surf)
+	if (!self || !other || !surf)
 	{
 		return;
 	}
@@ -1509,7 +1511,7 @@ blaster2_touch(edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf)
 	{
 		/* the only time players will be firing blaster2
 		   bolts will be from the defender sphere. */
-		if (self->owner->client)
+		if (self->owner && self->owner->client)
 		{
 			mod = MOD_DEFENDER_SPHERE;
 		}
@@ -1866,7 +1868,7 @@ fire_tracker(edict_t *self, vec3_t start, vec3_t dir, int damage,
 	edict_t *bolt;
 	trace_t tr;
 
-	if (!self || !enemy)
+	if (!self)
 	{
 		return;
 	}

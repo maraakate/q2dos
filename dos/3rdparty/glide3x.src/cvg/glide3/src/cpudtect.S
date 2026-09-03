@@ -18,12 +18,6 @@
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 */
 
-/*  $Header: /cvsroot/glide/glide3x/cvg/glide3/src/cpudtect.S,v 1.1.1.1 1999/12/07 21:42:30 joseph Exp $ */
-/*  $Log: cpudtect.S,v $
-/*  Revision 1.1.1.1  1999/12/07 21:42:30  joseph
-/*  Initial checkin into SourceForge.
-/* */
-/*   */
 /*  1     10/08/98 11:30a Brent */
 /*   */
 /*  6     10/03/98 3:35p Peter */

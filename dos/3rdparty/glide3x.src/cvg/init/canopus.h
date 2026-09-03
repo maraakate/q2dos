@@ -1,4 +1,3 @@
-/*-*-c++-*-*/
 /*
 ** THIS SOFTWARE IS SUBJECT TO COPYRIGHT PROTECTION AND IS OFFERED ONLY
 ** PURSUANT TO THE 3DFX GLIDE GENERAL PUBLIC LICENSE. THERE IS NO RIGHT
@@ -18,19 +17,14 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-**
-** $Revision: 1.1.8.1 $ 
-** $Date: 2005/08/13 21:07:00 $ 
-**
 */
 
 #ifndef _CANOPUS_H_
 #define _CANOPUS_H_
 
 // if we use FFLOAT as an integer, we need to handle clocks in Hz
-#define CLOCK_MULTIPLIER        1000000L        
-typedef unsigned int   FFLOAT;
-/* HDG: unused: typedef unsigned int   DDOUBLE; */
+#define CLOCK_MULTIPLIER        1000000L
+typedef FxU32 FFLOAT;
 
 /* FixMe!! Is this right? */
 #define CANOPUS_ID 0x10UL

@@ -16,9 +16,6 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-** $Revision: 1.2.8.8 $
-** $Date: 2006/01/16 21:22:42 $
 */
 
 #include <stddef.h>
@@ -71,7 +68,7 @@ main (int argc, char **argv)
 
     if (argc > 1) {
       if (strcmp("-inline", argv[1]) == 0) {
-        SstRegs dummyRegs;
+        SstRegs dummyRegs = { 0x00UL }; /* silence VC6 */
 
         printf("#ifndef __FX_INLINE_H__\n");
         printf("#define __FX_INLINE_H__\n");
@@ -79,7 +76,7 @@ main (int argc, char **argv)
 
         printf("#define kTriProcOffset 0x%lXUL\n",
                (unsigned long)offsetof(struct GrGC_s, triSetupProc));
-        
+
         printf("/* The # of 2-byte entries in the hw fog table */\n");
         printf("#define kInternalFogTableEntryCount 0x%X\n",
                (unsigned int)sizeof(dummyRegs.fogTable) >> 1);
@@ -136,6 +133,7 @@ main (int argc, char **argv)
 
     OFFSET (gc, cmdTransportInfo.lfbLockCount, "lfbLockCount");
 
+    OFFSET (gc, triSetupProc, "kTriProcOffset");
     OFFSET (gc, archDispatchProcs.triSetupProc, "triSetupProc");
     OFFSET (gc, archDispatchProcs.drawTrianglesProc, "drawTrianglesProc");
     OFFSET (gc, archDispatchProcs.triSetupProc, "drawVertexList");
@@ -195,7 +193,7 @@ main (int argc, char **argv)
 #if GL_X86
     OFFSET (gr,CPUType,"CPUType\t\t");
 #endif
-    OFFSET (gr,tlsOffset,"tlsOffset\t\t");    
+    OFFSET (gr,tlsOffset,"tlsOffset\t\t");
     OFFSET (gr, pool.f255,"pool_f255");
     SIZEOF (gr.GCs[0].state,"GrState\t");
     SIZEOF (gr.GCs[0],"GC\t");

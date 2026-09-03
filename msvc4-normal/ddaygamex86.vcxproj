@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{2EDA0A3D-2E57-43D4-BB3F-98244483BF49}</ProjectGuid>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>15.0.28307.799</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>.\dday\Release\</OutDir>
+    <IntDir>.\dday\Release\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>.\dday\Debug\</OutDir>
+    <IntDir>.\dday\Debug\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>.\dday\Release\</OutDir>
+    <IntDir>.\dday\Release\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>.\dday\Debug\</OutDir>
+    <IntDir>.\dday\Debug\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\dday\Release/ddaygamex86.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <OmitFramePointers>true</OmitFramePointers>
+      <PreprocessorDefinitions>WIN32;id386=1;NDEBUG;_WINDOWS;WITH_ACEBOT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x1009</Culture>
+    </ResourceCompile>
+    <Link>
+      <OutputFile>$(OutDir)gamex86.dll</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ModuleDefinitionFile>..\dday\game.def</ModuleDefinitionFile>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\dday\Release/ddaygamex86.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\dday\Debug/ddaygamex86.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;id386=1;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <BrowseInformation>true</BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x1009</Culture>
+    </ResourceCompile>
+    <Link>
+      <OutputFile>$(OutDir)gamex86.dll</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ModuleDefinitionFile>..\dday\game.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\dday\Debug/ddaygamex86.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>X64</TargetEnvironment>
+      <TypeLibraryName>.\dday\Release/ddaygamex86.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <OmitFramePointers>true</OmitFramePointers>
+      <PreprocessorDefinitions>WIN32;id386=0;NDEBUG;_WINDOWS;WITH_ACEBOT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DisableSpecificWarnings>4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x1009</Culture>
+    </ResourceCompile>
+    <Link>
+      <OutputFile>$(OutDir)gamex64.dll</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ModuleDefinitionFile>..\dday\game.def</ModuleDefinitionFile>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+    <Bscmake>
+      <OutputFile>.\dday\Release/ddaygamex86.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>X64</TargetEnvironment>
+      <TypeLibraryName>.\dday\Debug/ddaygamex86.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;id386=0;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <BrowseInformation>true</BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x1009</Culture>
+    </ResourceCompile>
+    <Link>
+      <OutputFile>$(OutDir)gamex64.dll</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ModuleDefinitionFile>..\dday\game.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+    <Bscmake>
+      <OutputFile>.\dday\Debug/ddaygamex86.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\dday\ai\ai_class_dmbot.c" />
+    <ClCompile Include="..\dday\ai\ai_class_monster_default.c" />
+    <ClCompile Include="..\dday\ai\ai_dropnodes.c" />
+    <ClCompile Include="..\dday\ai\ai_items.c" />
+    <ClCompile Include="..\dday\ai\ai_links.c" />
+    <ClCompile Include="..\dday\ai\ai_main.c" />
+    <ClCompile Include="..\dday\ai\ai_movement.c" />
+    <ClCompile Include="..\dday\ai\ai_navigation.c" />
+    <ClCompile Include="..\dday\ai\ai_nodes.c" />
+    <ClCompile Include="..\dday\ai\ai_tools.c" />
+    <ClCompile Include="..\dday\ai\ai_weapons.c" />
+    <ClCompile Include="..\dday\ai\AStar.c" />
+    <ClCompile Include="..\dday\ai\bot_common.c" />
+    <ClCompile Include="..\dday\ai\bot_spawn.c" />
+    <ClCompile Include="..\dday\gbr\gbr_guninfo.c" />
+    <ClCompile Include="..\dday\gbr\gbr_item.c" />
+    <ClCompile Include="..\dday\gbr\gbr_main.c" />
+    <ClCompile Include="..\dday\gbr\gbr_spawn.c" />
+    <ClCompile Include="..\dday\gbr\gbr_weapon.c" />
+    <ClCompile Include="..\dday\grm\grm_guninfo.c" />
+    <ClCompile Include="..\dday\grm\grm_item.c" />
+    <ClCompile Include="..\dday\grm\grm_main.c" />
+    <ClCompile Include="..\dday\grm\grm_spawn.c" />
+    <ClCompile Include="..\dday\grm\grm_weapon.c" />
+    <ClCompile Include="..\dday\g_ai.c" />
+    <ClCompile Include="..\dday\g_arty.c" />
+    <ClCompile Include="..\dday\g_cmds.c" />
+    <ClCompile Include="..\dday\g_combat.c" />
+    <ClCompile Include="..\dday\g_ents.c" />
+    <ClCompile Include="..\dday\g_func.c" />
+    <ClCompile Include="..\dday\g_items.c" />
+    <ClCompile Include="..\dday\g_main.c" />
+    <ClCompile Include="..\dday\g_maps.c" />
+    <ClCompile Include="..\dday\g_misc.c" />
+    <ClCompile Include="..\dday\g_monster.c" />
+    <ClCompile Include="..\dday\g_objectives.c" />
+    <ClCompile Include="..\dday\g_phys.c" />
+    <ClCompile Include="..\dday\g_save.c" />
+    <ClCompile Include="..\dday\g_spawn.c" />
+    <ClCompile Include="..\dday\g_svcmds.c" />
+    <ClCompile Include="..\dday\g_target.c" />
+    <ClCompile Include="..\dday\g_trigger.c" />
+    <ClCompile Include="..\dday\g_turret.c" />
+    <ClCompile Include="..\dday\g_utils.c" />
+    <ClCompile Include="..\dday\g_weapon.c" />
+    <ClCompile Include="..\dday\ita\ita_guninfo.c" />
+    <ClCompile Include="..\dday\ita\ita_item.c" />
+    <ClCompile Include="..\dday\ita\ita_main.c" />
+    <ClCompile Include="..\dday\ita\ita_spawn.c" />
+    <ClCompile Include="..\dday\ita\ita_weapon.c" />
+    <ClCompile Include="..\dday\jpn\jpn_guninfo.c" />
+    <ClCompile Include="..\dday\jpn\jpn_item.c" />
+    <ClCompile Include="..\dday\jpn\jpn_main.c" />
+    <ClCompile Include="..\dday\jpn\jpn_spawn.c" />
+    <ClCompile Include="..\dday\jpn\jpn_weapon.c" />
+    <ClCompile Include="..\dday\m_actor.c" />
+    <ClCompile Include="..\dday\m_civilian.c" />
+    <ClCompile Include="..\dday\m_flash.c" />
+    <ClCompile Include="..\dday\m_insane.c" />
+    <ClCompile Include="..\dday\m_move.c" />
+    <ClCompile Include="..\dday\pol\pol_guninfo.c" />
+    <ClCompile Include="..\dday\pol\pol_item.c" />
+    <ClCompile Include="..\dday\pol\pol_main.c" />
+    <ClCompile Include="..\dday\pol\pol_spawn.c" />
+    <ClCompile Include="..\dday\pol\pol_weapon.c" />
+    <ClCompile Include="..\dday\p_classes.c" />
+    <ClCompile Include="..\dday\p_client.c" />
+    <ClCompile Include="..\dday\p_generic_wep.c" />
+    <ClCompile Include="..\dday\p_hud.c" />
+    <ClCompile Include="..\dday\p_menu.c" />
+    <ClCompile Include="..\dday\p_observer.c" />
+    <ClCompile Include="..\dday\p_trail.c" />
+    <ClCompile Include="..\dday\p_view.c" />
+    <ClCompile Include="..\dday\p_weapon.c" />
+    <ClCompile Include="..\dday\q_shared.c" />
+    <ClCompile Include="..\dday\rus\rus_guninfo.c" />
+    <ClCompile Include="..\dday\rus\rus_item.c" />
+    <ClCompile Include="..\dday\rus\rus_main.c" />
+    <ClCompile Include="..\dday\rus\rus_spawn.c" />
+    <ClCompile Include="..\dday\rus\rus_weapon.c" />
+    <ClCompile Include="..\dday\usa\usa_guninfo.c" />
+    <ClCompile Include="..\dday\usa\usa_item.c" />
+    <ClCompile Include="..\dday\usa\usa_main.c" />
+    <ClCompile Include="..\dday\usa\usa_spawn.c" />
+    <ClCompile Include="..\dday\usa\usa_weapon.c" />
+    <ClCompile Include="..\dday\usm\usm_guninfo.c" />
+    <ClCompile Include="..\dday\usm\usm_item.c" />
+    <ClCompile Include="..\dday\usm\usm_main.c" />
+    <ClCompile Include="..\dday\usm\usm_spawn.c" />
+    <ClCompile Include="..\dday\usm\usm_weapon.c" />
+    <ClCompile Include="..\dday\u_entmgr.c" />
+    <ClCompile Include="..\dday\x_fbomb.c" />
+    <ClCompile Include="..\dday\x_fire.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\dday\game.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\dday\ai\ai.h" />
+    <ClInclude Include="..\dday\ai\ai_local.h" />
+    <ClInclude Include="..\dday\ai\ai_nodes_local.h" />
+    <ClInclude Include="..\dday\ai\ai_nodes_shared.h" />
+    <ClInclude Include="..\dday\ai\ai_weapons.h" />
+    <ClInclude Include="..\dday\ai\AStar.h" />
+    <ClInclude Include="..\dday\game.h" />
+    <ClInclude Include="..\dday\gbr\gbr_classes.h" />
+    <ClInclude Include="..\dday\gbr\gbr_defines.h" />
+    <ClInclude Include="..\dday\gbr\gbr_main.h" />
+    <ClInclude Include="..\dday\grm\grm_classes.h" />
+    <ClInclude Include="..\dday\grm\grm_defines.h" />
+    <ClInclude Include="..\dday\grm\grm_main.h" />
+    <ClInclude Include="..\dday\g_cmds.h" />
+    <ClInclude Include="..\dday\g_defines.h" />
+    <ClInclude Include="..\dday\g_local.h" />
+    <ClInclude Include="..\dday\g_maps.h" />
+    <ClInclude Include="..\dday\ita\ita_classes.h" />
+    <ClInclude Include="..\dday\ita\ita_defines.h" />
+    <ClInclude Include="..\dday\ita\ita_main.h" />
+    <ClInclude Include="..\dday\jpn\jpn_classes.h" />
+    <ClInclude Include="..\dday\jpn\jpn_defines.h" />
+    <ClInclude Include="..\dday\jpn\jpn_main.h" />
+    <ClInclude Include="..\dday\m_actor.h" />
+    <ClInclude Include="..\dday\m_insane.h" />
+    <ClInclude Include="..\dday\m_player.h" />
+    <ClInclude Include="..\dday\pol\pol_classes.h" />
+    <ClInclude Include="..\dday\pol\pol_defines.h" />
+    <ClInclude Include="..\dday\pol\pol_main.h" />
+    <ClInclude Include="..\dday\p_classes.h" />
+    <ClInclude Include="..\dday\p_menu.h" />
+    <ClInclude Include="..\dday\p_menus.h" />
+    <ClInclude Include="..\dday\p_observer.h" />
+    <ClInclude Include="..\dday\q_shared.h" />
+    <ClInclude Include="..\dday\rus\rus_classes.h" />
+    <ClInclude Include="..\dday\rus\rus_defines.h" />
+    <ClInclude Include="..\dday\rus\rus_main.h" />
+    <ClInclude Include="..\dday\usa\usa_classes.h" />
+    <ClInclude Include="..\dday\usa\usa_defines.h" />
+    <ClInclude Include="..\dday\usa\usa_main.h" />
+    <ClInclude Include="..\dday\usm\usm_classes.h" />
+    <ClInclude Include="..\dday\usm\usm_defines.h" />
+    <ClInclude Include="..\dday\usm\usm_main.h" />
+    <ClInclude Include="..\dday\x_fbomb.h" />
+    <ClInclude Include="..\dday\x_fire.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

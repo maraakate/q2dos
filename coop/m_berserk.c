@@ -365,7 +365,7 @@ berserk_pain(edict_t *self, edict_t *other /* unsued */,
 
 	if (self->health < (self->max_health / 2))
 	{
-		self->s.skinnum = 1;
+		self->s.skinnum |= 1;
 	}
 
 	if (level.time < self->pain_debounce_time)
@@ -376,7 +376,7 @@ berserk_pain(edict_t *self, edict_t *other /* unsued */,
 	self->pain_debounce_time = level.time + 3;
 	gi.sound(self, CHAN_VOICE, sound_pain, 1, ATTN_NORM, 0);
 
-	if (skill->value == 3)
+	if (skill->intValue == 3)
 	{
 		return; /* no pain anims in nightmare */
 	}
@@ -486,6 +486,7 @@ berserk_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /*
 	gi.sound(self, CHAN_VOICE, sound_die, 1, ATTN_NORM, 0);
 	self->deadflag = DEAD_DEAD;
 	self->takedamage = DAMAGE_YES;
+	self->s.skinnum |= 1;	// Knightmare- make sure pain skin is set if we got one-shotted
 
 	if (damage >= 50)
 	{
@@ -508,7 +509,7 @@ SP_monster_berserk(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;
@@ -554,6 +555,8 @@ SP_monster_berserk(edict_t *self)
 
 	self->monsterinfo.currentmove = &berserk_move_stand;
 	self->monsterinfo.scale = MODEL_SCALE;
+
+	self->blood_type = 3;	// Knightmare- use sparks and blood type
 
 	gi.linkentity(self);
 

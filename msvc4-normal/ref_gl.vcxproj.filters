@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{e362e0a3-9d9d-4313-984b-f4787c6db475}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;hpj;bat;for;f90</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{d7ee6040-f1ea-4be9-b51b-ef3b82235851}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{be1df098-da49-4b85-9e87-e5fb15f1d89f}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;fi;fd</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\ref_gl\gl_draw.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ref_gl\gl_image.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ref_gl\gl_light.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ref_gl\gl_mesh.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ref_gl\gl_model.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ref_gl\gl_rmain.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ref_gl\gl_rmisc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ref_gl\gl_rsurf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ref_gl\gl_warp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\win32\glw_imp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\q_shared.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\win32\q_shwin.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\win32\qgl_win.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\ref_gl\ref_gl.def">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+</Project>

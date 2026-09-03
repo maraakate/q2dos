@@ -36,7 +36,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "game.h"
 
 #include <ctype.h>
+#ifndef _WIN32
+#include <regex.h>
+#else
 #include "regex.h"
+#endif
 
 //*** UPDATE START ***
 #define PRIVATE_COMMANDS  8
@@ -1111,9 +1115,9 @@ void *q2a_memset( void *dest, int c, size_t count );
 void  readCfgFiles(void);
 void  ClientCommand (edict_t *ent);
 void  ServerCommand (void);
-void  dprintf_internal (unsigned long flags, char *fmt, ...);
-void  cprintf_internal(edict_t *ent, int printlevel, char *fmt, ...);
-void  bprintf_internal(int printlevel, char *fmt, ...);
+void  dprintf_internal (unsigned int flags, char *fmt, ...) __attribute__((__format__(__printf__,2,3)));
+void  cprintf_internal(edict_t *ent, int printlevel, char *fmt, ...) __attribute__((__format__(__printf__,3,4)));
+void  bprintf_internal(int printlevel, char *fmt, ...) __attribute__((__format__(__printf__,2,3)));
 void  AddCommandString_internal(char *text);
 void  stuffNextLine(edict_t *ent, int client);
 char  *getArgs(void);

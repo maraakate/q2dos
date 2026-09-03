@@ -17,8 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/cvg/glide3/src/splshdat.c,v 1.1.1.1.8.2 2007/05/19 11:06:47 koolsmoky Exp $
-** $Log: splshdat.c,v $
 ** Revision 1.1.1.1.8.2  2007/05/19 11:06:47  koolsmoky
 ** win32 build workaround
 **

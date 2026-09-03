@@ -31,7 +31,7 @@ void Sys_mkdir (char *path)
 {
 }
 
-void Sys_Error (char *error, ...)
+void Sys_Error (const char *error, ...)
 {
 	va_list		argptr;
 
@@ -103,7 +103,7 @@ int		Hunk_End (void)
 	return 0;
 }
 
-double		Sys_Milliseconds (void)
+int		Sys_Milliseconds (void)
 {
 	return 0;
 }

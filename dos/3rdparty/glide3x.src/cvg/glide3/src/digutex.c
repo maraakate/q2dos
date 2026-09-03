@@ -17,8 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/cvg/glide3/src/digutex.c,v 1.1.1.1.8.1 2004/10/04 09:17:16 dborca Exp $
-** $Log: digutex.c,v $
 ** Revision 1.1.1.1.8.1  2004/10/04 09:17:16  dborca
 ** killed some warnings / compilation errors
 **

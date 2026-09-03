@@ -52,15 +52,33 @@ PMenu_Open(edict_t *ent, pmenu_t *entries, pmenu_t *header, int cur, int num, in
 	}
 
 	hnd = malloc(sizeof(*hnd));
+	if (!hnd)
+	{
+		gi.error("PMenu_Open:  Failed allocating memory.\n");
+		return NULL;
+	}
 
 	hnd->arg = arg;
 	hnd->entries = malloc(sizeof(pmenu_t) * num);
+	if (!hnd->entries)
+	{
+		gi.error("PMenu_Open:  Failed allocating memory.\n");
+		free(hnd);
+		return NULL;
+	}
 	hnd->menutype = menutype;
 	memcpy(hnd->entries, entries, sizeof(pmenu_t) * num);
 
 	if (header && numheader) /* FS */
 	{
 		hnd->header = malloc(sizeof(pmenu_t) * numheader);
+		if (!hnd->header)
+		{
+			gi.error("PMenu_Open:  Failed allocating memory.\n");
+			free(hnd->entries);
+			free(hnd);
+			return NULL;
+		}
 		memcpy(hnd->header, header, sizeof(pmenu_t) * numheader);
 
 		for (i = 0; i < numheader; i++)
@@ -190,7 +208,7 @@ PMenu_UpdateEntry(pmenu_t *entry, const char *text, int align,
 void
 PMenu_Do_Update(edict_t *ent)
 {
-	char string[1400];
+	char string[LAYOUT_MAX_LENGTH];
 	int i;
 	pmenu_t *p;
 	int x;
@@ -417,8 +435,8 @@ PMenu_Select(edict_t *ent)
 void
 PMenu_Do_Scrolling_Update(edict_t *ent) /* FS */
 {
-	char string[1400];
-	int i, z, pos, scroll_lines, fixed_lines = 0;
+	char string[LAYOUT_MAX_LENGTH];
+	int i, z, pos, scroll_lines;
 	pmenu_t *p;
 	int x;
 	pmenuhnd_t *hnd;

@@ -19,6 +19,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // snd_loc.h -- private sound functions
 
+#ifndef __SND_LOC_H
+#define __SND_LOC_H
+
 #ifdef OGG_SUPPORT	// Knightmare added- vorbis support
 #include "snd_ogg.h"
 #endif
@@ -30,6 +33,8 @@ typedef struct
 	int			left;
 	int			right;
 } portable_samplepair_t;
+
+extern portable_samplepair_t paintbuffer[];
 
 typedef struct
 {
@@ -149,6 +154,9 @@ void	SNDDMA_BeginPainting (void);
 
 void	SNDDMA_Submit(void);
 #ifdef __DJGPP__
+/* FS: Gravis UltraSound specific stuff.  Mostly for the s_khz menu. */
+#define GUS_CLASSIC 1
+#define GUS_MAXPNP 2
 void GUS_ClearDMA (void); /* FS: This stops the constant clicking sound during map loads and pause screens */
 #endif
 
@@ -157,7 +165,8 @@ void GUS_ClearDMA (void); /* FS: This stops the constant clicking sound during m
 #define SND_BUFFER_SIZE 16384 /* FS: DMA BUFFER SIZE. NOTE: Q1 uses 4096. */
 #define	PAINTBUFFER_SIZE	2048 /* FS: NOTE: Q1 uses 512 */
 #define	MAX_CHANNELS			32
-extern	channel_t   channels[MAX_CHANNELS];
+extern	channel_t   *channels;
+extern size_t		s_max_channels_size;
 
 extern	int		paintedtime;
 extern	int		s_rawend;
@@ -165,12 +174,14 @@ extern	vec3_t	listener_origin;
 extern	vec3_t	listener_forward;
 extern	vec3_t	listener_right;
 extern	vec3_t	listener_up;
-extern	volatile dma_t	dma; /* FS: made it volatile for DOS */
+extern	dma_t	dma;
 extern	playsound_t	s_pendingplays;
 
 #define	MAX_RAW_SAMPLES	8192
-extern	portable_samplepair_t	s_rawsamples[MAX_RAW_SAMPLES];
+extern	portable_samplepair_t	*s_rawsamples;
+extern	size_t	s_rawsamples_size;
 
+extern cvar_t	*s_mastervolume; /* FS */
 extern cvar_t	*s_volume;
 extern cvar_t	*s_nosound;
 extern cvar_t	*s_loadas8bit;
@@ -200,3 +211,8 @@ void S_Spatialize(channel_t *ch);
 /* FS: So we can support WAV and OGG streamg */
 void S_StopBackgroundTrack(void);
 
+extern byte *s_streamDataPtr;
+
+extern int havegus; /* FS: Added */
+
+#endif // __SND_LOC_H

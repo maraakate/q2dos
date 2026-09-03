@@ -298,7 +298,7 @@ flipper_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
 
 	if (self->health < (self->max_health / 2))
 	{
-		self->s.skinnum = 1;
+		self->s.skinnum |= 1;
 	}
 
 	if (level.time < self->pain_debounce_time)
@@ -308,7 +308,7 @@ flipper_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
 
 	self->pain_debounce_time = level.time + 3;
 
-	if (skill->value == 3)
+	if (skill->intValue == 3)
 	{
 		return; /* no pain anims in nightmare */
 	}
@@ -465,6 +465,8 @@ flipper_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /*
 	gi.sound(self, CHAN_VOICE, sound_death, 1, ATTN_NORM, 0);
 	self->deadflag = DEAD_DEAD;
 	self->takedamage = DAMAGE_YES;
+	self->s.skinnum |= 1;	// Knightmare- make sure pain skin is set if we got one-shotted
+
 	self->monsterinfo.currentmove = &flipper_move_death;
 }
 
@@ -479,7 +481,7 @@ SP_monster_flipper(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;

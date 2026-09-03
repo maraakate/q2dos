@@ -1113,10 +1113,7 @@ void CL_ParseTEnt (void)
 		if (frand() < 0.5)
 			ex->baseframe = 15;
 		ex->frames = 15;
-		if (type == TE_ROCKET_EXPLOSION_WATER)
-			S_StartSound (pos, 0, 0, cl_sfx_watrexp, 1, ATTN_NORM, 0);
-		else
-			S_StartSound (pos, 0, 0, cl_sfx_rockexp, 1, ATTN_NORM, 0);
+		S_StartSound (pos, 0, 0, cl_sfx_rockexp, 1, ATTN_NORM, 0);
 		break;
 
 	case TE_FLASHLIGHT:
@@ -1401,9 +1398,9 @@ void CL_AddPlayerBeams (void)
 //PMM
 	if (hand)
 	{
-		if (hand->value == 2)
+		if (hand->intValue == 2)
 			hand_multiplier = 0;
-		else if (hand->value == 1)
+		else if (hand->intValue == 1)
 			hand_multiplier = -1;
 		else
 			hand_multiplier = 1;
@@ -1443,14 +1440,13 @@ void CL_AddPlayerBeams (void)
 				VectorMA (b->start, (hand_multiplier * b->offset[0]), cl.v_right, org);
 				VectorMA (     org, b->offset[1], cl.v_forward, org);
 				VectorMA (     org, b->offset[2], cl.v_up, org);
-				if ((hand) && (hand->value == 2)) {
+				if ((hand) && (hand->intValue == 2)) {
 					VectorMA (org, -1, cl.v_up, org);
 				}
 				// FIXME - take these out when final
 				VectorCopy (cl.v_right, r);
 				VectorCopy (cl.v_forward, f);
 				VectorCopy (cl.v_up, u);
-
 			}
 			else
 				VectorCopy (b->start, org);
@@ -1479,7 +1475,7 @@ void CL_AddPlayerBeams (void)
 			VectorMA (dist, (hand_multiplier * b->offset[0]), r, dist);
 			VectorMA (dist, b->offset[1], f, dist);
 			VectorMA (dist, b->offset[2], u, dist);
-			if ((hand) && (hand->value == 2)) {
+			if ((hand) && (hand->intValue == 2)) {
 				VectorMA (org, -1, cl.v_up, org);
 			}
 		}
@@ -1595,7 +1591,7 @@ void CL_AddPlayerBeams (void)
 			{
 //				ent.flags = RF_FULLBRIGHT|RF_TRANSLUCENT;
 //				ent.alpha = 0.3;
-				ent.flags = RF_FULLBRIGHT;
+				ent.flags = RF_FULLBRIGHT|RF_WEAPONMODEL; /* FS: For fov > 90 viewmodel hack */
 				ent.angles[0] = -pitch;
 				ent.angles[1] = yaw + 180.0;
 				ent.angles[2] = (cl.time) % 360;

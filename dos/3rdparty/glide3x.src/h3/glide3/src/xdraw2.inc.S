@@ -1,4 +1,3 @@
-/*  -*-asm-*- */
 /*
 ** THIS SOFTWARE IS SUBJECT TO COPYRIGHT PROTECTION AND IS OFFERED ONLY
 ** PURSUANT TO THE 3DFX GLIDE GENERAL PUBLIC LICENSE. THERE IS NO RIGHT
@@ -20,9 +19,6 @@
 */
 
 /*
- *  $Header: /cvsroot/glide/glide3x/h3/glide3/src/xdraw2.inc.S,v 1.4.2.2 2003/06/29 19:00:36 guillemj Exp $
- *  $Revision: 1.4.2.2 $
- *  $Log: xdraw2.inc.S,v $
  *  Revision 1.4.2.2  2003/06/29 19:00:36  guillemj
  *  Fixed nested comments warnings.
  *  Removed some trailing spaces.

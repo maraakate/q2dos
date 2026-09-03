@@ -16,9 +16,6 @@
 ;; 
 ;; COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 ;;
-;; $Header: /cvsroot/glide/glide3x/h5/glide3/src/xdraw2.asm,v 1.1.8.11 2007/05/13 09:21:06 koolsmoky Exp $
-;; $Revision: 1.1.8.11 $
-;; $Log: xdraw2.asm,v $
 ;; Revision 1.1.8.11  2007/05/13 09:21:06  koolsmoky
 ;; removed problematic context checks
 ;;
@@ -203,11 +200,11 @@ extrn halStore32, 8
 
 %ENDMACRO ; WRITE_MM1LOW_FIFO
 
-segment		DATA
+segment		SEG_DATA
     One         DD  1.0
     Area        DD  0
 
-segment		CONST
+segment		SEG_CONST
 $T2003  DD  12288.0
 $T2005  DD  1.0
 $T2006  DD  256.0
@@ -247,7 +244,7 @@ Y       equ 4
 
 ;--------------------------------------------------------------------------
 
-segment		TEXT
+segment		SEG_TEXT
 
             ALIGN    32
 PROC_TYPE clip_nocull_invalid

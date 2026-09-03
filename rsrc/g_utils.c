@@ -266,7 +266,7 @@ G_UseTargets(edict_t *ent, edict_t *activator)
 	edict_t *master;
 	qboolean done = false;
 
-	if (!ent || !activator)
+	if (!ent) /* FS: DO NOT PARANOIA CHECK ACTIVATOR! BREAKS PLATS IN XWARE.BSP! */
 	{
 		return;
 	}

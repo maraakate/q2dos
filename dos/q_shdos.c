@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include <sys/types.h>
+#include <limits.h>
 #include <sys/stat.h> /* mkdir() */
 #include <errno.h>
 #include <stdio.h>
@@ -26,6 +27,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <dir.h>
 #include <io.h>
 #include <sys/time.h>
+
+#ifndef PATH_MAX
+#define PATH_MAX 260
+#endif
 
 #include "../qcommon/qcommon.h"
 
@@ -38,7 +43,7 @@ void	*Hunk_Begin (int maxsize)
 	/* reserve a huge chunk of memory, but don't commit any yet */
 	maxhunksize = maxsize;
 	curhunksize = 0;
-	membase = malloc (maxhunksize);
+	membase = (byte *)malloc (maxhunksize);
 	if (!membase)
 		Sys_Error ("VirtualAlloc reserve failed %d bytes",maxsize);
 
@@ -68,7 +73,7 @@ int	Hunk_End (void)
 /* for realloc() to be useful here: you either need DJGPP-2.05 or newer,
  * or you need to replace malloc() & friends in any older DJGPP version
  * with nmalloc() as in DJGPP-2.05. */
-	byte *n = realloc(membase, curhunksize);
+	byte *n = (byte *)realloc(membase, curhunksize);
 	if (n != membase)
 		Sys_Error("Hunk_End:  Could not remap virtual block (%d)", errno);
 
@@ -84,7 +89,7 @@ int	Sys_Milliseconds (void)
 
 int	Sys_DOSTime (void) /* FS: DOS needs this for random qport */
 {
-	static int secbase;
+	static time_t secbase;
 	struct timeval tp;
 
 	gettimeofday(&tp, NULL);
@@ -93,7 +98,7 @@ int	Sys_DOSTime (void) /* FS: DOS needs this for random qport */
 		secbase = tp.tv_sec;
 		return tp.tv_usec/1000;
 	}
-	return (tp.tv_sec - secbase)*1000 + tp.tv_usec/1000;
+	return (tp.tv_sec - secbase) * 1000 + tp.tv_usec / 1000;
 }
 
 void	Sys_Mkdir (char *path)
@@ -103,8 +108,8 @@ void	Sys_Mkdir (char *path)
 
 static	struct ffblk	finddata;
 static	int	findhandle = -1;
-static	char	findbase[MAX_OSPATH];
-static	char	findpath[MAX_OSPATH];
+static	char	findbase[PATH_MAX];
+static	char	findpath[PATH_MAX];
 
 static qboolean CompareAttributes(const struct ffblk *ff,
 				  unsigned musthave, unsigned canthave)
@@ -177,7 +182,7 @@ char *Sys_FindFirst (char *path, unsigned musthave, unsigned canthave)
 	if (findhandle != 0)
 		return NULL;
 	if (CompareAttributes(&finddata, musthave, canthave)) {
-		sprintf (findpath, "%s/%s", findbase, finddata.ff_name);
+		Com_sprintf (findpath, sizeof(findpath), "%s/%s", findbase, finddata.ff_name);
 		return findpath;
 	}
 	return Sys_FindNext(musthave, canthave);
@@ -190,7 +195,7 @@ char *Sys_FindNext (unsigned musthave, unsigned canthave)
 
 	while (findnext(&finddata) == 0) {
 		if (CompareAttributes(&finddata, musthave, canthave)) {
-			sprintf (findpath, "%s/%s", findbase, finddata.ff_name);
+			Com_sprintf (findpath, sizeof(findpath), "%s/%s", findbase, finddata.ff_name);
 			return findpath;
 		}
 	}

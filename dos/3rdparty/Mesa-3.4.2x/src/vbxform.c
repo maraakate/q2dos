@@ -795,7 +795,7 @@ static void fixup_primitives( struct vertex_buffer *VB, struct immediate *IM )
       out_prim[in] = in_prim[in];
       out_nextprim[in] = in_nextprim[in];
    }
-	  
+
 
    VB->Primitive = out_prim;
    VB->NextPrimitive = out_nextprim;
@@ -810,7 +810,6 @@ static void fixup_primitives( struct vertex_buffer *VB, struct immediate *IM )
     *
     * Note that GL_POLYGON+1, ie outside begin/end, has increment 1.
     */
-
    incr = increment[prim];
   
    if (incr != 1 && (count - last - intro[prim])) 
@@ -818,9 +817,10 @@ static void fixup_primitives( struct vertex_buffer *VB, struct immediate *IM )
    else
       VB->Ovf = 0;
 
-   if (0) 
-      fprintf(stderr, "prim: %s count %u last %u incr %u ovf: %u\n",
-	      gl_prim_name[prim], count, last, incr, VB->Ovf);
+#ifdef MESA_DEBUG
+  fprintf(stderr, "prim: %s count %u last %u incr %u ovf: %u\n",
+	  gl_prim_name[prim], count, last, incr, VB->Ovf);
+#endif
 }
 
 

@@ -700,7 +700,8 @@ makron_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
 
 	if (self->health < (self->max_health / 2))
 	{
-		self->s.skinnum = 1;
+		self->s.skinnum |= 1;
+		self->blood_type = 3;	// Knightmare- sparks and blood
 	}
 
 	if (level.time < self->pain_debounce_time)
@@ -719,7 +720,7 @@ makron_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
 
 	self->pain_debounce_time = level.time + 3;
 
-	if (skill->value == 3)
+	if (skill->intValue == 3)
 	{
 		return; /* no pain anims in nightmare */
 	}
@@ -867,7 +868,7 @@ makron_die(edict_t *self, edict_t *inflictor /* update */, edict_t *attacker /* 
 	{
 		gi.sound(self, CHAN_VOICE, gi.soundindex("misc/udeath.wav"), 1, ATTN_NORM, 0);
 
-		for (n = 0; n < 1 /*4*/; n++)
+//		for (n = 0; n < 1 /*4*/; n++)
 		{
 			ThrowGib(self, "models/objects/gibs/sm_meat/tris.md2", damage, GIB_ORGANIC);
 		}
@@ -891,6 +892,8 @@ makron_die(edict_t *self, edict_t *inflictor /* update */, edict_t *attacker /* 
 	gi.sound(self, CHAN_VOICE, sound_death, 1, ATTN_NONE, 0);
 	self->deadflag = DEAD_DEAD;
 	self->takedamage = DAMAGE_YES;
+	self->s.skinnum |= 1;	// Knightmare- make sure pain skin is set if we got one-shotted
+	self->blood_type = 3;	// Knightmare- sparks and blood
 
 	tempent = G_Spawn();
 	VectorCopy(self->s.origin, tempent->s.origin);
@@ -1047,7 +1050,7 @@ SP_monster_makron(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;
@@ -1076,6 +1079,8 @@ SP_monster_makron(edict_t *self)
 	self->monsterinfo.sight = makron_sight;
 	self->monsterinfo.checkattack = Makron_CheckAttack;
 
+	self->blood_type = 2; // Knightmare- use sparks blood type
+
 	gi.linkentity(self);
 
 	self->monsterinfo.currentmove = &makron_move_sight;
@@ -1094,6 +1099,9 @@ MakronSpawn(edict_t *self)
 	{
 		return;
 	}
+
+	/* Knightmare- set the right classname */
+	self->classname = "monster_makron";
 
 	SP_monster_makron(self);
 

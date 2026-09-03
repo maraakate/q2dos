@@ -17,7 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/swlibs/fxmisc/fxver.h,v 1.2.8.1 2003/04/06 18:30:24 koolsmoky Exp $
 ** $Log: 
 **  1    3dfx      1.0         09/12/99 StarTeam VTS Administrator 
 ** $

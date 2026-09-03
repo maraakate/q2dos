@@ -1,12 +1,6 @@
 /*
 ** Insert new header here
-**
-**
-** $Revision: 1.1.1.1 $ 
-** $Date: 1999/12/07 21:42:43 $ 
-**
 */
-
 
 #ifndef _TLIB_H_
 #define _TLIB_H_
@@ -21,7 +15,7 @@ extern "C" {
 #ifdef assert
 #undef assert
 #endif
-#define assert(exp) (exp)
+#define assert(exp) (void) (exp)
 #endif
 
 /* The two most commonly defined macros in the known universe */
@@ -152,7 +146,7 @@ void tlCProjectVertices( TlVertex3D *dstList,
 FxBool tlOkToRender(void);
 
 FxBool
-tlErrorMessage(char *err);  
+tlErrorMessage(const char *err);
 
 typedef FxU32 TlPalette[256];
 typedef struct {

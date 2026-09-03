@@ -23,7 +23,7 @@
 
   We need to provide the following functions:
 
-char *
+const char *
 hwcGetErrorString(void);
 
 hwcInfo *
@@ -154,7 +154,7 @@ void grDRIPosition(int x, int y, int w, int h,
   driInfo.pClip=pClip;
 }
 
-static void loadEnvFile() {
+static void loadEnvFile(void) {
   FILE *file;
   char data[128];
   char *env, *val;
@@ -189,10 +189,11 @@ static void loadEnvFile() {
     item->next=first;
     first=item;
   }
+  fclose(file);
 }
 
 #if 0 /* not used */
-static void deleteEnvData() {
+static void deleteEnvData(void) {
   envitem *ptr, *next;
 
   ptr=first;
@@ -208,7 +209,7 @@ static void deleteEnvData() {
 }
 #endif
 
-char *
+const char *
 hwcGetErrorString()
 {
 #define FN_NAME "hwcGetErrorString"

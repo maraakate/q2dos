@@ -423,12 +423,14 @@ mmove_t zboss_move_pain3 = {FRAME_pain3Start, FRAME_pain3End, zboss_frames_pain3
 void zboss_pain (edict_t *self, edict_t *other, float kick, int damage)
 {
 	float r;
-	float hbreak = (self->max_health / 3.0);
+	float hbreak;
 
 	if (!self)
 	{
 		return;
 	}
+
+	hbreak = (self->max_health / 3.0);
 
 	// set the skin
 	if (self->health < hbreak)
@@ -504,7 +506,7 @@ void zboss_pain (edict_t *self, edict_t *other, float kick, int damage)
 
 	self->pain_debounce_time = level.time + 5;
 
-	if (skill->value == 3)
+	if (skill->intValue == 3)
 		return;		// no pain anims in nightmare
 
 	if(self->laser)
@@ -1181,11 +1183,11 @@ void FireCannon(edict_t *self)
 		distance = 700;
 	}
 	
-	if(skill->value < 2)
+	if(skill->intValue < 2)
 	{
 		fire_plasmaCannon (self, start, dir, 90, 700, 2.5, 90+40, distance);
 	}
-	else if(skill->value < 3)
+	else if(skill->intValue < 3)
 	{
 		fire_plasmaCannon (self, start, dir, 90, (int)(distance * 1.2), 2.5, 90+40, distance);
 	}
@@ -1782,6 +1784,7 @@ void zboss_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damage
 
 	self->deadflag = DEAD_DEAD;
 	self->takedamage = DAMAGE_YES;
+	self->s.skinnum = 2;	// Knightmare- make sure pain skin is set if we got one-shotted
 
 	// todo
 	if (random() < 0.5)
@@ -1837,7 +1840,7 @@ void SP_monster_zboss (edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict (self);
 		return;
@@ -1860,15 +1863,15 @@ void SP_monster_zboss (edict_t *self)
 	self->monsterinfo.aiflags = AI_MONREDUCEDDAMAGE;
 	self->monsterinfo.reducedDamageAmount = 0.25;
 
-	if(skill->value == 0)
+	if (skill->intValue == 0)
 	{
 		self->health = 3000;
 	}
-	else if(skill->value == 1)
+	else if (skill->intValue == 1)
 	{
 		self->health = 4500;
 	}
-	else if(skill->value == 2)
+	else if (skill->intValue == 2)
 	{
 		self->health = 6000;
 	}
@@ -1890,6 +1893,8 @@ void SP_monster_zboss (edict_t *self)
 	self->monsterinfo.melee = zboss_melee;
 	self->monsterinfo.sight = zboss_sight;
 	self->monsterinfo.idle = possibleBossTaunt;
+
+	self->blood_type = 2; // Knightmare- use sparks blood type
 
 	gi.linkentity (self);
 

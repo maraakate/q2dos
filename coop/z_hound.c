@@ -204,7 +204,7 @@ void hound_pain (edict_t *self, edict_t *other, float kick, int damage)
 
 	self->pain_debounce_time = level.time + 3;
 
-	if (skill->value == 3)
+	if (skill->intValue == 3)
 		return;		// no pain anims in nightmare
 
 	if (random() < 0.5)
@@ -553,7 +553,7 @@ void SP_monster_hound_precache(void)
 */
 void SP_monster_hound (edict_t *self)
 {
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict (self);
 		return;

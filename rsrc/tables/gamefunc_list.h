@@ -1486,4 +1486,4 @@
 {"DBall_SelectSpawnPoint", (byte *)DBall_SelectSpawnPoint},
 {"DBall_ClientBegin", (byte *)DBall_ClientBegin},
 {"DBall_CheckDMRules", (byte *)DBall_CheckDMRules},
-{0, 0}
+{NULL, NULL}

@@ -17,7 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/h5/minihwc/fxhwc.h,v 1.3.4.3 2003/06/29 18:43:28 guillemj Exp $
 ** $Log: 
 **  3    3dfx      1.0.1.0.1.0 10/11/00 Brent           Forced check in to enforce
 **       branching.
@@ -30,10 +29,9 @@
 ** 1     3/04/98 4:13p Dow
 **
 */
+
 #ifndef FXHWC_H
 #define FXHWC_H
-
-
 
 /*
 **  I/O Macros

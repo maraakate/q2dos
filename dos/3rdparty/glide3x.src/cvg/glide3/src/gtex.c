@@ -17,8 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/cvg/glide3/src/gtex.c,v 1.1.1.1.8.1 2004/09/27 08:49:42 dborca Exp $
-** $Log: gtex.c,v $
 ** Revision 1.1.1.1.8.1  2004/09/27 08:49:42  dborca
 ** fixed debug paths
 **

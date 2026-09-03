@@ -5,6 +5,7 @@ DXE3GEN = dxe3gen
 
 GAME = dm_ball.o \
 	dm_tag.o \
+	flashlight.o \
 	g_ai.o \
 	g_chase.o \
 	g_cmds.o \
@@ -65,8 +66,22 @@ GAME = dm_ball.o \
 	m_turret.o \
 	m_widow.o \
 	m_widow2.o \
+	b_cam.o \
+	z_acannon.o \
+	z_ai.o \
+	z_boss.o \
+	z_camera.o \
+	z_handler.o \
+	z_hound.o \
+	z_item.o \
+	z_mtest.o \
+	z_sentien.o \
+	z_spawn.o \
+	z_trigger.o \
+	z_weapon.o \
 	menu.o \
 	p_client.o \
+	p_hook.o \
 	p_hud.o \
 	p_trail.o \
 	p_view.o \

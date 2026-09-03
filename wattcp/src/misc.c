@@ -1497,6 +1497,7 @@ STATIC int setup_stk_check (void)
 
   *(WORD*)&sign[2] = FP_OFF (&_stklen);
   for (i = 0; i < 10; i++, p++)
+  {
       if (!memcmp(p, sign, sizeof(sign)))
       {
         DWORD addr = *(DWORD*) (p + sizeof(sign));
@@ -1526,6 +1527,7 @@ STATIC int setup_stk_check (void)
 #endif
         return (1);
       }
+  }
   return (0);
 }
 
@@ -1676,7 +1678,7 @@ void foo_70 (void) { puts ("I'm foo_70()"); }
 
 int main (void)
 {
-  BYTE strat;
+  BYTE strat = 0;
 
   printf ("DOS memory allocation strategy: ");
   if (!get_mem_strat(&strat))

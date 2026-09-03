@@ -496,22 +496,22 @@ TurretFire(edict_t *self)
 	{
 		rocketSpeed = 550;
 
-		if (skill->value == 2)
+		if (skill->intValue == 2)
 		{
 			rocketSpeed += 200 * random();
 		}
-		else if (skill->value == 3)
+		else if (skill->intValue == 3)
 		{
 			rocketSpeed += 100 + (200 * random());
 		}
 	}
 	else if (self->spawnflags & SPAWN_BLASTER)
 	{
-		if (skill->value == 0)
+		if (skill->intValue == 0)
 		{
 			rocketSpeed = 600;
 		}
-		else if (skill->value == 1)
+		else if (skill->intValue == 1)
 		{
 			rocketSpeed = 800;
 		}
@@ -527,7 +527,7 @@ TurretFire(edict_t *self)
 		VectorCopy(self->enemy->s.origin, end);
 
 		/* aim for the head. */
-		if ((self->enemy) && (self->enemy->client))
+		if (self->enemy->client)
 		{
 			end[2] += self->enemy->viewheight;
 		}
@@ -545,7 +545,7 @@ TurretFire(edict_t *self)
 			chance = random();
 
 			/* ramp chance. easy - 50%, avg - 60%, hard - 70%, nightmare - 80% */
-			chance += (3 - skill->value) * 0.1;
+			chance += (3 - skill->intValue) * 0.1;
 
 			if (chance < 0.8)
 			{
@@ -617,11 +617,11 @@ TurretFireBlind(edict_t *self)
 	{
 		rocketSpeed = 550;
 
-		if (skill->value == 2)
+		if (skill->intValue == 2)
 		{
 			rocketSpeed += 200 * random();
 		}
-		else if (skill->value == 3)
+		else if (skill->intValue == 3)
 		{
 			rocketSpeed += 100 + (200 * random());
 		}
@@ -1054,7 +1054,7 @@ turret_checkattack(edict_t *self)
 	if (enemy_range == RANGE_MELEE)
 	{
 		/* don't always melee in easy mode */
-		if ((skill->value == 0) && (rand() & 3))
+		if ((skill->intValue == 0) && (rand() & 3))
 		{
 			return false;
 		}
@@ -1066,24 +1066,24 @@ turret_checkattack(edict_t *self)
 	if (self->spawnflags & SPAWN_ROCKET)
 	{
 		chance = 0.10;
-		nexttime = (1.8 - (0.2 * skill->value));
+		nexttime = (1.8 - (0.2 * skill->intValue));
 	}
 	else if (self->spawnflags & SPAWN_BLASTER)
 	{
 		chance = 0.35;
-		nexttime = (1.2 - (0.2 * skill->value));
+		nexttime = (1.2 - (0.2 * skill->intValue));
 	}
 	else
 	{
 		chance = 0.50;
-		nexttime = (0.8 - (0.1 * skill->value));
+		nexttime = (0.8 - (0.1 * skill->intValue));
 	}
 
-	if (skill->value == 0)
+	if (skill->intValue == 0)
 	{
 		chance *= 0.5;
 	}
-	else if (skill->value > 1)
+	else if (skill->intValue > 1)
 	{
 		chance *= 2;
 	}
@@ -1117,7 +1117,7 @@ SP_monster_turret(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;

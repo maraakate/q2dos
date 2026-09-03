@@ -41,7 +41,7 @@ P_DamageModifier(edict_t *ent) /* FS: Coop: Rogue addition.  Set damage_multipli
 		is_quad = 1;
 
 		/* if we're quad and DF_NO_STACK_DOUBLE is on, return now. */
-		if (((int)(dmflags->value) & DF_NO_STACK_DOUBLE))
+		if ((dmflags->intValue & DF_NO_STACK_DOUBLE))
 		{
 			return damage_multiplier;
 		}
@@ -49,7 +49,7 @@ P_DamageModifier(edict_t *ent) /* FS: Coop: Rogue addition.  Set damage_multipli
 
 	if (ent->client->double_framenum > level.framenum)
 	{
-		if ((deathmatch->value) || (damage_multiplier == 1))
+		if ((deathmatch->intValue) || (damage_multiplier == 1))
 		{
 			damage_multiplier *= 2;
 			is_quad = 1;
@@ -142,7 +142,7 @@ PlayerNoise(edict_t *who, vec3_t where, int type)
 		}
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		return;
 	}
@@ -220,7 +220,7 @@ Pickup_Weapon(edict_t *ent, edict_t *other)
 
 	index = ITEM_INDEX(ent->item);
 
-	if ((((int)(dmflags->value) & DF_WEAPONS_STAY) || coop->value) && other->client->pers.inventory[index])
+	if (((dmflags->intValue & DF_WEAPONS_STAY) || coop->intValue) && other->client->pers.inventory[index])
 	{
 		if (!(ent->spawnflags & (DROPPED_ITEM | DROPPED_PLAYER_ITEM)))
 		{
@@ -241,7 +241,7 @@ Pickup_Weapon(edict_t *ent, edict_t *other)
 		{
 			ammo = FindItem(ent->item->ammo);
 			/* Don't get infinite ammo with trap */
-			if ( ((int)dmflags->value & DF_INFINITE_AMMO) && Q_stricmp(ent->item->pickup_name, "ammo_trap") ) /* FS: Coop: Xatrix specific -- Added ammo_trap*/
+			if ( (dmflags->intValue & DF_INFINITE_AMMO) && Q_stricmp(ent->item->pickup_name, "ammo_trap") ) /* FS: Coop: Xatrix specific -- Added ammo_trap*/
 			{
 				Add_Ammo(other, ammo, 1000);
 
@@ -263,9 +263,9 @@ Pickup_Weapon(edict_t *ent, edict_t *other)
 
 		if (!(ent->spawnflags & DROPPED_PLAYER_ITEM))
 		{
-			if (deathmatch->value)
+			if (deathmatch->intValue)
 			{
-				if ((int)(dmflags->value) & DF_WEAPONS_STAY)
+				if (dmflags->intValue & DF_WEAPONS_STAY)
 				{
 					ent->flags |= FL_RESPAWN;
 				}
@@ -275,7 +275,7 @@ Pickup_Weapon(edict_t *ent, edict_t *other)
 				}
 			}
 
-			if (coop->value)
+			if (coop->intValue)
 			{
 				ent->flags |= FL_RESPAWN;
 			}
@@ -285,7 +285,7 @@ Pickup_Weapon(edict_t *ent, edict_t *other)
 	if ((other->client->pers.weapon != ent->item) &&
 		(!(ent->item->hideFlags & HIDE_FROM_SELECTION)) &&  /* FS: Zaero specific */
 		(other->client->pers.inventory[index] == 1) &&
-		(!deathmatch->value || (other->client->pers.weapon == FindItem("blaster"))))
+		(!deathmatch->intValue || (other->client->pers.weapon == FindItem("blaster"))))
 	{
 		other->client->newweapon = ent->item;
 	}
@@ -522,7 +522,7 @@ Use_Weapon(edict_t *ent, gitem_t *item)
 		return;
 	}
 
-	if (item->ammo && !g_select_empty->value && !(item->flags & IT_AMMO))
+	if (item->ammo && !g_select_empty->intValue && !(item->flags & IT_AMMO))
 	{
 		ammo_item = FindItem(item->ammo);
 		if (ammo_item != NULL) /* FS: Zaero specific check ammo_item.  Probably OK as-is */
@@ -621,7 +621,7 @@ void Use_Weapon2_Rogue (edict_t *ent, gitem_t *item)
 	{
 		ammo_item = FindItem(item->ammo);
 		ammo_index = ITEM_INDEX(ammo_item);
-		if (!ent->client->pers.inventory[ammo_index] && !g_select_empty->value)
+		if (!ent->client->pers.inventory[ammo_index] && !g_select_empty->intValue)
 		{
 			gi.cprintf (ent, PRINT_HIGH, "No %s for %s.\n", ammo_item->pickup_name, item->pickup_name);
 			return;
@@ -694,7 +694,7 @@ void Use_Weapon2_Xatrix (edict_t *ent, gitem_t *item) /* FS: Coop: Xatrix specif
 	{
 		ammo_item = FindItem(item->ammo);
 		ammo_index = ITEM_INDEX(ammo_item);
-		if (!ent->client->pers.inventory[ammo_index] && !g_select_empty->value)
+		if (!ent->client->pers.inventory[ammo_index] && !g_select_empty->intValue)
 		{
 			gi.cprintf (ent, PRINT_HIGH, "No %s for %s.\n", ammo_item->pickup_name, item->pickup_name);
 			return;
@@ -761,7 +761,7 @@ void Use_Weapon2_Zaero (edict_t *ent, gitem_t *item) /* FS: Coop: Zaero specific
 	{
 		ammo_item = FindItem(item->ammo);
 		ammo_index = ITEM_INDEX(ammo_item);
-		if (!ent->client->pers.inventory[ammo_index] && !g_select_empty->value)
+		if (!ent->client->pers.inventory[ammo_index] && !g_select_empty->intValue)
 		{
 			gi.cprintf (ent, PRINT_HIGH, "No %s for %s.\n", ammo_item->pickup_name, item->pickup_name);
 			return;
@@ -806,7 +806,7 @@ Drop_Weapon(edict_t *ent, gitem_t *item)
 		return;
 	}
 
-	if ((int)(dmflags->value) & DF_WEAPONS_STAY)
+	if (dmflags->intValue & DF_WEAPONS_STAY)
 	{
 		return;
 	}
@@ -1075,7 +1075,7 @@ weapon_grenade_fire_rogue (edict_t *ent, qboolean held) /* FS: Coop: Rogue speci
 			break;
 	}
 
-	if (!((int)dmflags->value & DF_INFINITE_AMMO))
+	if (!(dmflags->intValue & DF_INFINITE_AMMO))
 	{
 		ent->client->pers.inventory[ent->client->ammo_index]--;
 	}
@@ -1144,7 +1144,7 @@ weapon_grenade_fire(edict_t *ent, qboolean held)
 		((GRENADE_MAXSPEED - GRENADE_MINSPEED) / GRENADE_TIMER);
 	fire_grenade2(ent, start, forward, damage, speed, timer, radius, held);
 
-	if (!((int)dmflags->value & DF_INFINITE_AMMO))
+	if (!(dmflags->intValue & DF_INFINITE_AMMO))
 	{
 		ent->client->pers.inventory[ent->client->ammo_index]--;
 	}
@@ -1566,7 +1566,7 @@ weapon_grenadelauncher_fire(edict_t *ent)
 
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
-	if (!((int)dmflags->value & DF_INFINITE_AMMO))
+	if (!(dmflags->intValue & DF_INFINITE_AMMO))
 	{
 		ent->client->pers.inventory[ent->client->ammo_index]--;
 	}
@@ -1665,7 +1665,7 @@ Weapon_RocketLauncher_Fire(edict_t *ent)
 
 		PlayerNoise(ent, start, PNOISE_WEAPON);
 
-		if (!((int)dmflags->value & DF_INFINITE_AMMO))
+		if (!(dmflags->intValue & DF_INFINITE_AMMO))
 		{
 			ent->client->pers.inventory[ent->client->ammo_index]--;
 		}
@@ -1766,7 +1766,7 @@ Weapon_Blaster_Fire(edict_t *ent)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		damage = 15;
 	}
@@ -1846,7 +1846,7 @@ Weapon_HyperBlaster_Fire(edict_t *ent)
 				effect = 0;
 			}
 
-			if (deathmatch->value)
+			if (deathmatch->intValue)
 			{
 				damage = 15;
 			}
@@ -1857,7 +1857,7 @@ Weapon_HyperBlaster_Fire(edict_t *ent)
 
 			if(Blaster_Fire(ent, offset, damage, true, effect)) /* FS: Zaero specific */
 			{
-				if (!((int)dmflags->value & DF_INFINITE_AMMO))
+				if (!(dmflags->intValue & DF_INFINITE_AMMO))
 				{
 					ent->client->pers.inventory[ent->client->ammo_index]--;
 				}
@@ -1982,7 +1982,7 @@ Machinegun_Fire(edict_t *ent)
 	ent->client->kick_angles[0] = ent->client->machinegun_shots * -1.5;
 
 	/* raise the gun as it is firing */
-	if (!deathmatch->value)
+	if (!deathmatch->intValue)
 	{
 		ent->client->machinegun_shots++;
 
@@ -2007,7 +2007,7 @@ Machinegun_Fire(edict_t *ent)
 
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
-	if (!((int)dmflags->value & DF_INFINITE_AMMO))
+	if (!(dmflags->intValue & DF_INFINITE_AMMO))
 	{
 		ent->client->pers.inventory[ent->client->ammo_index]--;
 	}
@@ -2062,7 +2062,7 @@ Chaingun_Fire(edict_t *ent)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		damage = 6;
 	}
@@ -2193,7 +2193,7 @@ Chaingun_Fire(edict_t *ent)
 
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
-	if (!((int)dmflags->value & DF_INFINITE_AMMO))
+	if (!(dmflags->intValue & DF_INFINITE_AMMO))
 	{
 		ent->client->pers.inventory[ent->client->ammo_index] -= shots;
 	}
@@ -2259,16 +2259,8 @@ weapon_shotgun_fire(edict_t *ent)
 		kick *= damage_multiplier;
 	}
 
-	if (deathmatch->value)
-	{
-		fire_shotgun(ent, start, forward, damage, kick, 500, 500,
-				DEFAULT_DEATHMATCH_SHOTGUN_COUNT, MOD_SHOTGUN);
-	}
-	else
-	{
-		fire_shotgun(ent, start, forward, damage, kick, 500, 500,
-				DEFAULT_SHOTGUN_COUNT, MOD_SHOTGUN);
-	}
+	fire_shotgun(ent, start, forward, damage, kick, 500, 500,
+			DEFAULT_DEATHMATCH_SHOTGUN_COUNT, MOD_SHOTGUN);
 
 	/* send muzzle flash */
 	gi.WriteByte(svc_muzzleflash);
@@ -2279,7 +2271,7 @@ weapon_shotgun_fire(edict_t *ent)
 	ent->client->ps.gunframe++;
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
-	if (!((int)dmflags->value & DF_INFINITE_AMMO))
+	if (!(dmflags->intValue & DF_INFINITE_AMMO))
 	{
 		ent->client->pers.inventory[ent->client->ammo_index]--;
 	}
@@ -2353,7 +2345,7 @@ weapon_supershotgun_fire(edict_t *ent)
 	ent->client->ps.gunframe++;
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
-	if (!((int)dmflags->value & DF_INFINITE_AMMO))
+	if (!(dmflags->intValue & DF_INFINITE_AMMO))
 	{
 		ent->client->pers.inventory[ent->client->ammo_index] -= 2;
 	}
@@ -2400,7 +2392,7 @@ weapon_railgun_fire(edict_t *ent)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		/* normal damage is too extreme in dm */
 		damage = 100;
@@ -2444,7 +2436,7 @@ weapon_railgun_fire(edict_t *ent)
 
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
-	if (!((int)dmflags->value & DF_INFINITE_AMMO))
+	if (!(dmflags->intValue & DF_INFINITE_AMMO))
 	{
 		ent->client->pers.inventory[ent->client->ammo_index]--;
 	}
@@ -2517,7 +2509,7 @@ weapon_bfg_fire(edict_t *ent)
 		}
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		damage = 200;
 	}
@@ -2565,7 +2557,7 @@ weapon_bfg_fire(edict_t *ent)
 
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
-	if (!((int)dmflags->value & DF_INFINITE_AMMO))
+	if (!(dmflags->intValue & DF_INFINITE_AMMO))
 	{
 		ent->client->pers.inventory[ent->client->ammo_index] -= 50;
 	}
@@ -2607,7 +2599,7 @@ weapon_chainfist_fire(edict_t *ent) /* FS: Coop: Rogue specific */
 
 	damage = 15;
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		damage = 30;
 	}
@@ -2772,7 +2764,7 @@ weapon_tracker_fire(edict_t *self) /* FS: Coop: Rogue specific */
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		damage = 30;
 	}
@@ -2872,7 +2864,7 @@ weapon_etf_rifle_fire(edict_t *ent) /* FS: Coop: Rogue specific */
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		damage = 10;
 	}
@@ -2994,7 +2986,7 @@ Heatbeam_Fire(edict_t *ent) /* FS: Coop: Rogue specific */
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		damage = HEATBEAM_DM_DMG;
 	}
@@ -3003,7 +2995,7 @@ Heatbeam_Fire(edict_t *ent) /* FS: Coop: Rogue specific */
 		damage = HEATBEAM_SP_DMG;
 	}
 
-	if (deathmatch->value)  /* really knock 'em around in deathmatch */
+	if (deathmatch->intValue)  /* really knock 'em around in deathmatch */
 	{
 		kick = 75;
 	}
@@ -3044,7 +3036,7 @@ Heatbeam_Fire(edict_t *ent) /* FS: Coop: Rogue specific */
 
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
-	if (!((int)dmflags->value & DF_INFINITE_AMMO))
+	if (!(dmflags->intValue & DF_INFINITE_AMMO))
 	{
 		ent->client->pers.inventory[ent->client->ammo_index] -= ent->client->pers.weapon->quantity;
 	}
@@ -3128,7 +3120,7 @@ void weapon_ionripper_fire (edict_t *ent) /* FS: Coop: Xatrix specific */
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		// tone down for deathmatch
 		damage = 30;
@@ -3170,7 +3162,7 @@ void weapon_ionripper_fire (edict_t *ent) /* FS: Coop: Xatrix specific */
 	ent->client->ps.gunframe++;
 	PlayerNoise (ent, start, PNOISE_WEAPON);
 
-	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
+	if (! ( dmflags->intValue & DF_INFINITE_AMMO ) )
 		ent->client->pers.inventory[ent->client->ammo_index] -= ent->client->pers.weapon->quantity;
 	
 	if (ent->client->pers.inventory[ent->client->ammo_index] < 0)
@@ -3242,7 +3234,7 @@ void weapon_phalanx_fire (edict_t *ent) /* FS: Coop: Xatrix specific */
 	
 		fire_plasma (ent, start, forward, damage, 725, damage_radius, radius_damage);
 
-		if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
+		if (! ( dmflags->intValue & DF_INFINITE_AMMO ) )
 			ent->client->pers.inventory[ent->client->ammo_index]--;
 	}
 	else
@@ -3319,7 +3311,7 @@ void weapon_trap_fire (edict_t *ent, qboolean held) /* FS: Coop: Xatrix specific
 	fire_trap (ent, start, forward, damage, speed, timer, radius, held);
 	
 // you don't get infinite traps!  ZOID
-//	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
+//	if (! ( dmflags->intValue & DF_INFINITE_AMMO ) )
 
 	ent->client->pers.inventory[ent->client->ammo_index]--;
 

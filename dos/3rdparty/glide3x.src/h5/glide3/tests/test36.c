@@ -21,11 +21,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#ifndef __linux__
-#include <conio.h>
-#else
-#include <linutil.h>
-#endif
 #include <assert.h>
 #include <string.h>
 
@@ -33,8 +28,6 @@
 #include "tlib.h"
 
 int hwconfig;
-static const char *version;
-static const char *extension;
 
 static const char name[]    = "test36";
 static const char purpose[] = "screen resolutions";
@@ -42,7 +35,7 @@ static const char usage[]   = "-p show passed, -n no progress";
 
 static const char status[]  = "-\\|/";
 
-void main( int argc, char **argv) {
+int main( int argc, char **argv) {
         FxBool bShowPassed = FXFALSE;
         FxBool bNoProgress = FXFALSE;
         GrResolution resTemplate;
@@ -51,7 +44,6 @@ void main( int argc, char **argv) {
                 iFailures = 0, iStatusAt = 0,
                 viewport[4];
         GrContext_t context;
-        extern unsigned long hWndMain;
 
         printf ( "Test36 - Glide resolution checker.  All output goes to the console.\n\n" );
         tlGetCH ();
@@ -119,7 +111,7 @@ void main( int argc, char **argv) {
 
         printf ( "Press any key.\n" );
         tlGetCH ();
-        return;
+        return 0;
 }
 
 

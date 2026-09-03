@@ -29,13 +29,13 @@ void DBall_BallRespawn(edict_t *self);
 int
 DBall_CheckDMRules(void)
 {
-	if (goallimit && goallimit->value)
+	if (goallimit && goallimit->intValue)
 	{
-		if (dball_team1_goalscore >= goallimit->value)
+		if (dball_team1_goalscore >= goallimit->intValue)
 		{
 			gi.bprintf(PRINT_HIGH, "Team 1 Wins.\n");
 		}
-		else if (dball_team2_goalscore >= goallimit->value)
+		else if (dball_team2_goalscore >= goallimit->intValue)
 		{
 			gi.bprintf(PRINT_HIGH, "Team 2 Wins.\n");
 		}
@@ -195,7 +195,7 @@ DBall_GameInit(void)
 	dball_team1_goalscore = 0;
 	dball_team2_goalscore = 0;
 
-	dmflags->value = (int)dmflags->value | DF_NO_MINES | DF_NO_NUKES |
+	dmflags->value = dmflags->intValue | DF_NO_MINES | DF_NO_NUKES |
 					 DF_NO_STACK_DOUBLE | DF_NO_FRIENDLY_FIRE | DF_SKINTEAMS;
 
 	dball_team1_skin = gi.cvar("dball_team1_skin", "male/ctf_r", 0);
@@ -629,13 +629,13 @@ SP_dm_dball_ball(edict_t *self)
 		return;
 	}
 
-	if (!(deathmatch->value))
+	if (!(deathmatch->intValue))
 	{
 		G_FreeEdict(self);
 		return;
 	}
 
-	if (gamerules && (gamerules->value != RDM_DEATHBALL))
+	if (gamerules && (gamerules->intValue != RDM_DEATHBALL))
 	{
 		G_FreeEdict(self);
 		return;
@@ -673,13 +673,13 @@ SP_dm_dball_team1_start(edict_t *self)
 		return;
 	}
 
-	if (!deathmatch->value)
+	if (!deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;
 	}
 
-	if (gamerules && (gamerules->value != RDM_DEATHBALL))
+	if (gamerules && (gamerules->intValue != RDM_DEATHBALL))
 	{
 		G_FreeEdict(self);
 		return;
@@ -698,13 +698,13 @@ SP_dm_dball_team2_start(edict_t *self)
 		return;
 	}
 
-	if (!deathmatch->value)
+	if (!deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;
 	}
 
-	if (gamerules && (gamerules->value != RDM_DEATHBALL))
+	if (gamerules && (gamerules->intValue != RDM_DEATHBALL))
 	{
 		G_FreeEdict(self);
 		return;
@@ -723,13 +723,13 @@ SP_dm_dball_ball_start(edict_t *self)
 		return;
 	}
 
-	if (!deathmatch->value)
+	if (!deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;
 	}
 
-	if (gamerules && (gamerules->value != RDM_DEATHBALL))
+	if (gamerules && (gamerules->intValue != RDM_DEATHBALL))
 	{
 		G_FreeEdict(self);
 		return;
@@ -752,13 +752,13 @@ SP_dm_dball_speed_change(edict_t *self)
 		return;
 	}
 
-	if (!deathmatch->value)
+	if (!deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;
 	}
 
-	if (gamerules && (gamerules->value != RDM_DEATHBALL))
+	if (gamerules && (gamerules->intValue != RDM_DEATHBALL))
 	{
 		G_FreeEdict(self);
 		return;
@@ -808,13 +808,13 @@ SP_dm_dball_goal(edict_t *self)
 		return;
 	}
 
-	if (!(deathmatch->value))
+	if (!(deathmatch->intValue))
 	{
 		G_FreeEdict(self);
 		return;
 	}
 
-	if (gamerules && (gamerules->value != RDM_DEATHBALL))
+	if (gamerules && (gamerules->intValue != RDM_DEATHBALL))
 	{
 		G_FreeEdict(self);
 		return;

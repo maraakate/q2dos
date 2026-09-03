@@ -39,8 +39,10 @@ cvar_t *sv_coop_summon_time; /* FS: Added */
 cvar_t *sv_coop_announce_name_change; /* FS: Added */
 cvar_t *sv_coop_name_timeout; /* FS: Added */
 cvar_t *sv_coop_blinky_cam_disallowflags; /* FS: Added */
+cvar_t *sv_drop_timeout; /* FS: Added */
 cvar_t *sv_spawn_protection; /* FS: Coop: Spawn protection */
 cvar_t *sv_spawn_protection_time; /* FS: Coop: Spawn protection */
+cvar_t *sv_allow_hook; /* FS: Coop: Added */
 cvar_t *motd; /* FS: Coop: Added */
 cvar_t *adminpass; /* FS: Coop: Admin goodies */
 cvar_t *vippass; /* FS: Coop: VIP goodies */
@@ -60,6 +62,8 @@ cvar_t *maxspectators;
 cvar_t *maxentities;
 cvar_t *g_select_empty;
 cvar_t *dedicated;
+cvar_t *flashlightmode;
+cvar_t *sv_filter_wallfly_ip;
 
 cvar_t *filterban;
 
@@ -175,7 +179,7 @@ game_export_t *GetGameAPI (game_import_t *import)
 
 #ifndef GAME_HARD_LINKED
 // this is only here so the functions in q_shared.c and q_shwin.c can link
-void Sys_Error (char *error, ...)
+void Sys_Error (const char *error, ...)
 {
 	va_list		argptr;
 	char		text[1024];
@@ -188,7 +192,7 @@ void Sys_Error (char *error, ...)
 	gi.error ("%s", text);
 }
 
-void Com_Printf (char *msg, ...)
+void Com_Printf (const char *msg, ...)
 {
 	va_list		argptr;
 	char		text[1024];
@@ -227,7 +231,7 @@ void ClientEndServerFrames (void)
 
 	// calc the player views now that all pushing
 	// and damage has been added
-	for (i=0 ; i<maxclients->value ; i++)
+	for (i=0 ; i<maxclients->intValue; i++)
 	{
 		ent = g_edicts + 1 + i;
 
@@ -277,7 +281,7 @@ void EndDMLevel (void)
 	static const char *seps = " ,\n\r";
 
 	/* stay on same level flag */
-	if ((int)dmflags->value & DF_SAME_LEVEL)
+	if (dmflags->intValue & DF_SAME_LEVEL)
 	{
 		BeginIntermission(CreateTargetChangeLevel(level.mapname));
 		return;
@@ -388,12 +392,12 @@ CheckDMRules(void)
 		return;
 	}
 
-	if (!deathmatch->value)
+	if (!deathmatch->intValue)
 	{
 		return;
 	}
 
-	if (gamerules && gamerules->value && DMGame.CheckDMRules) /* FS: Coop: Rogue specific */
+	if (gamerules && gamerules->intValue && DMGame.CheckDMRules) /* FS: Coop: Rogue specific */
 	{
 		if (DMGame.CheckDMRules())
 		{
@@ -411,9 +415,9 @@ CheckDMRules(void)
 		}
 	}
 
-	if (fraglimit->value)
+	if (fraglimit->intValue)
 	{
-		for (i = 0; i < maxclients->value; i++)
+		for (i = 0; i < maxclients->intValue; i++)
 		{
 			cl = game.clients + i;
 
@@ -422,7 +426,7 @@ CheckDMRules(void)
 				continue;
 			}
 
-			if (cl->resp.score >= fraglimit->value)
+			if (cl->resp.score >= fraglimit->intValue)
 			{
 				gi.bprintf(PRINT_HIGH, "Fraglimit hit.\n");
 				EndDMLevel();
@@ -451,7 +455,7 @@ ExitLevel(void)
 	ClientEndServerFrames();
 
 	/* clear some things before going to next level */
-	for (i = 0; i < maxclients->value; i++)
+	for (i = 0; i < maxclients->intValue; i++)
 	{
 		ent = g_edicts + 1 + i;
 
@@ -557,7 +561,7 @@ G_RunFrame(void)
 			}
 		}
 
-		if ((i > 0) && (i <= maxclients->value))
+		if ((i > 0) && (i <= maxclients->intValue))
 		{
 			ClientBeginServerFrame(ent);
 			continue;
@@ -588,6 +592,8 @@ void G_ResetTimer_Hack (void) /* FS: Some of the grossest shit of all time.  Res
 
 		level.framenum = 55; /* FS: Dont start at 0, advance it a bit */
 		level.time = level.framenum * FRAMETIME;
+		if (level.intermissiontime) /* Phatman: This fixes the issue when the intermission gets stuck after idling with no players */
+			level.intermissiontime = level.time;
 		lastgibframe = 0;
 
 		ent = &g_edicts[0];
