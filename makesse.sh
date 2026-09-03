@@ -34,7 +34,7 @@ cp -p readme.txt _build
 cp -p readme.fx _build
 
 cd _build || exit 1
-echo "These SSE builds are entirely UNSUPPORTED and provided only as a convenience!  Please do not send us bug reports from them, Thanks!" > !READ_SSE.txt
+echo "SSE is for Pentium 3 or later processors ONLY.  It takes advantage of additional CPU extensions that can speed up graphics processing.  These SSE builds are entirely UNSUPPORTED and provided only as a convenience!  Please do not send us bug reports from them, Thanks!" > !READ_SSE.txt
 unix2dos -k !READ_SSE.txt
 unix2dos -k readme.txt
 unix2dos -k readme.fx

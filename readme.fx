@@ -64,6 +64,7 @@
 ---------------------------------------------------------
 * -bpp for setting 15, 16, or 32 bpp on Voodoo 4/5 cards.
   "set vid_glbpp" will control the bpp in-game.  Requires a vid_restart.
+  Some drivers do not support 15bpp.
 * gl_dosdriver to have multiple GL DXEs co-existing.  Can be useful for
   testing out performance of Mesa vs Sage or between Mesa versions.  Can be
   used at startup i.e. "+set gl_dosddriver glsage.dxe".  Defaults to gl.dxe
@@ -86,6 +87,8 @@
   the hardware I tested it on I was able to gain a few extra frames in
   timedemos (about 3-4) with 6 with no input lag and I am even able to
   use m_filter in combination with this.
+* FX_GLIDE_ALLOC_COLOR=3 to set triple buffering.  Default is -1
+  (driver decides).  May cause issues on some configurations.
 * SST_SCREENREFRESH for refresh rate control on Voodoo 1, Rush.
 * SSTH3_ALPHADITHERMODE set to 3 for the "Smoother" option that is equivalent
   in the Windows control panel for Alpha Blending Quality.  Values 0-2 all
@@ -99,8 +102,9 @@
     2 - SLI Enabled, AA Disabled (default setting).
     3 - SLI Enabled, 2xAA Enabled. (has issues, see Known General Issues)
     4 - SLI Disabled, 4xAA Enabled.
-  Options 5-8 are for Voodoo 5 6000 users: if you're out there, send me
-  an email!
+  Options 5-8 are for Voodoo 5 6000 user; but SLI, 2xAA and 4xAA modes
+  will automatically be set for the appropriate number of TMUs on the 5500
+  and 6000.
 * SSTV2_SCREENREFRESH for refresh rate control on Voodoo 2.
 * Voodoo 1 users:
   - SST_FASTPCIRD for fast PCI reads.
@@ -127,12 +131,14 @@
 ---------------------------------------------------------
 * MESA_FX_IGNORE_CMBEXT to allow Voodoo 4/5 to perform single-pass
   trilinear.  This also provides a small speed boost of 4-5 fps on average
-  in my timedemo tests with bilinear.  Mesa warns some advanced (multi)texturing
-  modes won't work (GL_EXT_texture_env_combine), but multitexturing is slower
-  in Mesa and is recommended to be disabled (see below).
-* MESA_FX_IGNORE_TEXFMT set to any value (including 0) to disable the
-  32bpp-like quality on 16bpp modes.  This causes a slightly performance hit.
-  This is enabled by default, and only affects Voodoo 4 and 5.
+  in my timedemo tests with bilinear.  Mesa warns some advanced
+  (multi)texturing modes won't work (GL_EXT_texture_env_combine),
+  but multitexturing is slower in Mesa and is recommended to be disabled
+  (see below).
+* MESA_FX_IGNORE_TEXFMT on Voodoo 4/5 set to any value (including 0)
+  to disable the 32bpp-like quality on 16bpp modes.
+* MESA_FX_IGNORE_PIXEXT to force 565 16bpp mode on Voodoo 4/5.
+  (traditional Voodoo, no 32/15bpp).
 
 6 - Interesting Sage parameters
 ---------------------------------------------------------
@@ -149,8 +155,10 @@
   Since most people are likely to be using 16bpp and 640x480 through 1024x768
   gl_ext_multitexture defaults to 0.  If you would like to try it anyways
   set it to 1 and do a vid_restart.
-* 2xAA (With or without SLI) locks if LFB WC is set.  4xAA is OK.
-  A workaround for 2xAA is to SET FX_GLIDE_FORCE_OLD_AA=1.
+* 2xAA (With or without SLI) locks if LFB WC is set on Voodoo 5 5500.
+  4xAA is OK.  A workaround for 2xAA is to SET FX_GLIDE_FORCE_OLD_AA=1.
+* Voodoo 5 6000 clones with 256MB RAM enabled (such as the Strange God)
+  will hardlock during glReadPixels().  This means taking screenshots.
 
 8 - Known Mesa Issues
 ---------------------------------------------------------
@@ -161,7 +169,7 @@
   Mesa DLLs for Windows.
 * Outdoor scenes are slower compared to Windows OpenGL ICD.  This issue
   also exists in Mesa.  You can verify by downloading the Windows Mesa DLLs
-  from http://falconfly.de/ .
+  from FalconFly mirror @ http://www.3dfxarchive.com/ .
 * gl_ext_pointparameters can lock some machines when particles are drawn,
   i.g. if you start a map and try to fire your gun and the game locks up.
   This is why it is disabled by default in Q2DOS.  But if you are using
@@ -173,8 +181,6 @@
 9 - Known Sage Issues
 ---------------------------------------------------------
 * Trilinear filtering does not work on Voodoo 4 and 5.
-* Requires initialization twice for proper performance.  There is a hack in
-  our client which does that automatically already until the issue is fixed.
 
 10 - Other tidbits
 ---------------------------------------------------------

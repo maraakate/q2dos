@@ -53,6 +53,8 @@ By Neozeed, [HCI]Mara'akate, and sezero.
 ---------------------------------------------------------
 * Playing in a Windows 9x DOS box.
 * Several PCI sound cards like AC'97 or HDA (run with -sndpci)
+  - You can also try using SBEMU, a legacy sound blaster emulator for DOS,
+    with your PCI sound card: https://github.com/crazii/SBEMU
 * Mouse wheel support. (see info below.)
 * Hor+ FOV scaling. (see info below.)
 
@@ -108,7 +110,22 @@ By Neozeed, [HCI]Mara'akate, and sezero.
   will set the attractloop mode on which can be used as a hint from the client
   that a demo is currently playing without having to hack between the server
   and client.  Starting a demo with demomap is easy, i.e.  demomap demo1.dm2.
-  The extension must be incldued.
+  The extension must be included.
+* Some PS/2 mice on certain configurations can cause a performance drop when
+  looking around.  Using a serial mouse does not have this issue.  Sometimes
+  reducing the sampling rate can help.  Use m_ps2_sample_rate CVAR with
+  a value of 0-6 for 10hz, 20hz, 40hz, 100hz, and 200hz respectively.
+  40hz seems to work best on my machine.   Additionally, you can set
+  m_ps2_resolution with a value of 0-3 for 1 count per mm, 2 count per mm,
+  4 count per mm (default), and 8 count per mm respectively.  8 count
+  can help give a boost to sensitvity.  Please note these CVARs are not
+  saved.  You will need to add them to autoexec.cfg.  If you have problems
+  with these CVARs or the PS/2 detection for this additional code you can
+  start the game -nops2 parameter to bypass it.
+* SSE compiles are for Pentium 3 or later processors ONLY.  It takes advantage
+  of additional CPU extensions that can speed up graphics processing.
+  SSE builds are entirely UNSUPPORTED and provided only as a convenience!
+  Please do not send us bug reports from them, Thanks!
 
 6 - 3DFX Notes
 ---------------------------------------------------------
@@ -125,7 +142,7 @@ http://dk.toastednet.org/
 Various code from
 * cURL -- (http://curl.haxx.se/)
 * DJGPP community -- (http://www.delorie.com/djgpp/)
-* Gamespy SDK -- Released publically in 2014.
+* Gamespy SDK -- Released publicly in 2014.
 * ggorts -- Ported 3ZB2, Action, Chaos, and DDay to Q2DOS.  Banked VGA code and
             Planar mode help.  3DFX/MesaFX help.
 * Glide Open Source Project -- (http://glide.sourceforge.net/)

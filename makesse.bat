@@ -32,7 +32,7 @@ md release
 cd release
 
 @echo on
-echo These SSE builds are entirely UNSUPPORTED and provided only as a convenience!  Please do not send us bug reports from them, Thanks! > !READ_SSE.txt
+echo SSE is for Pentium 3 or later processors ONLY.  It takes advantage of additional CPU extensions that can speed up graphics processing.  These SSE builds are entirely UNSUPPORTED and provided only as a convenience!  Please do not send us bug reports from them, Thanks! > !READ_SSE.txt
 @echo off
 cd..
 
