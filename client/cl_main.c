@@ -112,6 +112,8 @@ cvar_t	*console_old_complete; /* FS: Old style command completing */
 cvar_t	*cl_autorepeat_allkeys; /* FS: So I can autorepeat whatever I want, hoss. */
 cvar_t	*cl_sleep; /* Knightmare: Added */
 cvar_t	*cl_stufftext_check; /* FS: Added */
+cvar_t	*cl_nochatmsg; /* FS: Added */
+cvar_t	*cl_ignoreplayers; /* FS: Added */
 
 #ifdef GAMESPY
 /* FS: Gamespy CVARs */
@@ -1763,6 +1765,10 @@ void CL_InitLocal (void)
 	Cvar_SetDescription("cl_autorepeat_allkeys", "Allow to autorepeat any key, not just Backspace, Pause, PgUp, and PgDn keys.");
 	cl_stufftext_check = Cvar_Get ("cl_stufftext_check", "0", 0);
 	Cvar_SetDescription("cl_stufftext_check", "Check malicious stufftexts from servers and their admins.  Must explicitly be enabled and will not be saved.  Values higher than 1 will ignore connect stufftexts from WallFly, etc.");
+	cl_nochatmsg = Cvar_Get("cl_nochatmsg", "0", CVAR_ARCHIVE);
+	Cvar_SetDescription("cl_nochatmsg", "Disable chat messages in multiplayer.");
+	cl_ignoreplayers = Cvar_Get("cl_ignoreplayers", "", CVAR_ARCHIVE);
+	Cvar_SetDescription("cl_ignoreplayers", "Ignore messages from specific players in multiplayer.  Separated by semicolons.");
 
 	/* Knightmare: Added */
 	cl_sleep = Cvar_Get("cl_sleep", "0", CVAR_ARCHIVE);

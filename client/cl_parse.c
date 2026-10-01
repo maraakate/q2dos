@@ -49,6 +49,8 @@ char *svc_strings[256] =
 	"svc_frame"
 };
 
+static qboolean CL_UserIsOnIgnoredList (const char *msg);
+
 //=============================================================================
 
 void CL_DownloadFileName(char *dest, int destlen, char *fn)
@@ -970,6 +972,12 @@ void CL_ParseServerMessage (void)
 
 			if (i == PRINT_CHAT)
 			{
+				if (CL_UserIsOnIgnoredList(s) || cl_nochatmsg->intValue) /* FS: Added to ignore trolls on tastyspleen.net:27916. */
+				{
+					con.ormask = 0;
+					break;
+				}
+
 				S_StartLocalSound ("misc/talk.wav");
 				con.ormask = 128;
 
@@ -979,8 +987,8 @@ void CL_ParseServerMessage (void)
 				{
 					cls.spamTime = cls.realtime + 1500; /* FS: 1.5 second delay */
 				}
-
 			}
+
 			Com_Printf("%s", s); /* FS: !version reply */
 
 			con.ormask = 0;
@@ -1063,4 +1071,64 @@ void CL_ParseServerMessage (void)
 
 }
 
+static qboolean CL_UserIsOnIgnoredList (const char *msg)
+{
+	static char *playerList;
+	char separators[] = ";";
+	static char player[32];
+	char *listPtr = NULL;
+	char *playersToken = NULL;
+	int i;
 
+	if (!msg || !cl_ignoreplayers->string[0])
+	{
+		return false;
+	}
+
+	if (cl_ignoreplayers->modified)
+	{
+		if (playerList)
+		{
+			Z_Free(playerList);
+		}
+
+		playerList = CopyString(cl_ignoreplayers->string);
+		if (!playerList)
+		{
+			Com_Error(ERR_FATAL, "CL_UserIsOnIgnoredList(): Failed to allocate memory");
+			return false;
+		}
+		cl_ignoreplayers->modified = false;
+	}
+
+	for (i = 0 ; i < 32; i++)
+	{
+		if (!msg[i] || msg[i] == ':')
+			break;
+	}
+
+	if (i == 0)
+	{
+		return false;
+	}
+
+	Q_strncpyz(player, msg, i+1);
+
+	playersToken = strtok_r(playerList, separators, &listPtr);
+	if (!playersToken)
+	{
+		return false;
+	}
+
+	while (playersToken)
+	{
+		if (!Q_stricmp(player, playersToken))
+		{
+			return true;
+		}
+
+		playersToken = strtok_r(NULL, separators, &listPtr);
+	}
+
+	return false;
+}
