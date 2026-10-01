@@ -292,7 +292,6 @@ void GL_TextureSolidMode (char *string) /* FS: Redid this to initialize a defaul
 	gl_tex_solid_format = gl_solid_modes[i].mode;
 	Com_sprintf(prevTextureMode, sizeof(prevTextureMode), "%s", gl_solid_modes[i].name);
 }
-//#endif	/* end Knightmare */
 
 
 /* Knightmare- added anisotropic filter update */

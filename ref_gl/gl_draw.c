@@ -379,9 +379,9 @@ void Draw_StretchRaw (int x, int y, int w, int h, int cols, int rows, byte *data
 				dest[j] = r_rawpalette[source[ministep]];
 				frac += fracstep;
 			}
-		}	
-	//	qglTexImage2D (GL_TEXTURE_2D, 0, gl_tex_solid_format, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image32);
-		qglTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image32);
+		}
+		qglTexImage2D (GL_TEXTURE_2D, 0, gl_tex_solid_format, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image32);
+		//qglTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image32);
 	}
 	else
 	{
@@ -482,8 +482,8 @@ void Draw_StretchRaw (int x, int y, int w, int h, int cols, int rows, byte *data
 			}
 		}
 
-	//	qglTexImage2D (GL_TEXTURE_2D, 0, gl_tex_solid_format, 256, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, image32);
-		qglTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, 256, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, image32);
+		qglTexImage2D (GL_TEXTURE_2D, 0, gl_tex_solid_format, 256, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, image32);
+		//qglTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, 256, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, image32);
 	}
 	else
 	{
