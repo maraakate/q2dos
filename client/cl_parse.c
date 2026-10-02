@@ -1075,12 +1075,12 @@ static qboolean CL_PlayerIsOnIgnoreList (const char *msg)
 {
 	static char *playerList;
 	char separators[] = ";";
-	static char player[32]; /* FS: FIXME: Pretty sure the hard limit is 16, need to double check in code. */
+	static char player[MAX_NETNAME];
 	char *listPtr = NULL;
 	char *playersToken = NULL;
 	int i;
 
-	if (!msg || !cl_ignoreplayers->string[0])
+	if (!msg || Q_StrIsNullOrEmpty(cl_ignoreplayers->string))
 	{
 		return false;
 	}
@@ -1101,7 +1101,7 @@ static qboolean CL_PlayerIsOnIgnoreList (const char *msg)
 		cl_ignoreplayers->modified = false;
 	}
 
-	for (i = 0 ; i < 32; i++)
+	for (i = 0 ; i < MAX_NETNAME; i++)
 	{
 		if (!msg[i] || msg[i] == ':')
 			break;

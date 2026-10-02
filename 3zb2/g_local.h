@@ -885,7 +885,7 @@ void GetChaseTarget(edict_t *ent);
 typedef struct
 {
 	char		userinfo[MAX_INFO_STRING];
-	char		netname[16];
+	char		netname[MAX_NETNAME];
 	int			hand;
 
 	qboolean	connected;			// a loadgame will leave valid entities that

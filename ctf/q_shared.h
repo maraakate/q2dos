@@ -302,6 +302,7 @@ void Q_strncpyz (char *dst, const char *src, int dstSize);
 void Q_strncatz (char *dst, const char *src, int dstSize);
 char *Q_strlwr (char *string);
 char *Q_strupr (char *string);
+qboolean Q_StrIsNullOrEmpty (const char *str); /* FS */
 
 //=============================================
 
@@ -1309,3 +1310,6 @@ extern int vidref_val;
 #define DEVELOPER_MSG_UNUSED2		0x00008000 // 32768
 #define DEVELOPER_MSG_VERBOSE		0x00010000 // 65536
 #define DEVELOPER_MSG_GAMESPY		0x00020000 // 131072
+
+/* FS: Hardcoded to 16 in netname[].  Made define for clarity. */
+#define MAX_NETNAME					16

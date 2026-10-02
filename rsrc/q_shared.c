@@ -1384,7 +1384,12 @@ void Info_RemoveKey (char *s, char *key)
 	char	value[512];
 	char	*o;
 
-	if (strstr (key, "\\"))
+	if (!s || !key)
+	{
+		return;
+	}
+
+	if (strchr (key, '\\'))
 	{
 //		Com_Printf ("Can't use a key with a \\\n");
 		return;
@@ -1436,9 +1441,11 @@ can mess up the server's parsing
 */
 qboolean Info_Validate (char *s)
 {
-	if (strstr (s, "\""))
+	if (!s)
 		return false;
-	if (strstr (s, ";"))
+	if (strchr (s, '\"'))
+		return false;
+	if (strchr (s, ';'))
 		return false;
 	return true;
 }
@@ -1449,19 +1456,37 @@ void Info_SetValueForKey (char *s, char *key, char *value)
 	int		c;
 	int		maxsize = MAX_INFO_STRING;
 
-	if (strstr (key, "\\") || strstr (value, "\\") )
+	if (!s)
+	{
+		Com_Printf("Info_SetValueForKey: String is NULL\n");
+		return;
+	}
+
+	if (!key)
+	{
+		Com_Printf("Info_SetValueForKey: Key is NULL\n");
+		return;
+	}
+
+	if (!value)
+	{
+		Com_Printf("Info_SetValueForKey: Value is NULL\n");
+		return;
+	}
+
+	if (strchr (key, '\\') || strchr (value, '\\') )
 	{
 		Com_Printf ("Can't use keys or values with a \\\n");
 		return;
 	}
 
-	if (strstr (key, ";") )
+	if (strchr (key, ';') )
 	{
 		Com_Printf ("Can't use keys or values with a semicolon\n");
 		return;
 	}
 
-	if (strstr (key, "\"") || strstr (value, "\"") )
+	if (strchr (key, '\"') || strchr (value, '\"') )
 	{
 		Com_Printf ("Can't use keys or values with a \"\n");
 		return;
@@ -1586,6 +1611,44 @@ char *Q_strupr (char *string)
 	}
 	return string;
 }
+
+static const int BADEMPTYCHARS[] =
+{
+	' ',
+	' ', // <- 96 'No Break Space'
+	'\t',
+	'\n',
+	'\r',
+};
+
+static const size_t BADEMPTYCHARSSIZE = (sizeof(BADEMPTYCHARS) / sizeof(BADEMPTYCHARS[0]));
+
+qboolean Q_StrIsNullOrEmpty (const char *str) /* FS */
+{
+	size_t len, i, j, badchars;
+
+	if (!str || str[0] == '\0')
+		return true;
+
+	len = strlen(str);
+	if (!len)
+		return true;
+
+	for (i = 0, badchars = 0; i <= len; i++)
+	{
+		for (j = 0; j < BADEMPTYCHARSSIZE; j++)
+		{
+			if (str[i] == BADEMPTYCHARS[j])
+				badchars++;
+		}
+	}
+
+	if (badchars == len)
+		return true;
+
+	return false;
+}
+
 
 #if defined(__DJGPP__) || defined(_WIN32)
 char * /* from OpenBSD */

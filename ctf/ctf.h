@@ -66,7 +66,7 @@ typedef enum
 
 typedef struct ghost_s
 {
-	char netname[16];
+	char netname[MAX_NETNAME];
 	int number;
 
 	/* stats */

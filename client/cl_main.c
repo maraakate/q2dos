@@ -2967,7 +2967,7 @@ static void CL_AddIgnorePlayer_f (void)
 	}
 
 	user = Cmd_Argv(1);
-	if (!user || user[0] == '\0')
+	if (Q_StrIsNullOrEmpty(user))
 	{
 		return;
 	}
@@ -3030,7 +3030,7 @@ static void CL_RemoveIgnorePlayer_f (void)
 	}
 
 	user = Cmd_Argv(1);
-	if (!user || user[0] == '\0')
+	if (Q_StrIsNullOrEmpty(user))
 	{
 		return;
 	}

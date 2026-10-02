@@ -1612,6 +1612,44 @@ char *Q_strupr (char *string)
 	return string;
 }
 
+static const int BADEMPTYCHARS[] =
+{
+	' ',
+	' ', // <- 96 'No Break Space'
+	'\t',
+	'\n',
+	'\r',
+};
+
+static const size_t BADEMPTYCHARSSIZE = (sizeof(BADEMPTYCHARS) / sizeof(BADEMPTYCHARS[0]));
+
+qboolean Q_StrIsNullOrEmpty (const char *str) /* FS */
+{
+	size_t len, i, j, badchars;
+
+	if (!str || str[0] == '\0')
+		return true;
+
+	len = strlen(str);
+	if (!len)
+		return true;
+
+	for (i = 0, badchars = 0; i <= len; i++)
+	{
+		for (j = 0; j < BADEMPTYCHARSSIZE; j++)
+		{
+			if (str[i] == BADEMPTYCHARS[j])
+				badchars++;
+		}
+	}
+
+	if (badchars == len)
+		return true;
+
+	return false;
+}
+
+
 #if defined(__DJGPP__) || defined(_WIN32)
 char * /* from OpenBSD */
 strtok_r(char *s, const char *delim, char **last)
