@@ -1085,7 +1085,7 @@ static qboolean CL_PlayerIsOnIgnoreList (const char *msg)
 		return false;
 	}
 
-	if (cl_ignoreplayers->modified)
+	//if (cl_ignoreplayers->modified) /* FS: FIXME: This is inefficient as hell and strtok is going to modify so we have to copy every time. */
 	{
 		if (playerList)
 		{
