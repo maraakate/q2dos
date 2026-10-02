@@ -156,6 +156,9 @@ static void CL_PrintBrowserList_f (void);
 static void CL_LoadGameSpy (void);
 #endif
 
+static void CL_AddIgnorePlayer_f (void);
+static void CL_RemoveIgnorePlayer_f (void);
+
 #ifdef __DJGPP__
 void Sys_Memory_Stats_f (void); /* FS: Added */
 #endif
@@ -1768,7 +1771,7 @@ void CL_InitLocal (void)
 	cl_nochatmsg = Cvar_Get("cl_nochatmsg", "0", CVAR_ARCHIVE);
 	Cvar_SetDescription("cl_nochatmsg", "Disable chat messages in multiplayer.");
 	cl_ignoreplayers = Cvar_Get("cl_ignoreplayers", "", CVAR_ARCHIVE);
-	Cvar_SetDescription("cl_ignoreplayers", "Ignore messages from specific players in multiplayer.  Separated by semicolons.");
+	Cvar_SetDescription("cl_ignoreplayers", "Ignore messages from specific players in multiplayer.  Separated by semicolons.  Use 'addignoreplayer' and 'removeignoreplayer' to modify the list.");
 
 	/* Knightmare: Added */
 	cl_sleep = Cvar_Get("cl_sleep", "0", CVAR_ARCHIVE);
@@ -1870,6 +1873,9 @@ void CL_InitLocal (void)
 
 	CL_LoadGameSpy ();
 #endif /* GAMESPY */
+
+	Cmd_AddCommand("addignoreplayer", CL_AddIgnorePlayer_f);
+	Cmd_AddCommand("removeignoreplayer", CL_RemoveIgnorePlayer_f);
 
 #ifdef __DJGPP__
 	Cmd_AddCommand ("memstats", Sys_Memory_Stats_f); /* FS: Added to keep track of memory usage in DOS */
@@ -2943,4 +2949,137 @@ qboolean CL_IsDemoWithTimeDemo (void)
 	}
 
 	return false;
+}
+
+static void CL_AddIgnorePlayer_f (void)
+{
+	const char *user = NULL;
+	char *playerList = NULL;
+	char separators[] = ";";
+	char *listPtr = NULL;
+	char *playersToken = NULL;
+	size_t len = 0;
+
+	if (Cmd_Argc() != 2)
+	{
+		Com_Printf ("addignoreplayer <username>\n");
+		return;
+	}
+
+	user = Cmd_Argv(1);
+	if (!user || user[0] == '\0')
+	{
+		return;
+	}
+
+	playerList = CopyString(cl_ignoreplayers->string);
+	if (!playerList)
+	{
+		Sys_Error("CL_AddIgnorePlayer_f(): Failed to allocate memory.");
+		return;
+	}
+
+	len = strlen(playerList);
+	playersToken = strtok_r(playerList, separators, &listPtr);
+	if (!playersToken)
+	{
+		Cvar_Set("cl_ignoreplayers", va("%s;", user));
+		Z_Free(playerList);
+		return;
+	}
+
+	while (playersToken)
+	{
+		if (!Q_stricmp(user, playersToken))
+		{
+			Com_Printf("Player '%s' already exists.\n", user);
+			return;
+		}
+
+		playersToken = strtok_r(NULL, separators, &listPtr);
+	}
+
+	if (len >= 1 && cl_ignoreplayers->string[len-1] != ';')
+	{
+		Cvar_Set("cl_ignoreplayers", va("%s;%s;", cl_ignoreplayers->string, user));
+	}
+	else
+	{
+		Cvar_Set("cl_ignoreplayers", va("%s%s;", cl_ignoreplayers->string, user));
+	}
+
+	Com_Printf("Player '%s' added.\n", user); 
+	Z_Free(playerList);
+}
+
+static void CL_RemoveIgnorePlayer_f (void)
+{
+	const char *user = NULL;
+	char *playerList = NULL;
+	char separators[] = ";";
+	char *listPtr = NULL;
+	char *playersToken = NULL;
+	char *ignoreListString = NULL, *ignoreListStart = NULL;
+	size_t len = 0;
+	qboolean bDeleted = false;
+
+	if (Cmd_Argc() != 2)
+	{
+		Com_Printf ("removeignoreplayer <username>\n");
+		return;
+	}
+
+	user = Cmd_Argv(1);
+	if (!user || user[0] == '\0')
+	{
+		return;
+	}
+
+	playerList = CopyString(cl_ignoreplayers->string);
+	if (!playerList)
+	{
+		Sys_Error("CL_RemoveIgnorePlayer_f(): Failed to allocate memory.");
+		return;
+	}
+
+	len = strlen(playerList);
+	ignoreListString = Z_Malloc(len+1);
+	if (!ignoreListString)
+	{
+		Sys_Error("CL_RemoveIgnorePlayer_f(): Failed to allocate memory.");
+		return;
+	}
+
+	ignoreListStart = ignoreListString;
+
+	playersToken = strtok_r(playerList, separators, &listPtr);
+	if (!playersToken)
+	{
+		Cvar_Set("cl_ignoreplayers", va("%s;", user));
+		Z_Free(ignoreListStart);
+		Z_Free(playerList);
+		return;
+	}
+
+	while (playersToken)
+	{
+		if (!Q_stricmp(user, playersToken))
+		{
+			bDeleted = true;
+			playersToken = strtok_r(NULL, separators, &listPtr);
+			continue;
+		}
+		
+		Q_strncatz(ignoreListString, va("%s;", playersToken), len);
+		playersToken = strtok_r(NULL, separators, &listPtr);
+	}
+
+	if (!bDeleted)
+		Com_Printf("Player '%s' not found.\n", user);
+	else
+		Com_Printf("Player '%s' added.\n", user);
+
+	Cvar_Set("cl_ignoreplayers", ignoreListString);
+	Z_Free(ignoreListStart);
+	Z_Free(playerList);
 }

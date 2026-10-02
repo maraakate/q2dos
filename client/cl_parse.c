@@ -49,7 +49,7 @@ char *svc_strings[256] =
 	"svc_frame"
 };
 
-static qboolean CL_UserIsOnIgnoredList (const char *msg);
+static qboolean CL_PlayerIsOnIgnoreList (const char *msg);
 
 //=============================================================================
 
@@ -972,7 +972,7 @@ void CL_ParseServerMessage (void)
 
 			if (i == PRINT_CHAT)
 			{
-				if (CL_UserIsOnIgnoredList(s) || cl_nochatmsg->intValue) /* FS: Added to ignore trolls on tastyspleen.net:27916. */
+				if (CL_PlayerIsOnIgnoreList(s) || cl_nochatmsg->intValue) /* FS: Added to ignore trolls on tastyspleen.net:27916. */
 				{
 					con.ormask = 0;
 					break;
@@ -1071,11 +1071,11 @@ void CL_ParseServerMessage (void)
 
 }
 
-static qboolean CL_UserIsOnIgnoredList (const char *msg)
+static qboolean CL_PlayerIsOnIgnoreList (const char *msg)
 {
 	static char *playerList;
 	char separators[] = ";";
-	static char player[32];
+	static char player[32]; /* FS: FIXME: Pretty sure the hard limit is 16, need to double check in code. */
 	char *listPtr = NULL;
 	char *playersToken = NULL;
 	int i;
@@ -1089,13 +1089,13 @@ static qboolean CL_UserIsOnIgnoredList (const char *msg)
 	{
 		if (playerList)
 		{
-			Z_Free(playerList);
+			Z_Free(playerList); /* FS: FIXME: Should free on exit. */
 		}
 
 		playerList = CopyString(cl_ignoreplayers->string);
 		if (!playerList)
 		{
-			Com_Error(ERR_FATAL, "CL_UserIsOnIgnoredList(): Failed to allocate memory");
+			Sys_Error("CL_PlayerIsOnIgnoreList(): Failed to allocate memory");
 			return false;
 		}
 		cl_ignoreplayers->modified = false;
