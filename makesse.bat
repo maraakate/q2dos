@@ -9,16 +9,22 @@ cd /D "%Q2DOSDEVBASE%"
 
 make %1 %2 %3 %4 %5 %6 %7 %8 %9 -f Makefile.dj clean
 make %1 %2 %3 %4 %5 %6 %7 %8 %9 -f Makefile.dj USE_SSE=1
-upx -9 q2sse.exe
+objcopy --only-keep-debug q2sse.exe q2sse.dbg
+objcopy --strip-debug --strip-unneeded q2sse.exe
+REM upx -9 q2sse.exe
 
 make %1 %2 %3 %4 %5 %6 %7 %8 %9 -f Makefile.dj clean
 make %1 %2 %3 %4 %5 %6 %7 %8 %9 -f Makefile.dj USE_SSE=1 REF_DXE=0 REF_STATIC_GL=1 REFGL_DRIVER=sage
 copy /y q2fx.exe q2sage.exe
-upx -9 q2sage.exe
+objcopy --only-keep-debug q2sage.exe q2sage.dbg
+objcopy --strip-debug --strip-unneeded q2sage.exe
+REM upx -9 q2sage.exe
 
 make %1 %2 %3 %4 %5 %6 %7 %8 %9 -f Makefile.dj clean
 make %1 %2 %3 %4 %5 %6 %7 %8 %9 -f Makefile.dj USE_SSE=1 REF_DXE=0 REF_STATIC_GL=1 REFGL_DRIVER=mesa
-upx -9 q2fx.exe
+objcopy --only-keep-debug q2fx.exe q2fx.dbg
+objcopy --strip-debug --strip-unneeded q2fx.exe
+REM upx -9 q2fx.exe
 
 cd ref_gl
 make %1 %2 %3 %4 %5 %6 %7 %8 %9 -f Makefile.dj clean
@@ -37,8 +43,11 @@ echo SSE is for Pentium 3 or later processors ONLY.  It takes advantage of addit
 cd..
 
 copy q2sse.exe release
+copy q2sse.dbg release
 copy q2fx.exe release
+copy q2fx.dbg release
 copy q2sage.exe release
+copy q2sage.dbg release
 copy ref_gl\ref_gl.dxe release
 copy readme.fx release
 copy readme.txt release

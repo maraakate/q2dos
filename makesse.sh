@@ -11,24 +11,33 @@ mkdir -p _build || exit 1
 
 make CC=$TARGET-gcc -f Makefile.dj clean $*     || exit 1
 make CC=$TARGET-gcc -f Makefile.dj USE_SSE=1 $*     || exit 1
-upx -9 q2sse.exe || exit 1
+objcopy --only-keep-debug q2sse.exe q2sse.dbg
+objcopy --strip-debug --strip-unneeded q2sse.exe
+#upx -9 q2sse.exe || exit 1
 
 make CC=$TARGET-gcc -f Makefile.dj clean $*     || exit 1
 make CC=$TARGET-gcc -f Makefile.dj USE_SSE=1 REF_DXE=0 REF_STATIC_GL=1 REFGL_DRIVER=sage $*     || exit 1
 cp q2fx.exe q2sage.exe
-upx -9 q2sage.exe || exit 1
+objcopy --only-keep-debug q2sage.exe q2sage.dbg
+objcopy --strip-debug --strip-unneeded q2sage.exe
+#upx -9 q2sage.exe || exit 1
 
 rm q2fx.exe
 make CC=$TARGET-gcc -f Makefile.dj clean $*     || exit 1
 make CC=$TARGET-gcc -f Makefile.dj USE_SSE=1 REF_DXE=0 REF_STATIC_GL=1 REFGL_DRIVER=mesa $*     || exit 1
-upx -9 q2fx.exe || exit 1
+objcopy --only-keep-debug q2fx.exe q2fx.dbg
+objcopy --strip-debug --strip-unneeded q2fx.exe
+#upx -9 q2fx.exe || exit 1
 
 make CC=$TARGET-gcc -C ref_gl -f Makefile.dj clean $* || exit 1
 make CC=$TARGET-gcc -C ref_gl -f Makefile.dj USE_SSE=1 $* || exit 1
 
 cp -p q2sse.exe _build
+cp -p q2sse.dbg _build
 cp -p q2fx.exe _build
+cp -p q2fx.dbg _build
 cp -p q2sage.exe _build
+cp -p q2sage.dbg _build
 cp -p ref_gl/ref_gl.dxe _build
 cp -p readme.txt _build
 cp -p readme.fx _build

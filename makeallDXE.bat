@@ -4,8 +4,9 @@ call setenv.bat
 
 make %1 %2 %3 %4 %5 %6 %7 %8 %9 -f Makefile.dj clean
 make %1 %2 %3 %4 %5 %6 %7 %8 %9 -f Makefile.dj
-strip q2.exe
-upx -9 q2.exe
+objcopy --only-keep-debug q2.exe q2.dbg
+objcopy --strip-debug --strip-unneeded q2.exe
+REM upx -9 q2.exe
 
 cd ref_soft
 make %1 %2 %3 %4 %5 %6 %7 %8 %9 -f Makefile.dj clean

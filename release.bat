@@ -26,6 +26,7 @@ md zaero
 cd ..
 
 copy q2.exe release
+copy q2.dbg release
 copy ref_soft\ref_soft.dxe release
 copy ref_gl\ref_gl.dxe release
 copy cwsdpmi.exe release

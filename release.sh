@@ -8,12 +8,15 @@ rm -f $PKG_NAME
 
 . ./cross_defs.dj
 
-echo $TARGET-strip q2.exe
-$TARGET-strip q2.exe || exit 1
+#echo $TARGET-strip q2.exe
+#$TARGET-strip q2.exe || exit 1
+objcopy --only-keep-debug q2.exe q2.dbg
+objcopy --strip-debug --strip-unneeded q2.exe
 
 mkdir -p _build || exit 1
 
 cp -p q2.exe _build
+cp -p q2.dbg _build
 cp -p ref_soft/ref_soft.dxe _build
 cp -p ref_gl/ref_gl.dxe _build
 cp -pr dos/3rdparty/lib_dxe/* _build

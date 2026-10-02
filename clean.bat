@@ -15,6 +15,7 @@ del /s /q gam*.dll
 del /s /q ref*.dxe
 del /s /q ref*.dll
 del /q q2*.exe
+del /q q2*.dbg
 
 cd msvc4-normal
 rmdir /s /q Release
