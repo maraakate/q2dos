@@ -81,9 +81,9 @@ typedef struct
 	void	(*print)(const char *str, ...) __fp_attribute__((__format__(__printf__,1,2)));
 	void	(*dprint)(unsigned int developerFlags, const char *fmt, ...) __fp_attribute__((__format__(__printf__,2,3)));
 	void	(*error)(const char *error, ...) __fp_attribute__((__noreturn__, __format__(__printf__,1,2)));
-	cvar_t	*(*cvar)(char *name, char *value, int flags);
-	cvar_t	*(*cvar_set)(char *name, char *value);
-	cvar_t	*(*cvar_forceset)(char *name, char *value);
+	cvar_t	*(*cvar)(const char *name, const char *value, int flags);
+	cvar_t	*(*cvar_set)(const char *name, const char *value);
+	cvar_t	*(*cvar_forceset)(const char *name, const char *value);
 	char	*(*net_strerror)(void);
 	void	(*run_keyevents)(void);
 	void	(*play_sound)(char *s);

@@ -97,7 +97,7 @@ typedef struct searchpath_s
 searchpath_t	*fs_searchpaths;
 searchpath_t	*fs_base_searchpaths;	// without gamedirs
 
-char *COM_FileExtension (char *in);
+char *COM_FileExtension (const char *in);
 
 /*
 
@@ -138,7 +138,7 @@ FS_TypeFlagForPakItem
 Returns bit flag based on pak item's extension.
 =================
 */
-static unsigned int FS_TypeFlagForPakItem (char *itemName)
+static unsigned int FS_TypeFlagForPakItem (const char *itemName)
 {
 	int		i;	
 	const char	*tmp;
@@ -209,7 +209,7 @@ void	FS_CreatePath (char *path)
 }
 
 // Knightmare- Psychospaz's mod detector
-qboolean FS_ModType (char *name)
+qboolean FS_ModType (const char *name)
 {
 	searchpath_t	*search;
 
@@ -269,7 +269,7 @@ Performs a binary search by hashed filename
 to find pack items in a sorted pack
 =================
 */
-static int FS_FindPackItem (pack_t *pack, char *itemName, long itemHash)
+static int FS_FindPackItem (pack_t *pack, const char *itemName, long itemHash)
 {
 	int		smax, smin, smidpt;	//, counter = 0;
 	int		i;
@@ -312,7 +312,7 @@ a seperate file.
 ===========
 */
 int file_from_pak = 0;
-int FS_FOpenFile (char *filename, FILE **file)
+int FS_FOpenFile (const char *filename, FILE **file)
 {
 	searchpath_t	*search;
 	char			netpath[MAX_OSPATH];
@@ -561,7 +561,7 @@ Filename are reletive to the quake search path
 a null buffer will just return the file length without loading
 ============
 */
-int FS_LoadFile (char *path, void **buffer)
+int FS_LoadFile (const char *path, void **buffer)
 {
 	FILE *h;
 	byte *buf;
@@ -625,10 +625,10 @@ Checks against a blacklist to see if a file
 should not be loaded from a pak.
 =================
 */
-static qboolean FS_FileInPakBlacklist (char *filename)
+static qboolean FS_FileInPakBlacklist (const char *filename)
 {
 	int			i;
-	char		*compare;
+	const char		*compare;
 	qboolean	ignore = false;
 
 	compare = filename;
@@ -799,7 +799,7 @@ static pack_t *FS_LoadPackFile (const char *packfile)
 	return pack;
 }
 
-qboolean FS_FileExists (char *filename) /* FS */
+qboolean FS_FileExists (const char *filename) /* FS */
 {
 	searchpath_t *search;
 	char			netpath[MAX_OSPATH];
@@ -1071,7 +1071,7 @@ FS_SetGamedir
 Sets the gamedir and path to a different directory.
 ================
 */
-void FS_SetGamedir (char *dir)
+void FS_SetGamedir (const char *dir)
 {
 	searchpath_t	*next;
 

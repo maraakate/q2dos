@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "client.h"
 #include "snd_loc.h"
 
-char *svc_strings[256] =
+const char *svc_strings[256] =
 {
 	"svc_bad",
 
@@ -69,7 +69,7 @@ Returns true if the file exists, otherwise it attempts
 to start a download from the server.
 ===============
 */
-qboolean	CL_CheckOrDownloadFile (char *filename)
+qboolean	CL_CheckOrDownloadFile (const char *filename)
 {
 	FILE *fp;
 	char	name[MAX_OSPATH];
@@ -575,7 +575,7 @@ void CL_ParseClientinfo (int player)
 }
 
 // Knightmare added
-qboolean FS_ModType (char *name);
+qboolean FS_ModType (const char *name);
 /*
 ================
 CL_MissionPackCDTrack
@@ -857,10 +857,9 @@ void CL_ParseStartSoundPacket(void)
 		return;
 
 	S_StartSound (pos, ent, channel, cl.sound_precache[sound_num], volume, attenuation, ofs);
-}       
+}
 
-
-void SHOWNET(char *s)
+void SHOWNET(const char *s)
 {
 	if (cl_shownet->intValue >=2)
 		Com_Printf ("%3i:%s\n", net_message.readcount-1, s);
@@ -870,21 +869,21 @@ void SHOWNET(char *s)
        MIA for months moved on to another xatrix server.  The admin started sending
 	   down malicious stufftexts for me to connect elsewhere.  Let's stop that and other
 	   potentially scary shit */
-qboolean CL_MaliciousStuffText(char *s)
+static qboolean CL_MaliciousStuffText (const char *s)
 {
-	if(!cl_stufftext_check->intValue)
+	if (!cl_stufftext_check->intValue)
 		return false;
 
-	if(!s || s[0] == 0)
+	if (Q_StrIsNullOrEmpty(s))
 		return false;
 
-	if((cl_stufftext_check->intValue > 1) && (strstr(s, "connect "))) /* FS: Special case, because you might want to use WallFly to jump from server-to-server, but ignore malicious admin from Friends of Xatrix server. */
+	if ((cl_stufftext_check->intValue > 1) && (strstr(s, "connect "))) /* FS: Special case, because you might want to use WallFly to jump from server-to-server, but ignore malicious admin from Friends of Xatrix server. */
 	{
 		Com_DPrintf (DEVELOPER_MSG_NET, "Ignoring malicious stufftext: %s\n", s);
 		return true;
 	}
 
-	if( (strstr(s, "fov ")) || (strstr(s, "s_mixahead ")) || (strstr(s, "rate ")) || (strstr(s, "cl_maxfps ")) || (strstr(s, "r_maxfps ")) )
+	if ((strstr(s, "fov ")) || (strstr(s, "s_mixahead ")) || (strstr(s, "rate ")) || (strstr(s, "cl_maxfps ")) || (strstr(s, "r_maxfps ")) )
 	{
 		Com_DPrintf (DEVELOPER_MSG_NET, "Ignoring malicious stufftext: %s\n", s);
 		return true;
@@ -1002,7 +1001,7 @@ void CL_ParseServerMessage (void)
 			s = MSG_ReadString (&net_message);
 			Com_DPrintf(DEVELOPER_MSG_NET, "stufftext: %s\n", s);
 
-			if(!CL_MaliciousStuffText(s)) /* FS: See function for more info */
+			if (!CL_MaliciousStuffText(s)) /* FS: See function for more info */
 				Cbuf_AddText (s);
 			break;
 			
@@ -1075,7 +1074,7 @@ static qboolean CL_PlayerIsOnIgnoreList (const char *msg)
 {
 	static char *playerList;
 	char separators[] = ";";
-	static char player[MAX_NETNAME];
+	static char player[MAX_NETNAME+1];
 	char *listPtr = NULL;
 	char *playersToken = NULL;
 	int i;

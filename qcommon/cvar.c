@@ -28,14 +28,14 @@ void Cvar_ParseDeveloperFlags (void); /* FS: Special stuff for showing all the d
 void Cvar_Force_f (void); /* FS: Force a NOSET CVAR (within reason) */
 void Cvar_Toggle_f (void); /* FS: Toggle a CVAR */
 void Cvar_Reset_f (void); /* FS: Reset a CVAR to it's default value */
-qboolean Cvar_Never_Reset_Cmds(char *var_name); /* FS: Tired of copying CVARs everywhere */
+qboolean Cvar_Never_Reset_Cmds(const char *var_name); /* FS: Tired of copying CVARs everywhere */
 
 /*
 ============
 Cvar_InfoValidate
 ============
 */
-static qboolean Cvar_InfoValidate (char *s)
+static qboolean Cvar_InfoValidate (const char *s)
 {
 	if (strchr(s, '\\'))
 		return false;
@@ -53,7 +53,7 @@ static qboolean Cvar_InfoValidate (char *s)
 Cvar_FindVar
 ============
 */
-static cvar_t *Cvar_FindVar (char *var_name)
+static cvar_t *Cvar_FindVar (const char *var_name)
 {
 	cvar_t	*var;
 
@@ -69,7 +69,7 @@ static cvar_t *Cvar_FindVar (char *var_name)
 Cvar_VariableValue
 ============
 */
-float Cvar_VariableValue (char *var_name)
+float Cvar_VariableValue (const char *var_name)
 {
 	cvar_t	*var;
 
@@ -84,7 +84,7 @@ float Cvar_VariableValue (char *var_name)
 Cvar_VariableValue
 ============
 */
-int Cvar_VariableValueInt (char *var_name) /* FS */
+int Cvar_VariableValueInt (const char *var_name) /* FS */
 {
 	cvar_t	*var;
 
@@ -99,7 +99,7 @@ int Cvar_VariableValueInt (char *var_name) /* FS */
 Cvar_VariableString
 ============
 */
-char *Cvar_VariableString (char *var_name)
+char *Cvar_VariableString (const char *var_name)
 {
 	cvar_t *var;
 
@@ -115,7 +115,7 @@ char *Cvar_VariableString (char *var_name)
 Cvar_CompleteVariable
 ============
 */
-char *Cvar_CompleteVariable (char *partial)
+char *Cvar_CompleteVariable (const char *partial)
 {
 	cvar_t		*cvar;
 	int			len;
@@ -147,7 +147,7 @@ If the variable already exists, the value will not be set
 The flags will be or'ed in if the variable exists.
 ============
 */
-cvar_t *Cvar_Get (char *var_name, char *var_value, int flags)
+cvar_t *Cvar_Get (const char *var_name, const char *var_value, int flags)
 {
 	cvar_t	*var;
 
@@ -208,7 +208,7 @@ cvar_t *Cvar_Get (char *var_name, char *var_value, int flags)
 Cvar_Set2
 ============
 */
-cvar_t *Cvar_Set2 (char *var_name, char *value, qboolean force)
+cvar_t *Cvar_Set2 (const char *var_name, const char *value, qboolean force)
 {
 	cvar_t	*var;
 
@@ -305,7 +305,7 @@ cvar_t *Cvar_Set2 (char *var_name, char *value, qboolean force)
 Cvar_ForceSet
 ============
 */
-cvar_t *Cvar_ForceSet (char *var_name, char *value)
+cvar_t *Cvar_ForceSet (const char *var_name, const char *value)
 {
 	return Cvar_Set2 (var_name, value, true);
 }
@@ -315,7 +315,7 @@ cvar_t *Cvar_ForceSet (char *var_name, char *value)
 Cvar_Set
 ============
 */
-cvar_t *Cvar_Set (char *var_name, char *value)
+cvar_t *Cvar_Set (const char *var_name, const char *value)
 {
 	return Cvar_Set2 (var_name, value, false);
 }
@@ -325,7 +325,7 @@ cvar_t *Cvar_Set (char *var_name, char *value)
 Cvar_FullSet
 ============
 */
-cvar_t *Cvar_FullSet (char *var_name, char *value, int flags)
+cvar_t *Cvar_FullSet (const char *var_name, const char *value, int flags)
 {
 	cvar_t	*var;
 
@@ -355,7 +355,7 @@ cvar_t *Cvar_FullSet (char *var_name, char *value, int flags)
 Cvar_SetValue
 ============
 */
-void Cvar_SetValue (char *var_name, float value)
+void Cvar_SetValue (const char *var_name, float value)
 {
 	char	val[32];
 
@@ -488,13 +488,13 @@ Appends lines containing "set variable value" for all variables
 with the archive flag set to true.
 ============
 */
-void Cvar_WriteVariables (char *path)
+void Cvar_WriteVariables (const char *path)
 {
 	cvar_t	*var;
 	char	buffer[1024];
 	FILE	*f;
 
-	if (!path)
+	if (Q_StrIsNullOrEmpty(path))
 	{
 		Com_Error(ERR_DROP, "Cvar_WriteVariables(): Null or empty path.  Aborting.\n");
 		return;
@@ -823,7 +823,7 @@ void Cvar_Force_f (void) /* FS: Added */
 	}
 }
 
-qboolean Cvar_Never_Reset_Cmds(char *var_name) /* FS: Tired of copying CVARs everywhere */
+qboolean Cvar_Never_Reset_Cmds(const char *var_name) /* FS: Tired of copying CVARs everywhere */
 {
 	if(!strcmp(var_name, "dedicated"))
 		return true;
@@ -843,7 +843,7 @@ void Cvar_Reset_f (void) /* FS: Reset a CVAR to its default value */
 {
 	int args;
 	cvar_t *var;
-	char *var_name;
+	const char *var_name;
 
 	args = Cmd_Argc();
 
@@ -930,7 +930,7 @@ void Cvar_ParseDeveloperFlags (void) /* FS: Special stuff for showing all the de
 	}
 }
 
-void Cvar_SetDescription (char *var_name, const char *description) /* FS: Set descriptions for CVARs */
+void Cvar_SetDescription (const char *var_name, const char *description) /* FS: Set descriptions for CVARs */
 {
 	cvar_t	*var = Cvar_FindVar (var_name);
 	if (!var) {

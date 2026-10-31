@@ -387,7 +387,7 @@ typedef struct cvar_s
 	float		value;
 	int			intValue; /* FS: Added */
 	char		*defaultValue; /* FS: Added */
-	const char	*description; /* FS: Added */
+	char		*description; /* FS: Added */
 	int			defaultFlags; /* FS: Added */
 	struct cvar_s *next;
 } cvar_t;

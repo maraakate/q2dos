@@ -176,7 +176,7 @@ void COM_AddParm (char *parm);
 void COM_Init (void);
 void COM_InitArgv (int argc, char **argv);
 
-char *CopyString (char *in);
+char *CopyString (const char *in);
 
 void StripHighBits (char *string, int highbits);
 void ExpandNewLines (char *string);
@@ -493,31 +493,31 @@ interface from being ambiguous.
 
 extern	cvar_t	*cvar_vars;
 
-cvar_t *Cvar_Get (char *var_name, char *value, int flags);
+cvar_t *Cvar_Get (const char *var_name, const char *value, int flags);
 // creates the variable if it doesn't exist, or returns the existing one
 // if it exists, the value will not be changed, but flags will be ORed in
 // that allows variables to be unarchived without needing bitflags
 
-cvar_t 	*Cvar_Set (char *var_name, char *value);
+cvar_t 	*Cvar_Set (const char *var_name, const char *value);
 // will create the variable if it doesn't exist
 
-cvar_t *Cvar_ForceSet (char *var_name, char *value);
+cvar_t *Cvar_ForceSet (const char *var_name, const char *value);
 // will set the variable even if NOSET or LATCH
 
-cvar_t 	*Cvar_FullSet (char *var_name, char *value, int flags);
+cvar_t 	*Cvar_FullSet (const char *var_name, const char *value, int flags);
 
-void	Cvar_SetValue (char *var_name, float value);
+void	Cvar_SetValue (const char *var_name, float value);
 // expands value to a string and calls Cvar_Set
 
-float	Cvar_VariableValue (char *var_name);
+float	Cvar_VariableValue (const char *var_name);
 // returns 0 if not defined or non numeric
 
-int		Cvar_VariableValueInt (char *var_name); /* FS */
+int		Cvar_VariableValueInt (const char *var_name); /* FS */
 
-char	*Cvar_VariableString (char *var_name);
+char	*Cvar_VariableString (const char *var_name);
 // returns an empty string if not defined
 
-char 	*Cvar_CompleteVariable (char *partial);
+char 	*Cvar_CompleteVariable (const char *partial);
 // attempts to match a partial variable name for command line completion
 // returns NULL if nothing fits
 
@@ -529,7 +529,7 @@ qboolean Cvar_Command (void);
 // command.  Returns true if the command was a variable reference that
 // was handled. (print or change)
 
-void 	Cvar_WriteVariables (char *path);
+void 	Cvar_WriteVariables (const char *path);
 // appends lines containing "set variable value" for all variables
 // with the archive flag set to true.
 
@@ -542,7 +542,7 @@ char	*Cvar_Userinfo (void);
 char	*Cvar_Serverinfo (void);
 // returns an info string containing all the CVAR_SERVERINFO cvars
 
-void	Cvar_SetDescription (char *var_name, const char *description);
+void	Cvar_SetDescription (const char *var_name, const char *description);
 /* FS: Set descriptions for CVARs */
 
 extern	qboolean	userinfo_modified;
@@ -739,16 +739,16 @@ typedef enum {
 } fsOrigin_t;
 
 void	FS_InitFilesystem (void);
-void	FS_SetGamedir (char *dir);
+void	FS_SetGamedir (const char *dir);
 char	*FS_Gamedir (void);
 char	*FS_NextPath (char *prevpath);
 void	FS_ExecAutoexec (void);
 
-int		FS_FOpenFile (char *filename, FILE **file);
+int		FS_FOpenFile (const char *filename, FILE **file);
 void	FS_FCloseFile (FILE *f);
 // note: this can't be called from another DLL, due to MS libc issues
 
-int		FS_LoadFile (char *path, void **buffer);
+int		FS_LoadFile (const char *path, void **buffer);
 // a null buffer will just return the file length without loading
 // a -1 length is not present
 
@@ -772,7 +772,7 @@ void		FS_AddPAKFile (const char *packPath);
 qboolean	FS_LocalFileExists (char *path);
 // end Knightmare
 
-qboolean FS_FileExists (char *filename); /* FS */
+qboolean FS_FileExists (const char *filename); /* FS */
 
 /*
 ==============================================================

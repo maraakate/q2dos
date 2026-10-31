@@ -453,7 +453,7 @@ extern	sizebuf_t	net_message;
 
 void DrawString (int x, int y, char *s);
 void DrawAltString (int x, int y, char *s);	// toggle high bit
-qboolean	CL_CheckOrDownloadFile (char *filename);
+qboolean	CL_CheckOrDownloadFile (const char *filename);
 
 void CL_AddNetgraph (void);
 
@@ -651,11 +651,11 @@ void CL_Record_f (void);
 //
 // cl_parse.c
 //
-extern	char *svc_strings[256];
+extern	const char *svc_strings[];
 
 void CL_ParseServerMessage (void);
 void CL_LoadClientinfo (clientinfo_t *ci, char *s);
-void SHOWNET(char *s);
+void SHOWNET(const char *s);
 void CL_ParseClientinfo (int player);
 void CL_Download_f (void);
 void CL_Download_Reset_KBps_counter (void); /* FS: Added KB/s download counter */
