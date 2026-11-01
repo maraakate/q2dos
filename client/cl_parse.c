@@ -1178,5 +1178,13 @@ static qboolean CL_PlayerIsOnIgnoreList (const char *msg)
 		}
 	}
 
+	if (cl_ignoreplayers_blanknames->intValue)
+	{
+		if (strstr(msg, ":") && Q_StrIsNullOrEmpty(player))
+		{
+			return true;
+		}
+	}
+
 	return false;
 }

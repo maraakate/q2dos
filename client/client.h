@@ -412,6 +412,7 @@ extern	cvar_t	*cl_vwep;
 extern	cvar_t	*cl_autorepeat_allkeys; /* FS: Added */
 extern	cvar_t	*cl_nochatmsg; /* FS: Added */
 extern	cvar_t	*cl_ignoreplayers; /* FS: Added */
+extern	cvar_t	*cl_ignoreplayers_blanknames; /* FS: Added */
 
 /* FS: Gamespy stuff */
 extern	cvar_t	*s_gamespy_sounds;

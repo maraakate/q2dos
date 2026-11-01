@@ -114,6 +114,7 @@ cvar_t	*cl_sleep; /* Knightmare: Added */
 cvar_t	*cl_stufftext_check; /* FS: Added */
 cvar_t	*cl_nochatmsg; /* FS: Added */
 cvar_t	*cl_ignoreplayers; /* FS: Added */
+cvar_t	*cl_ignoreplayers_blanknames; /* FS: Added */
 
 #ifdef GAMESPY
 /* FS: Gamespy CVARs */
@@ -1772,6 +1773,8 @@ void CL_InitLocal (void)
 	Cvar_SetDescription("cl_nochatmsg", "Disable chat messages in multiplayer.");
 	cl_ignoreplayers = Cvar_Get("cl_ignoreplayers", "", CVAR_ARCHIVE);
 	Cvar_SetDescription("cl_ignoreplayers", "Ignore messages from specific players in multiplayer.  Separated by semicolons.  Use 'addignoreplayer' and 'removeignoreplayer' to modify the list.");
+	cl_ignoreplayers_blanknames = Cvar_Get("cl_ignoreplayers_blanknames", "0", CVAR_ARCHIVE);
+	Cvar_SetDescription("cl_ignoreplayers_blanknames", "Ignore messages from players with blank names.");
 
 	/* Knightmare: Added */
 	cl_sleep = Cvar_Get("cl_sleep", "0", CVAR_ARCHIVE);
