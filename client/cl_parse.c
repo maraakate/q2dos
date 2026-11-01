@@ -1070,63 +1070,112 @@ void CL_ParseServerMessage (void)
 
 }
 
-static qboolean CL_PlayerIsOnIgnoreList (const char *msg)
+typedef struct
 {
-	static char *playerList;
-	char separators[] = ";";
-	static char player[MAX_NETNAME+1];
+	char player[MAX_NETNAME];
+}ignoreList_t;
+
+#ifndef MAX_PLAYER_IGNORE_LIST
+#define MAX_PLAYER_IGNORE_LIST 1024
+#endif // MAX_PLAYER_IGNORE_LIST
+
+ignoreList_t _playerIgnoreList[MAX_PLAYER_IGNORE_LIST];
+int numIgnorePlayers;
+
+void CL_SetupPlayerIgnoreList (void)
+{
+	char *_playerList;
 	char *listPtr = NULL;
 	char *playersToken = NULL;
-	int i;
+	char separators[] = ";";
 
-	if (!msg || Q_StrIsNullOrEmpty(cl_ignoreplayers->string))
+	if (cl_ignoreplayers->modified)
 	{
-		return false;
-	}
+		cl_ignoreplayers->modified = false;
 
-	//if (cl_ignoreplayers->modified) /* FS: FIXME: This is inefficient as hell and strtok is going to modify so we have to copy every time. */
-	{
-		if (playerList)
+		numIgnorePlayers = 0;
+
+		if (Q_StrIsNullOrEmpty(cl_ignoreplayers->string))
 		{
-			Z_Free(playerList); /* FS: FIXME: Should free on exit. */
+			return;
 		}
 
-		playerList = CopyString(cl_ignoreplayers->string);
-		if (!playerList)
+		_playerList = CopyString(cl_ignoreplayers->string);
+		if (!_playerList)
 		{
 			Sys_Error("CL_PlayerIsOnIgnoreList(): Failed to allocate memory");
-			return false;
+			return;
 		}
-		cl_ignoreplayers->modified = false;
-	}
+		playersToken = strtok_r(_playerList, separators, &listPtr);
+		if (!playersToken)
+		{
+			return;
+		}
 
-	for (i = 0 ; i < MAX_NETNAME; i++)
-	{
-		if (!msg[i] || msg[i] == ':')
-			break;
-	}
+		while (playersToken)
+		{
+			if (numIgnorePlayers + 1 >= MAX_PLAYER_IGNORE_LIST)
+			{
+				Com_Printf("WARNING: Limit of %d players on list reached!\n", MAX_PLAYER_IGNORE_LIST);
+				Z_Free(_playerList);
+				return;
+			}
 
-	if (i == 0)
+			Q_strncpyz(_playerIgnoreList[numIgnorePlayers++].player, playersToken, sizeof(_playerIgnoreList[0].player));
+			playersToken = strtok_r(NULL, separators, &listPtr);
+		}
+
+		Z_Free(_playerList);
+	}
+}
+
+static qboolean CL_PlayerIsOnIgnoreList (const char *msg)
+{
+	static char player[MAX_NETNAME+1];
+	int i;
+
+	if (!msg)
 	{
 		return false;
 	}
 
-	Q_strncpyz(player, msg, i+1);
+	CL_SetupPlayerIgnoreList();
 
-	playersToken = strtok_r(playerList, separators, &listPtr);
-	if (!playersToken)
+	if (msg[0] == '(')
 	{
-		return false;
+		for (i = 1; i < MAX_NETNAME+1; i++)
+		{
+			if (!msg[i] || msg[i] == ')')
+				break;
+		}
+	}
+	else
+	{
+		for (i = 0; i < MAX_NETNAME; i++)
+		{
+			if (!msg[i] || msg[i] == ':')
+				break;
+		}
 	}
 
-	while (playersToken)
+	if (msg[0] == '(')
 	{
-		if (!Q_stricmp(player, playersToken))
+		if (!msg[1])
+			return false;
+
+		Q_strncpyz(player, msg+1, i);
+	}
+	else
+	{
+		Q_strncpyz(player, msg, i+1);
+	}
+
+	for (i = 0; i < numIgnorePlayers; i++)
+	{
+		if (!Q_stricmp(player, _playerIgnoreList[i].player))
 		{
 			return true;
 		}
-
-		playersToken = strtok_r(NULL, separators, &listPtr);
 	}
 
 	return false;
